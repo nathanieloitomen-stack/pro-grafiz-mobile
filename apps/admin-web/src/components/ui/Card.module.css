@@ -1,0 +1,22 @@
+.card {
+  border-radius: var(--pg-radius-job-card);
+  padding: 20px;
+}
+
+.paper {
+  background: #fff;
+  border: 1px solid var(--pg-hairline);
+}
+
+.hero {
+  background: var(--pg-ink);
+  color: var(--pg-paper);
+  border-radius: var(--pg-radius-hero-card);
+  box-shadow: var(--pg-shadow-dark-hero-card);
+}
+
+.clay {
+  background: var(--pg-clay);
+  color: var(--pg-text-warm);
+  border-radius: var(--pg-radius-hero-card);
+}

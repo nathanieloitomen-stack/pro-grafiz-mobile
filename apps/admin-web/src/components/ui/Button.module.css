@@ -1,0 +1,36 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  padding: 0 24px;
+  border-radius: var(--pg-radius-pill);
+  font-family: var(--pg-font-sans);
+  font-size: var(--pg-text-button);
+  font-weight: 700;
+  border: 1.5px solid transparent;
+  transition: transform var(--pg-motion-rise) var(--pg-ease-standard);
+}
+
+.button:active {
+  transform: scale(0.96);
+}
+
+.primary {
+  background: var(--pg-ember);
+  color: var(--pg-paper);
+  box-shadow: var(--pg-shadow-primary-cta);
+}
+
+.primary:disabled {
+  background: var(--pg-hairline-max);
+  box-shadow: none;
+  color: var(--pg-text-faint);
+  cursor: not-allowed;
+}
+
+.secondary {
+  background: transparent;
+  color: var(--pg-ink);
+  border-color: var(--pg-hairline-max);
+}

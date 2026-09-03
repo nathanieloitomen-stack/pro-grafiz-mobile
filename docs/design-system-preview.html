@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Pro_Grafiz — Design System Preview (PG-002)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- Best-effort web font load for local preview only; falls back to
+     system fonts offline. Not used by the actual apps — see
+     apps/mobile/README.md and apps/admin-web/README.md for how fonts
+     are wired there. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Karla:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --pg-ink: #1e1613; --pg-ink-deep: #141010; --pg-paper: #fbf4ea; --pg-paper-warm: #f6ede1;
+  --pg-clay: #f2e4d2; --pg-clay-deep: #ede2d4;
+  --pg-ember: #c33b22; --pg-ember-bright: #e8452b; --pg-ember-dark: #9e2c16; --pg-amber: #f0a03c;
+  --pg-text-mid: #5c4b3f; --pg-text-soft: #8a7566; --pg-text-faint: #a08f80; --pg-text-warm: #6e5a4c; --pg-text-dark: #3a2e27;
+  --pg-success-bg: #e4efe7; --pg-success-fg: #2f6b57;
+  --pg-warning-bg: #faefd8; --pg-warning-fg: #8a6314; --pg-warning-dot: #b07a1c;
+  --pg-danger-bg: #f6e3de; --pg-danger-fg: #a33b22;
+  --pg-auto-bg: #f3eff7; --pg-auto-fg: #5b4a7a; --pg-auto-tag-bg: #ede6f3;
+  --pg-hairline: rgba(30,22,19,.12);
+  --pg-font-serif: 'Instrument Serif', Georgia, serif;
+  --pg-font-sans: 'Karla', -apple-system, sans-serif;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--pg-paper); color: var(--pg-ink);
+  font-family: var(--pg-font-sans); font-size: 13.5px; line-height: 1.55;
+  padding: 32px; max-width: 920px; margin-inline: auto;
+}
+h1, h2, h3 { font-family: var(--pg-font-serif); font-weight: 400; letter-spacing: -0.02em; margin: 0 0 4px; }
+section { margin-bottom: 48px; }
+.label { font-size: 11px; text-transform: uppercase; letter-spacing: .16em; color: var(--pg-text-soft); font-weight: 700; margin-bottom: 12px; display: block; }
+.row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+
+/* Colour swatches */
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+.swatch { border-radius: 14px; overflow: hidden; border: 1px solid var(--pg-hairline); }
+.swatch .fill { height: 56px; }
+.swatch .meta { padding: 8px 10px; background: #fff; font-size: 11.5px; }
+.swatch .meta b { display: block; font-size: 12.5px; }
+
+/* Type scale */
+.type-row { display: flex; align-items: baseline; gap: 16px; padding: 10px 0; border-bottom: 1px solid var(--pg-hairline); }
+.type-row .px { width: 64px; flex-shrink: 0; font-family: var(--pg-font-sans); font-size: 11px; color: var(--pg-text-faint); }
+.serif { font-family: var(--pg-font-serif); }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; justify-content: center; height: 50px; padding: 0 24px; border-radius: 999px; font-family: var(--pg-font-sans); font-size: 14px; font-weight: 700; border: 1.5px solid transparent; cursor: pointer; }
+.btn-primary { background: var(--pg-ember); color: var(--pg-paper); box-shadow: 0 10px 22px -12px rgba(195,59,34,.9); }
+.btn-secondary { background: transparent; color: var(--pg-ink); border-color: rgba(30,22,19,.16); }
+
+/* Pills / tags */
+.pill { display: inline-flex; align-items: center; padding: 10px 16px; border-radius: 999px; border: 1px solid var(--pg-hairline); background: #fff; font-size: 14px; }
+.pill.selected { background: var(--pg-ink); border-color: var(--pg-ink); color: var(--pg-paper); font-weight: 700; }
+.tag { display: inline-flex; padding: 5px 10px; border-radius: 999px; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+.tag.success { background: var(--pg-success-bg); color: var(--pg-success-fg); }
+.tag.warning { background: var(--pg-warning-bg); color: var(--pg-warning-fg); }
+.tag.danger { background: var(--pg-danger-bg); color: var(--pg-danger-fg); }
+.tag.auto { background: var(--pg-auto-tag-bg); color: var(--pg-auto-fg); }
+
+/* Cards */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.card { border-radius: 26px; padding: 20px; }
+.card.paper { background: #fff; border: 1px solid var(--pg-hairline); }
+.card.hero { background: var(--pg-ink); color: var(--pg-paper); border-radius: 28px; box-shadow: 0 14px 30px -18px rgba(30,22,19,.85); }
+.card.clay { background: var(--pg-clay); color: var(--pg-text-warm); border-radius: 28px; }
+
+/* Radius scale */
+.radii { display: flex; gap: 16px; flex-wrap: wrap; }
+.radius-sample { width: 72px; height: 72px; background: var(--pg-clay-deep); display: flex; align-items: center; justify-content: center; font-size: 10.5px; color: var(--pg-text-mid); text-align: center; }
+</style>
+</head>
+<body>
+
+<header style="margin-bottom:40px;">
+  <span class="label">Pro_Grafiz — PG-002</span>
+  <h1 style="font-size:38px;">Design System Preview</h1>
+  <p style="color:var(--pg-text-soft); margin-top:8px;">
+    Static, dependency-free reference for visually verifying tokens against the approved
+    design handoff. Not part of the shipped app — see <code>docs/design-system.md</code>.
+  </p>
+</header>
+
+<section>
+  <span class="label">Colour — Ground &amp; Action</span>
+  <div class="swatches">
+    <div class="swatch"><div class="fill" style="background:var(--pg-ink)"></div><div class="meta"><b>Ink</b>#1E1613</div></div>
+    <div class="swatch"><div class="fill" style="background:var(--pg-ink-deep)"></div><div class="meta"><b>Ink deep</b>#141010</div></div>
+    <div class="swatch"><div class="fill" style="background:var(--pg-paper); border-bottom:1px solid var(--pg-hairline)"></div><div class="meta"><b>Paper</b>#FBF4EA</div></div>
+    <div class="swatch"><div class="fill" style="background:var(--pg-paper-warm)"></div><div class="meta"><b>Paper warm</b>#F6EDE1</div></div>
+    <div class="swatch"><div class="fill" style="background:var(--pg-clay)"></div><div class="meta"><b>Clay</b>#F2E4D2</div></div>
+    <div class="swatch"><div class="fill" style="background:var(--pg-clay-deep)"></div><div class="meta"><b>Clay deep</b>#EDE2D4</div></div>
+    <div class="swatch"><div class="fill" style="background:var(--pg-ember)"></div><div class="meta"><b>Ember</b>#C33B22</div></div>
+    <div class="swatch"><div class="fill" style="background:var(--pg-ember-bright)"></div><div class="meta"><b>Ember bright</b>#E8452B</div></div>
+    <div class="swatch"><div class="fill" style="background:var(--pg-amber)"></div><div class="meta"><b>Amber</b>#F0A03C</div></div>
+  </div>
+</section>
+
+<section>
+  <span class="label">Colour — Status</span>
+  <div class="row">
+    <span class="tag success">Matched</span>
+    <span class="tag warning">On hold</span>
+    <span class="tag danger">No match</span>
+    <span class="tag auto">Auto-draft</span>
+  </div>
+</section>
+
+<section>
+  <span class="label">Typography — Instrument Serif</span>
+  <div class="type-row"><span class="px">38 / hero</span><span class="serif" style="font-size:38px;">Pro_Grafiz</span></div>
+  <div class="type-row"><span class="px">30 / title</span><span class="serif" style="font-size:30px;">Job PG-2492</span></div>
+  <div class="type-row"><span class="px">26 / card</span><span class="serif" style="font-size:26px;">Deposit confirmed</span></div>
+  <div class="type-row"><span class="px">23 / section</span><span class="serif" style="font-size:23px;">Suggested designs</span></div>
+  <div class="type-row"><span class="px">21 / quote</span><span class="serif" style="font-size:21px; font-style:italic;">"Match the pattern on my neighbour's gate."</span></div>
+  <div class="type-row"><span class="px">19 / numeric</span><span class="serif" style="font-size:19px;">₦486,000</span></div>
+
+  <span class="label" style="margin-top:24px;">Typography — Karla</span>
+  <div class="type-row"><span class="px">15 / input</span><span style="font-size:15px;">1800 × 2400 mm</span></div>
+  <div class="type-row"><span class="px">14 / button</span><span style="font-size:14px; font-weight:700;">Send to Pro_Grafiz</span></div>
+  <div class="type-row"><span class="px">13.5 / body</span><span style="font-size:13.5px;">Bank-reference matching replaces screenshot approval.</span></div>
+  <div class="type-row"><span class="px">12.5 / meta</span><span style="font-size:12.5px; color:var(--pg-text-soft);">3 hrs ago · Owode</span></div>
+  <div class="type-row"><span class="px">11 / label</span><span style="font-size:11px; text-transform:uppercase; letter-spacing:.16em; font-weight:700; color:var(--pg-text-soft);">Material</span></div>
+  <div class="type-row"><span class="px">10.5 / tag</span><span class="tag auto">Auto-draft</span></div>
+</section>
+
+<section>
+  <span class="label">Buttons</span>
+  <div class="row">
+    <button class="btn btn-primary">Primary action</button>
+    <button class="btn btn-secondary">Secondary action</button>
+  </div>
+</section>
+
+<section>
+  <span class="label">Pills</span>
+  <div class="row">
+    <span class="pill selected">All</span>
+    <span class="pill">Geometric Lattice</span>
+    <span class="pill">Hexagonal</span>
+    <span class="pill">Islamic Star</span>
+  </div>
+</section>
+
+<section>
+  <span class="label">Cards</span>
+  <div class="cards">
+    <div class="card hero">
+      <div style="font-size:10.5px; text-transform:uppercase; letter-spacing:.1em; opacity:.7; margin-bottom:6px;">Live job</div>
+      <h2 style="font-size:26px; color:var(--pg-paper);">Cutting</h2>
+      <p style="opacity:.8; margin-top:8px;">PG-2489 · Maraba</p>
+    </div>
+    <div class="card paper">
+      <h3 style="font-size:23px;">Eight Point</h3>
+      <p style="color:var(--pg-text-soft); margin-top:8px;">PGLC0601 · Islamic Star</p>
+    </div>
+    <div class="card clay">
+      <h3 style="font-size:23px; color:var(--pg-text-warm);">36,000 clients</h3>
+      <p style="margin-top:8px;">642 projects delivered</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="label">Radius scale</span>
+  <div class="radii">
+    <div class="radius-sample" style="border-radius:999px;">pill<br/>999</div>
+    <div class="radius-sample" style="border-radius:28px;">hero<br/>28</div>
+    <div class="radius-sample" style="border-radius:26px;">job card<br/>26</div>
+    <div class="radius-sample" style="border-radius:24px;">list<br/>24</div>
+    <div class="radius-sample" style="border-radius:20px;">thumb<br/>20</div>
+    <div class="radius-sample" style="border-radius:16px;">icon<br/>16</div>
+  </div>
+</section>
+
+<footer style="color:var(--pg-text-faint); font-size:11.5px; margin-top:48px;">
+  Source of truth for every value on this page: the approved design handoff README
+  ("Design tokens"). See <code>docs/design-system.md</code> for where each token lives in code.
+</footer>
+
+</body>
+</html>

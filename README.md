@@ -38,9 +38,12 @@ pro-grafiz/
 
 ## Status
 
-**PG-001 (Foundation) — scaffolding only.** No database schema, no
-authentication, no payment integration, no catalogue data, and no UI
-screens exist yet. See [`PRO_GRAFIZ_MASTER_SPEC.md`](./PRO_GRAFIZ_MASTER_SPEC.md#17-development-sequence)
+**PG-001 (Foundation) and PG-002 (Design System) complete.** Design
+tokens (colour, typography, spacing, radius, shadow, motion) and a small
+library of generic, content-free components exist in both apps — see
+[`docs/design-system.md`](./docs/design-system.md). No database schema,
+authentication, payment integration, catalogue data, or feature screens
+exist yet. See [`PRO_GRAFIZ_MASTER_SPEC.md`](./PRO_GRAFIZ_MASTER_SPEC.md#17-development-sequence)
 for the full task sequence. Do not implement tasks beyond the currently
 authorized one in a single pass.
 

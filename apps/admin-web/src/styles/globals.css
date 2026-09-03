@@ -1,0 +1,67 @@
+@import './tokens.css';
+
+/* Once next/font/google resolves (see layout.tsx), it exposes the actual
+   font family via these CSS variables on <html>. Layer them in front of
+   the fallback chain defined in tokens.css so the tokens keep working
+   even before fonts are wired up (e.g. in isolated component previews). */
+html {
+  --pg-font-serif: var(--pg-font-serif-loaded, 'Instrument Serif', Georgia, serif);
+  --pg-font-sans: var(--pg-font-sans-loaded, 'Karla', -apple-system, BlinkMacSystemFont, sans-serif);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  background: var(--pg-paper);
+  color: var(--pg-ink);
+  font-family: var(--pg-font-sans);
+  font-size: var(--pg-text-body);
+  line-height: 1.55;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--pg-font-serif);
+  font-weight: 400;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  font-size: var(--pg-text-screen-title);
+}
+h2 {
+  font-size: var(--pg-text-card-title);
+}
+h3 {
+  font-size: var(--pg-text-section-head);
+}
+
+button {
+  font-family: var(--pg-font-sans);
+  cursor: pointer;
+}
+
+/* No hover styling per the approved design ("it is a touch app") —
+   the admin web surface is desktop/keyboard-first, so a restrained
+   hover state is reasonable here even though mobile has none. Keep it
+   subtle and don't reintroduce ripple/elevation effects. */
+a {
+  color: var(--pg-ember);
+}
+a:hover {
+  color: var(--pg-ember-dark);
+}
+
+::selection {
+  background: var(--pg-clay-deep);
+}

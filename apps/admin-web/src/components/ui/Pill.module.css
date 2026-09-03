@@ -1,0 +1,24 @@
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-radius: var(--pg-radius-pill);
+  font-family: var(--pg-font-sans);
+  font-size: var(--pg-text-button);
+  border: 1px solid var(--pg-hairline);
+  background: #fff;
+  color: var(--pg-ink);
+  transition: transform var(--pg-motion-rise) var(--pg-ease-standard);
+}
+
+.pill:active {
+  transform: scale(0.96);
+}
+
+.selected {
+  background: var(--pg-ink);
+  border-color: var(--pg-ink);
+  color: var(--pg-paper);
+  font-weight: 700;
+}

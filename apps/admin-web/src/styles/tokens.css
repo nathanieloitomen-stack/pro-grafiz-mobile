@@ -1,0 +1,113 @@
+/**
+ * Pro_Grafiz design tokens — CSS custom properties.
+ *
+ * Source of truth: the approved design handoff README, "Design tokens".
+ * Mirrors apps/mobile/lib/shared/design_system/tokens/*.dart — if the two
+ * ever disagree, treat the handoff README as authoritative and fix
+ * whichever file drifted.
+ *
+ * The admin web app is a staff surface (branch/central admin), so it
+ * reuses the same colour/type/spacing language as the mobile staff
+ * surface rather than inventing a separate visual system.
+ */
+
+:root {
+  /* Ground */
+  --pg-ink: #1e1613;
+  --pg-ink-deep: #141010;
+  --pg-paper: #fbf4ea;
+  --pg-paper-warm: #f6ede1;
+  --pg-clay: #f2e4d2;
+  --pg-clay-deep: #ede2d4;
+
+  /* Action */
+  --pg-ember: #c33b22;
+  --pg-ember-bright: #e8452b;
+  --pg-ember-dark: #9e2c16;
+  --pg-amber: #f0a03c;
+
+  /* Text */
+  --pg-text-mid: #5c4b3f;
+  --pg-text-soft: #8a7566;
+  --pg-text-faint: #a08f80;
+  --pg-text-warm: #6e5a4c;
+  --pg-text-dark: #3a2e27;
+
+  /* Status */
+  --pg-success-bg: #e4efe7;
+  --pg-success-fg: #2f6b57;
+  --pg-warning-bg: #faefd8;
+  --pg-warning-fg: #8a6314;
+  --pg-warning-dot: #b07a1c;
+  --pg-danger-bg: #f6e3de;
+  --pg-danger-fg: #a33b22;
+  --pg-auto-bg: #f3eff7;
+  --pg-auto-fg: #5b4a7a;
+  --pg-auto-tag-bg: #ede6f3;
+
+  /* Hairline — approved opacity range .07–.16 against ink; default .12 */
+  --pg-hairline: rgba(30, 22, 19, 0.12);
+  --pg-hairline-min: rgba(30, 22, 19, 0.07);
+  --pg-hairline-max: rgba(30, 22, 19, 0.16);
+
+  /* Material fills (pattern previews) */
+  --pg-material-mild-steel: #4a4038;
+  --pg-material-stainless: #8b8f93;
+  --pg-material-aluminium: #a9aeb2;
+  --pg-material-corten: #8c4a2b;
+  --pg-material-black: #1e1613;
+  --pg-material-bg-steel: #ede2d4;
+  --pg-material-bg-stainless: #e6e7e4;
+  --pg-material-bg-aluminium: #e9ebec;
+  --pg-material-bg-corten: #f0dccb;
+
+  /* Typography — families set by next/font in layout.tsx; these vars
+     are the fallback chain used until that's wired to real font files. */
+  --pg-font-serif: 'Instrument Serif', Georgia, serif;
+  --pg-font-sans: 'Karla', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Type scale (px) */
+  --pg-text-hero: 38px;
+  --pg-text-screen-title: 30px;
+  --pg-text-card-title: 26px;
+  --pg-text-section-head: 23px;
+  --pg-text-quote: 21px;
+  --pg-text-numeric: 19px;
+  --pg-text-input: 15px;
+  --pg-text-button: 14px;
+  --pg-text-body: 13.5px;
+  --pg-text-meta: 12.5px;
+  --pg-text-caption: 11.5px;
+  --pg-text-label: 11px;
+  --pg-text-tag: 10.5px;
+
+  /* Spacing */
+  --pg-space-screen-x: 18px;
+  --pg-space-section-gap: 20px;
+  --pg-space-group-gap: 12px;
+  --pg-space-label-to-value: 8px;
+
+  /* Radius */
+  --pg-radius-pill: 999px;
+  --pg-radius-hero-card: 28px;
+  --pg-radius-job-card: 26px;
+  --pg-radius-list-group: 24px;
+  --pg-radius-inset-note: 22px;
+  --pg-radius-thumbnail: 20px;
+  --pg-radius-small-note: 18px;
+  --pg-radius-icon-tile: 16px;
+  --pg-radius-bottom-sheet-top: 32px;
+
+  /* Shadows — exactly three in the approved design */
+  --pg-shadow-dark-hero-card: 0 14px 30px -18px rgba(30, 22, 19, 0.85);
+  --pg-shadow-primary-cta: 0 10px 22px -12px rgba(195, 59, 34, 0.9);
+  --pg-shadow-bottom-sheet: 0 -20px 50px -20px rgba(30, 22, 19, 0.6);
+
+  /* Motion */
+  --pg-motion-pulse: 1.8s;
+  --pg-motion-rise: 0.25s;
+  --pg-motion-toast: 2.6s;
+  --pg-motion-progress: 0.6s;
+  --pg-motion-zoom: 0.25s;
+  --pg-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+}
