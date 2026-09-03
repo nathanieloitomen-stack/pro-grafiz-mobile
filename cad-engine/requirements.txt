@@ -1,0 +1,2 @@
+# No dependencies yet — cad-engine implementation starts at PG-015
+# (or earlier if V1 scope requires a minimal DXF/check path; see README.md).

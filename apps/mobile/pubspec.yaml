@@ -1,0 +1,50 @@
+name: pro_grafiz_mobile
+description: >
+  Pro_Grafiz customer and staff mobile app (Flutter). One install, two
+  surfaces: customer catalogue/quote/job-tracking and staff intake/queue/
+  design-desk/payments, gated by role.
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+# NOTE: version constraints below were written without access to a live
+# pub.dev registry (sandboxed authoring environment, no network). Run
+# `flutter pub outdated` before first `pub get` and adjust to current
+# stable releases rather than trusting these numbers blindly.
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Backend
+  supabase_flutter: ^2.5.0
+
+  # Offline-first local database (Master Spec ยง3 offline architecture)
+  drift: ^2.16.0
+  sqlite3_flutter_libs: ^0.5.20
+  path_provider: ^2.1.0
+  path: ^1.9.0
+
+  # State management
+  flutter_riverpod: ^2.5.0
+
+  # Notifications
+  firebase_core: ^2.27.0
+  firebase_messaging: ^14.7.0
+
+  # Utilities
+  intl: ^0.19.0
+  uuid: ^4.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  drift_dev: ^2.16.0
+  build_runner: ^2.4.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/pglc/

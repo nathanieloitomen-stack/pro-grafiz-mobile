@@ -1,0 +1,28 @@
+# Local Supabase project config skeleton (PG-001).
+# No schema, RLS policies, or Edge Functions exist yet — see
+# migrations/ and PRO_GRAFIZ_MASTER_SPEC.md Section 7 for what's coming
+# in PG-003/PG-005.
+#
+# This file was authored without running `supabase init` (no network/
+# CLI access in the authoring environment). Regenerate or reconcile
+# against `supabase init` output once the Supabase CLI is available,
+# rather than trusting these defaults blindly.
+
+project_id = "pro-grafiz"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage"]
+
+[db]
+port = 54322
+
+[studio]
+enabled = true
+port = 54323
+
+[storage]
+enabled = true
+# Buckets are created via migration, not here, once PG-003/PG-011 define
+# the private storage layout (previews vs. production DXF vs. documents).
