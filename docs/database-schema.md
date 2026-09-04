@@ -1,23 +1,114 @@
 # Database Schema
 
-**Status: not started. Owned by PG-003.**
+**Status: PG-003 complete.** 28 tables across 12 migrations in
+`supabase/migrations/`. No Row Level Security — that's PG-005,
+deliberately separate. No authentication wiring — that's PG-004. This
+migration set was authored without a live Postgres instance or the
+Supabase CLI (no network access) — see "Verification" below before
+trusting it applies cleanly.
 
-No migrations exist yet (`supabase/migrations/` is empty). This document
-will hold, once PG-003 lands:
+## Migration order
 
-- Entity-relationship overview
-- Table-by-table reference (columns, types, constraints, indexes)
-- RLS policy summary per table (cross-referenced with PG-005)
-- Naming conventions for human-readable business references
-  (`PGLCxxxx`, `PGMXxxxx`, `QR-xxxx`, `PG-xxxx`, `PGJO-xxxx`, `PGAO-xxxx`)
+| File | Contents |
+|---|---|
+| `20260904000001_extensions_and_functions.sql` | `pgcrypto`, shared `set_updated_at()` trigger |
+| `20260904000002_enums.sql` | `role_enum`, `job_stage_enum`, `job_status_enum`, `payment_status_enum`, `document_type_enum`, `asset_type_enum`, `check_result_enum` |
+| `20260904000003_lookup_tables.sql` | `branches`, `pattern_categories`, `materials`, `material_thicknesses`, `finishes` |
+| `20260904000004_profiles_and_customers.sql` | `profiles`, `customers` |
+| `20260904000005_catalogue.sql` | `patterns`, `pattern_assets`, **`blends`, `blend_patterns`** (see Gap-fill below) |
+| `20260904000006_sketches_and_quoting.sql` | `sketches`, `quote_requests`, `quotes` |
+| `20260904000007_jobs.sql` | `jobs`, `job_stage_history`, `design_revisions` |
+| `20260904000008_drafts_and_cad.sql` | `drafts`, `draft_checks` |
+| `20260904000009_payments.sql` | `payments`, `payment_events` |
+| `20260904000010_documents_and_dxf.sql` | `documents`, `dxf_release_grants`, `dxf_download_logs` |
+| `20260904000011_notifications_and_offline.sql` | `notifications`, `devices`, `offline_actions` |
+| `20260904000012_audit.sql` | `audit_events` |
 
-The authoritative table list (26 tables: `branches`, `profiles`,
-`pattern_categories`, `patterns`, `pattern_assets`, `materials`,
-`material_thicknesses`, `finishes`, `customers`, `sketches`,
-`quote_requests`, `quotes`, `jobs`, `job_stage_history`,
-`design_revisions`, `drafts`, `draft_checks`, `payments`,
-`payment_events`, `documents`, `dxf_release_grants`,
-`dxf_download_logs`, `notifications`, `devices`, `offline_actions`,
-`audit_events`) is defined in `PRO_GRAFIZ_MASTER_SPEC.md`, Section 7.
-Treat that section as authoritative until this document is populated by
-PG-003; do not hand-edit production schema outside a migration.
+All 26 tables from `PRO_GRAFIZ_MASTER_SPEC.md` §7 exist, plus two
+gap-fill tables (below). UUID primary keys (`gen_random_uuid()`,
+built into Postgres 13+, no extension needed), foreign keys, indexes on
+every FK column, and `timestamptz` timestamps defaulting to
+`timezone('utc', now())` throughout, per the Master Spec's general
+schema conventions.
+
+## Gap-fill: `blends` and `blend_patterns`
+
+Master Spec §7 does not enumerate a `blends` table, but
+`quote_requests.blend_id` and `jobs.blend_id` — both defined in that
+same section — clearly reference one, and `CLAUDE.md`'s business rules
+independently state: "Blends contain 2–3 patterns; order is
+significant." Two tables were added to satisfy that:
+
+- `blends` — minimal header row
+- `blend_patterns` — join table with an ordered `position` (1–3), plus a
+  deferred constraint trigger (`trg_check_blend_pattern_count`) enforcing
+  the 2–3 count at transaction commit
+
+This fills a structural gap using a rule already stated elsewhere in the
+provided docs, not an invented one — but it wasn't in the enumerated
+table list, so treat the exact shape as provisional until the product
+owner confirms it.
+
+## Human-readable references
+
+`CLAUDE.md` fixes four prefix formats explicitly: `PGLCxxxx` (patterns),
+`QR-xxxx` (quote requests), `PG-xxxx` (jobs), `PGJO-xxxx` / `PGAO-xxxx`
+(documents, by type). All four are implemented as sequence-backed
+generator functions with column defaults (or a `BEFORE INSERT` trigger
+for documents, since the prefix depends on the row's own `type` column).
+
+Three reference-like columns exist in the schema with **no format given
+anywhere in the provided docs**: `customers.customer_ref`,
+`quotes.quote_ref`, `payments.payment_ref`. These are plain unique `text`
+columns with no auto-generator — confirm a format with the product owner
+rather than inventing one. `PGMXxxxx`, listed in `CLAUDE.md` but not
+mapped to any specific table in the Master Spec's §7 list, is in the
+same position — not wired to anything yet.
+
+## Columns left as plain `text` instead of an enum
+
+Per `CLAUDE.md`: "Never invent business rules just to keep coding."
+Enums were only created where the source docs give an explicit, closed
+value list. Everywhere a status-like column exists without one, it's
+`text` with a comment in the migration explaining what's known and what
+isn't:
+
+- `sketches.status`, `quote_requests.status`, `quotes.status`,
+  `design_revisions.status`, `drafts.release_status`,
+  `devices.sync_state`, `offline_actions.status`, `payments.kind`,
+  `notifications.type`
+
+`jobs.status` (`active` / `on_hold` / `cancelled`) is the one exception
+made an enum despite no explicit list — it's a direct structural
+inference from the `hold_reason`/`cancel_reason` columns the Master Spec
+itself already defines, not new logic. Flagged in the migration comment
+regardless.
+
+## Two open modeling questions, flagged rather than guessed
+
+- `design_revisions.requested_by` references `profiles(id)`, but the
+  customer-approval flow (Master Spec's customer journey) implies a
+  customer can request a change, and customers aren't `profiles` rows.
+  May need a second nullable FK to `customers(id)` once that flow is
+  designed.
+- `notifications.recipient_user_id` and `devices.user_id` reference
+  `auth.users(id)` directly (rather than `profiles` or `customers`)
+  since a recipient/device can be either staff or a customer — `auth.users`
+  is the one table both sides join back to.
+
+## Verification
+
+Not run against a live database — there was no Postgres instance or
+Supabase CLI available while authoring this. Every file was checked by
+hand for parenthesis/quote balance and reviewed for referential order
+(each migration only references tables created in the same or an
+earlier file). Before relying on this:
+
+```bash
+supabase start        # or point at a real Postgres instance
+supabase db reset      # applies all migrations, then supabase/seed/
+```
+
+Confirm it applies cleanly end-to-end and fix forward with a new
+migration file if anything doesn't — don't hand-edit an already-applied
+migration, per `CLAUDE.md`: "Every schema change requires a migration."
