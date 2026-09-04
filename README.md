@@ -39,15 +39,18 @@ pro-grafiz/
 ## Status
 
 **PG-001 (Foundation), PG-002 (Design System), PG-003 (Database),
-PG-004 (Authentication), PG-005 (Authorization/RLS), and PG-006 (PGLC
-Catalogue) complete.** The catalogue (Home, Patterns, Design detail,
-Configure) is browsable, backed entirely by PG-005's RLS — see
-[`docs/catalogue.md`](./docs/catalogue.md). **PG-005 has still not been
-executed against a live database** — see
-[`docs/authorization.md`](./docs/authorization.md) for exactly what's
-verified vs. not. No quote engine, no payment gateway integration, no
-job-flow screens exist yet. See
-[`PRO_GRAFIZ_MASTER_SPEC.md`](./PRO_GRAFIZ_MASTER_SPEC.md#17-development-sequence)
+PG-004 (Authentication), PG-005 (Authorization/RLS), PG-006 (PGLC
+Catalogue), and PG-007 (Quote Engine) complete.** The Configure screen
+now shows a live estimate from the real quote engine — but see
+[`docs/quote-engine.md`](./docs/quote-engine.md) for **seven explicit
+open decisions** (pricing formula details, VAT/deposit rates, and a
+genuine V1/V2 spec conflict around sheet-count estimation) that were
+deliberately reported rather than silently resolved; the engine
+honestly refuses to price anything until a Super Admin configures real
+rates. **PG-005 has still not been executed against a live database**
+— see [`docs/authorization.md`](./docs/authorization.md). No quote
+*submission* flow, no payment integration, no job-flow screens exist
+yet. See [`PRO_GRAFIZ_MASTER_SPEC.md`](./PRO_GRAFIZ_MASTER_SPEC.md#17-development-sequence)
 for the full task sequence. Do not implement tasks beyond the currently
 authorized one in a single pass.
 

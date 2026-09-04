@@ -251,6 +251,18 @@ only new files. Full context in `docs/catalogue.md`.
   two `bucket_id`s — additive, doesn't touch any other bucket's
   policies (none exist yet).
 
+## PG-007 addendum
+
+PG-007 (Quote Engine) added two more additive tables:
+`pricing_rates` and `commercial_settings`, both empty by design,
+finance-staff read / Super-Admin write only. No existing PG-005 policy
+was touched. `issue-quote`'s Edge Function authorization logic
+duplicates `quote_requests_select_own_or_staff` in application code
+rather than a new rule — see `docs/quote-engine.md` for the full
+detail, including a real information-leak bug found and fixed during
+this task (raw rates were briefly reachable via the public
+`estimate-quote` endpoint before being stripped from its response).
+
 ## Verification status
 
 Per the explicit test requirement for this task, every claim below is

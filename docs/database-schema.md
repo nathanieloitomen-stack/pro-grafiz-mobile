@@ -31,6 +31,9 @@ cleanly.
 | `20260904000016`–`20260904000024` | RLS policies for all 28 tables (PG-005) — see `docs/authorization.md` |
 | `20260904000025_pattern_favourites.sql` | `pattern_favourites` table + `pattern_favourite_counts` view (PG-006 gap-fill) |
 | `20260904000026_pglc_storage_buckets.sql` | `pglc-public`/`pglc-production` Storage buckets (PG-006) |
+| `20260904000027_pricing_configuration.sql` | `pricing_rates`, `commercial_settings` — empty, configurable rate tables (PG-007) |
+| `20260904000028_quote_request_quantity.sql` | `quote_requests.quantity` column (PG-007 gap fix) |
+| `20260904000029_quote_ref_provisional.sql` | Provisional `quote_ref` generator (PG-007) |
 
 All 26 tables from `PRO_GRAFIZ_MASTER_SPEC.md` §7 exist, plus two
 gap-fill tables (below). UUID primary keys (`gen_random_uuid()`,

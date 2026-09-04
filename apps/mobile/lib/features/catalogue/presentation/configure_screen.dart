@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../shared/design_system/design_system.dart';
+import '../../quoting/data/quote_repository.dart';
 import '../data/catalogue_repository.dart';
 import '../data/models/material_option.dart';
 
@@ -11,15 +13,20 @@ import '../data/models/material_option.dart';
 /// item separate from "Server-side quotation engine" and "Quote
 /// request/intake".
 ///
-/// Deliberately NOT built here: the live ₦ estimate, sheet count, and
-/// lead time (all require the Quote Engine, PG-007) and the
-/// "Send to Pro_Grafiz" submission itself (Quote request/intake,
-/// PG-008) — even though `quote_requests` already has a working RLS
-/// INSERT policy for customers from PG-005, wiring an actual submission
-/// here would mean building a customer journey step this task wasn't
-/// authorized for. The button below is intentionally inert, with an
-/// explanation, rather than either a fake success state or a silent
-/// no-op.
+/// PG-007 update: the summary card now calls the real `estimate-quote`
+/// Edge Function (public, no session required) for a live ₦ total —
+/// but until a Super Admin configures `pricing_rates`/
+/// `commercial_settings`, that function always honestly reports
+/// "pricing not available yet" rather than a fabricated number, so
+/// that's what this screen shows too. See docs/quote-engine.md.
+///
+/// Still NOT built here: the "Send to Pro_Grafiz" submission itself
+/// (Quote request/intake, PG-008) — even though `quote_requests` already
+/// has a working RLS INSERT policy for customers from PG-005, wiring an
+/// actual submission here would mean building a customer journey step
+/// this task wasn't authorized for. The button below is intentionally
+/// inert, with an explanation, rather than either a fake success state
+/// or a silent no-op.
 ///
 /// UNTESTED against a live backend.
 class ConfigureScreen extends StatefulWidget {
@@ -39,6 +46,8 @@ class ConfigureScreen extends StatefulWidget {
 }
 
 class _ConfigureScreenState extends State<ConfigureScreen> {
+  late final _quoteRepository = QuoteRepository(Supabase.instance.client);
+
   List<MaterialOption> _materials = [];
   List<FinishOption> _finishes = [];
   String? _error;
@@ -48,6 +57,9 @@ class _ConfigureScreenState extends State<ConfigureScreen> {
   double _width = 900;
   double _height = 900;
   FinishOption? _selectedFinish;
+
+  QuoteEstimate? _estimate;
+  bool _estimating = false;
 
   @override
   void initState() {
@@ -69,9 +81,35 @@ class _ConfigureScreenState extends State<ConfigureScreen> {
             : null;
         _selectedFinish = finishes.isNotEmpty ? finishes.first : null;
       });
+      _fetchEstimate();
     } catch (_) {
       if (!mounted) return;
       setState(() => _error = 'Could not load material and finish options. Check your connection.');
+    }
+  }
+
+  Future<void> _fetchEstimate() async {
+    if (_selectedMaterial == null || _selectedFinish == null || _selectedThickness == null) return;
+    setState(() => _estimating = true);
+    try {
+      final estimate = await _quoteRepository.estimate(
+        materialId: _selectedMaterial!.id,
+        finishId: _selectedFinish!.id,
+        thicknessMm: _selectedThickness!,
+        widthMm: _width,
+        heightMm: _height,
+      );
+      if (!mounted) return;
+      setState(() {
+        _estimate = estimate;
+        _estimating = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _estimate = const QuoteEstimate(available: false, reason: 'Could not reach the pricing service.');
+        _estimating = false;
+      });
     }
   }
 
@@ -117,10 +155,13 @@ class _ConfigureScreenState extends State<ConfigureScreen> {
                 PGPill(
                   label: material.name,
                   selected: _selectedMaterial?.id == material.id,
-                  onTap: () => setState(() {
-                    _selectedMaterial = material;
-                    _selectedThickness = material.thicknesses.isNotEmpty ? material.thicknesses.first : null;
-                  }),
+                  onTap: () {
+                    setState(() {
+                      _selectedMaterial = material;
+                      _selectedThickness = material.thicknesses.isNotEmpty ? material.thicknesses.first : null;
+                    });
+                    _fetchEstimate();
+                  },
                 ),
             ],
           ),
@@ -139,6 +180,7 @@ class _ConfigureScreenState extends State<ConfigureScreen> {
               activeColor: PGColors.ember,
               label: '${_selectedThickness?.toStringAsFixed(1)} mm',
               onChanged: (v) => setState(() => _selectedThickness = v),
+              onChangeEnd: (_) => _fetchEstimate(),
             )
           else
             Text('No thickness options for this material yet.', style: PGTextStyles.caption.copyWith(color: PGColors.textFaint)),
@@ -154,6 +196,7 @@ class _ConfigureScreenState extends State<ConfigureScreen> {
             activeColor: PGColors.ember,
             label: '${_width.round()} mm',
             onChanged: (v) => setState(() => _width = v),
+            onChangeEnd: (_) => _fetchEstimate(),
           ),
           const PGLabel('Height'),
           const SizedBox(height: PGSpacing.labelToValue),
@@ -165,6 +208,7 @@ class _ConfigureScreenState extends State<ConfigureScreen> {
             activeColor: PGColors.ember,
             label: '${_height.round()} mm',
             onChanged: (v) => setState(() => _height = v),
+            onChangeEnd: (_) => _fetchEstimate(),
           ),
 
           const SizedBox(height: PGSpacing.sectionGap),
@@ -177,7 +221,10 @@ class _ConfigureScreenState extends State<ConfigureScreen> {
                 PGPill(
                   label: finish.name,
                   selected: _selectedFinish?.id == finish.id,
-                  onTap: () => setState(() => _selectedFinish = finish),
+                  onTap: () {
+                    setState(() => _selectedFinish = finish);
+                    _fetchEstimate();
+                  },
                 ),
             ],
           ),
@@ -194,6 +241,23 @@ class _ConfigureScreenState extends State<ConfigureScreen> {
                   '${_width.round()} × ${_height.round()} mm · ${_selectedFinish?.name ?? '—'}',
                   style: PGTextStyles.body.copyWith(color: PGColors.paper),
                 ),
+                const SizedBox(height: 12),
+                Container(height: 1, color: PGColors.paper.withOpacity(0.15)),
+                const SizedBox(height: 12),
+                if (_estimating)
+                  Text('Getting a price…', style: PGTextStyles.meta.copyWith(color: PGColors.paper.withOpacity(0.8)))
+                else if (_estimate == null)
+                  Text('—', style: PGTextStyles.numeric.copyWith(color: PGColors.paper))
+                else if (_estimate!.available)
+                  Text(
+                    '₦${_formatKobo(_estimate!.totalKobo!)}',
+                    style: PGTextStyles.numeric.copyWith(color: PGColors.paper, fontSize: 24),
+                  )
+                else
+                  Text(
+                    _estimate!.reason ?? 'Pricing not available yet.',
+                    style: PGTextStyles.meta.copyWith(color: PGColors.paper.withOpacity(0.8)),
+                  ),
               ],
             ),
           ),
@@ -204,14 +268,25 @@ class _ConfigureScreenState extends State<ConfigureScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Pricing and quote submission arrive in a later stage of the build '
-            '(Quote Engine and Quote Request/Intake) — this screen only covers '
-            'the catalogue configuration step.',
+            'Pricing is now live from the quote engine — once a Super Admin '
+            'configures rates, a real total will appear above. Sending the '
+            'request to Pro_Grafiz arrives in a later stage of the build '
+            '(Quote Request/Intake).',
             style: PGTextStyles.caption.copyWith(color: PGColors.textFaint),
           ),
           const SizedBox(height: PGSpacing.screenBottomForNav),
         ],
       ),
     );
+  }
+
+  String _formatKobo(int kobo) {
+    final naira = kobo / 100;
+    final wholePart = naira.floor();
+    final withCommas = wholePart.toString().replaceAllMapped(
+          RegExp(r'\B(?=(\d{3})+(?!\d))'),
+          (match) => ',',
+        );
+    return withCommas;
   }
 }
