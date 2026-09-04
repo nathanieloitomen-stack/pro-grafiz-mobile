@@ -39,14 +39,14 @@ pro-grafiz/
 ## Status
 
 **PG-001 (Foundation), PG-002 (Design System), PG-003 (Database),
-PG-004 (Authentication), and PG-005 (Authorization/RLS) complete.**
-Every table has Row Level Security enabled with an explicit policy —
-see [`docs/authorization.md`](./docs/authorization.md) for the full
-authorization matrix, design decisions, and — critically — exactly
-which claims are verified locally vs. still require a live Supabase
-project to confirm. **PG-005 has not been executed against a live
-database** — treat it as a thorough, reviewable draft, not proof.
-No payment gateway integration, no feature screens exist yet. See
+PG-004 (Authentication), PG-005 (Authorization/RLS), and PG-006 (PGLC
+Catalogue) complete.** The catalogue (Home, Patterns, Design detail,
+Configure) is browsable, backed entirely by PG-005's RLS — see
+[`docs/catalogue.md`](./docs/catalogue.md). **PG-005 has still not been
+executed against a live database** — see
+[`docs/authorization.md`](./docs/authorization.md) for exactly what's
+verified vs. not. No quote engine, no payment gateway integration, no
+job-flow screens exist yet. See
 [`PRO_GRAFIZ_MASTER_SPEC.md`](./PRO_GRAFIZ_MASTER_SPEC.md#17-development-sequence)
 for the full task sequence. Do not implement tasks beyond the currently
 authorized one in a single pass.

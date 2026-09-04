@@ -235,6 +235,22 @@ Payments, etc.) is confirmed.
 `docs/database-schema.md` get a one-line status update pointing here —
 see the diff for exactly that, nothing else.
 
+## PG-006 addendum
+
+PG-006 (PGLC Catalogue) added two new, additive database objects. No
+existing PG-005 policy was modified — verified via `git diff` showing
+only new files. Full context in `docs/catalogue.md`.
+
+- **`pattern_favourites`** (`20260904000025_pattern_favourites.sql`):
+  RLS-protected, customer-owns-only (`customer_id = current_customer_id()`),
+  no staff access at all. A `pattern_favourite_counts` view exposes only
+  an aggregate count per pattern, safe for public `SELECT`.
+- **Storage buckets** (`20260904000026_pglc_storage_buckets.sql`):
+  `pglc-public` (public read, staff write) and `pglc-production`
+  (staff-only), with `storage.objects` policies scoped to just those
+  two `bucket_id`s — additive, doesn't touch any other bucket's
+  policies (none exist yet).
+
 ## Verification status
 
 Per the explicit test requirement for this task, every claim below is

@@ -29,6 +29,8 @@ cleanly.
 | `20260904000014_customer_authentication.sql` | Provisional `customer_ref` generator; `auth.users` trigger auto-provisioning `customers` on phone signup |
 | `20260904000015_authorization_helpers.sql` | SECURITY DEFINER role/branch-check functions (PG-005) |
 | `20260904000016`–`20260904000024` | RLS policies for all 28 tables (PG-005) — see `docs/authorization.md` |
+| `20260904000025_pattern_favourites.sql` | `pattern_favourites` table + `pattern_favourite_counts` view (PG-006 gap-fill) |
+| `20260904000026_pglc_storage_buckets.sql` | `pglc-public`/`pglc-production` Storage buckets (PG-006) |
 
 All 26 tables from `PRO_GRAFIZ_MASTER_SPEC.md` §7 exist, plus two
 gap-fill tables (below). UUID primary keys (`gen_random_uuid()`,
