@@ -6,6 +6,8 @@ import '../../catalogue/data/catalogue_repository.dart';
 import '../../home/presentation/home_screen.dart';
 import '../../jobs/data/job_repository.dart';
 import '../../jobs/presentation/jobs_screen.dart';
+import '../../payments/data/payment_repository.dart';
+import '../../payments/presentation/staff_payments_screen.dart';
 import '../data/auth_repository.dart';
 import 'customer_phone_sign_in_screen.dart';
 import 'staff_sign_in_sheet.dart';
@@ -177,9 +179,18 @@ class _StaffSignedInPlaceholder extends StatelessWidget {
               Text('Signed in — staff', style: PGTextStyles.screenTitle.copyWith(color: PGColors.ink)),
               const SizedBox(height: PGSpacing.groupGap),
               Text(
-                'Staff feature screens (Intake, Job queue, Design desk, Payments, '
+                'Staff feature screens (Intake, Job queue, Design desk, '
                 'Admin) start in later PG tasks.',
                 style: PGTextStyles.body.copyWith(color: PGColors.textMid),
+              ),
+              const SizedBox(height: PGSpacing.groupGap),
+              PGSecondaryButton(
+                label: 'Payments',
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => StaffPaymentsScreen(paymentRepository: PaymentRepository(Supabase.instance.client)),
+                  ),
+                ),
               ),
               const Spacer(),
               PGSecondaryButton(label: 'Sign out', onPressed: authRepository.signOut),

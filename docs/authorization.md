@@ -263,6 +263,16 @@ detail, including a real information-leak bug found and fixed during
 this task (raw rates were briefly reachable via the public
 `estimate-quote` endpoint before being stripped from its response).
 
+## PG-009 addendum
+
+PG-009 (Payments) added no RLS policy changes at all — one new
+migration (a provisional `payment_ref` generator function only). The
+three new Edge Functions (`create-payment-request`, `triage-payment`,
+`confirm-payment`) all write via service-role, matching `payments`'
+existing zero-client-write-policy design from PG-005 exactly. See
+`docs/payments.md` for the full detail, including the payment-provider
+stop-and-report and the fresh-challenge confirmation mechanism.
+
 ## Verification status
 
 Per the explicit test requirement for this task, every claim below is

@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../shared/design_system/design_system.dart';
+import '../../payments/data/payment_repository.dart';
 import '../data/job_repository.dart';
 import '../data/models/job_summary.dart';
 
 /// Job detail — approved screen #7: current stage card, hold/cancel
-/// banner, eight-stage timeline, and the approval card (Approve /
-/// Request a change), wired to `respond-to-design`.
+/// banner, eight-stage timeline, the approval card (Approve /
+/// Request a change) wired to `respond-to-design`, and (PG-009) a
+/// minimal payment section wired to `create-payment-request`.
 ///
-/// Deliberately NOT shown here (need later tasks): the payment card
-/// (PG-009) and the documents list (PG-011) — both tables already have
-/// correct customer-read RLS from PG-005, so this screen queries them
-/// gracefully and just shows nothing if empty, rather than faking data
-/// or blocking on those tasks.
+/// Deliberately NOT shown here (needs a later task): the documents list
+/// (PG-011) — that table already has correct customer-read RLS from
+/// PG-005, so this screen queries it gracefully and shows nothing if
+/// empty, rather than faking data or blocking on that task. Payment is
+/// bank-transfer only (no gateway is specified — see docs/payments.md):
+/// this screen lets a customer request the deposit/balance and see its
+/// status, but cannot show a "Pay now" card for a card/USSD flow that
+/// doesn't exist.
 ///
 /// UNTESTED against a live backend.
 class JobDetailScreen extends StatefulWidget {
@@ -26,8 +32,11 @@ class JobDetailScreen extends StatefulWidget {
 }
 
 class _JobDetailScreenState extends State<JobDetailScreen> {
+  late final _paymentRepository = PaymentRepository(Supabase.instance.client);
+
   JobDetail? _detail;
   List<Map<String, dynamic>> _history = [];
+  PaymentRecord? _depositPayment;
   String? _error;
   bool _submitting = false;
 
@@ -41,10 +50,12 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     try {
       final detail = await widget.jobRepository.fetchJobDetail(widget.jobId);
       final history = await widget.jobRepository.fetchStageHistory(widget.jobId);
+      final deposit = await _paymentRepository.fetchLatestForJob(widget.jobId, 'deposit');
       if (!mounted) return;
       setState(() {
         _detail = detail;
         _history = history;
+        _depositPayment = deposit;
       });
     } catch (_) {
       if (!mounted) return;
@@ -101,6 +112,21 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       await widget.jobRepository.requestChange(widget.jobId, note);
       if (!mounted) return;
       showPGToast(context, 'Change request sent to the design desk.');
+      _load();
+    } catch (e) {
+      if (!mounted) return;
+      showPGToast(context, e.toString().replaceFirst('Exception: ', ''));
+    } finally {
+      if (mounted) setState(() => _submitting = false);
+    }
+  }
+
+  Future<void> _requestDepositPayment() async {
+    setState(() => _submitting = true);
+    try {
+      await _paymentRepository.requestPayment(jobId: widget.jobId, kind: 'deposit');
+      if (!mounted) return;
+      showPGToast(context, 'Deposit payment requested — Pro_Grafiz will confirm it once received.');
       _load();
     } catch (e) {
       if (!mounted) return;
@@ -183,6 +209,58 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               ),
             );
           }),
+
+          if (detail.currentStage == 'SUBMITTED' && detail.status == 'active') ...[
+            const SizedBox(height: PGSpacing.sectionGap),
+            const PGSectionHeader(title: 'Deposit payment'),
+            const SizedBox(height: PGSpacing.groupGap),
+            PGCard(
+              child: _depositPayment == null
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'No deposit payment requested yet. Payment is by bank transfer '
+                          'only for now — Pro_Grafiz will confirm it once received.',
+                          style: PGTextStyles.body.copyWith(color: PGColors.textMid),
+                        ),
+                        const SizedBox(height: PGSpacing.groupGap),
+                        PGPrimaryButton(
+                          label: 'Request deposit payment',
+                          onPressed: _submitting ? null : _requestDepositPayment,
+                        ),
+                      ],
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '₦${(_depositPayment!.amountKobo / 100).toStringAsFixed(0)}',
+                              style: PGTextStyles.numeric.copyWith(color: PGColors.ink),
+                            ),
+                            if (_depositPayment!.bankReference != null)
+                              Text(
+                                'Ref: ${_depositPayment!.bankReference}',
+                                style: PGTextStyles.caption.copyWith(color: PGColors.textSoft),
+                              ),
+                          ],
+                        ),
+                        PGTag(
+                          label: _depositPayment!.status.replaceAll('_', ' '),
+                          tone: switch (_depositPayment!.status) {
+                            'confirmed' => PGTagTone.success,
+                            'no_match' || 'failed' => PGTagTone.danger,
+                            'matched' => PGTagTone.warning,
+                            _ => PGTagTone.neutral,
+                          },
+                        ),
+                      ],
+                    ),
+            ),
+          ],
 
           if (detail.currentStage == 'DESIGN_SENT_FOR_APPROVAL' && detail.status == 'active') ...[
             const SizedBox(height: PGSpacing.sectionGap),

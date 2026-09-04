@@ -34,6 +34,7 @@ cleanly.
 | `20260904000027_pricing_configuration.sql` | `pricing_rates`, `commercial_settings` — empty, configurable rate tables (PG-007) |
 | `20260904000028_quote_request_quantity.sql` | `quote_requests.quantity` column (PG-007 gap fix) |
 | `20260904000029_quote_ref_provisional.sql` | Provisional `quote_ref` generator (PG-007) |
+| `20260904000030_payment_ref_provisional.sql` | Provisional `payment_ref` generator (PG-009) |
 
 All 26 tables from `PRO_GRAFIZ_MASTER_SPEC.md` §7 exist, plus two
 gap-fill tables (below). UUID primary keys (`gen_random_uuid()`,
