@@ -20,13 +20,12 @@ import '../data/models/material_option.dart';
 /// "pricing not available yet" rather than a fabricated number, so
 /// that's what this screen shows too. See docs/quote-engine.md.
 ///
-/// Still NOT built here: the "Send to Pro_Grafiz" submission itself
-/// (Quote request/intake, PG-008) — even though `quote_requests` already
-/// has a working RLS INSERT policy for customers from PG-005, wiring an
-/// actual submission here would mean building a customer journey step
-/// this task wasn't authorized for. The button below is intentionally
-/// inert, with an explanation, rather than either a fake success state
-/// or a silent no-op.
+/// PG-008 update: "Send to Pro_Grafiz" now submits a real
+/// `quote_requests` row (customer's own default branch, this screen's
+/// configured spec) — "Customer Job Flow" (PG-008) is the "designated
+/// quotation workflow task" earlier reviews deferred this to. Staff
+/// review/accept/decline it server-side (`decide-quote-request`, no
+/// staff UI built in this task — see docs/customer-job-flow.md for why).
 ///
 /// UNTESTED against a live backend.
 class ConfigureScreen extends StatefulWidget {
@@ -60,6 +59,43 @@ class _ConfigureScreenState extends State<ConfigureScreen> {
 
   QuoteEstimate? _estimate;
   bool _estimating = false;
+  bool _submitting = false;
+
+  Future<void> _submit() async {
+    if (_selectedMaterial == null || _selectedFinish == null || _selectedThickness == null) return;
+    setState(() => _submitting = true);
+    try {
+      final client = Supabase.instance.client;
+      if (client.auth.currentSession == null) {
+        throw Exception('Sign in as a customer to send a request.');
+      }
+      final customerRow = await client.from('customers').select('id, default_branch_id').maybeSingle();
+      if (customerRow == null) {
+        throw Exception('Only a customer account can send a request — staff use the Intake flow.');
+      }
+      if (customerRow['default_branch_id'] == null) {
+        throw Exception('Your account has no default centre set — contact Pro_Grafiz to set one.');
+      }
+      await client.from('quote_requests').insert({
+        'customer_id': customerRow['id'],
+        'branch_id': customerRow['default_branch_id'],
+        'pattern_id': widget.patternId,
+        'material_id': _selectedMaterial!.id,
+        'finish_id': _selectedFinish!.id,
+        'thickness_mm': _selectedThickness,
+        'width_mm': _width,
+        'height_mm': _height,
+      });
+      if (!mounted) return;
+      showPGToast(context, 'Request sent — we\'ll notify you once it\'s reviewed.');
+      Navigator.of(context).pop();
+    } catch (e) {
+      if (!mounted) return;
+      showPGToast(context, e.toString().replaceFirst('Exception: ', ''));
+    } finally {
+      if (mounted) setState(() => _submitting = false);
+    }
+  }
 
   @override
   void initState() {
@@ -262,16 +298,15 @@ class _ConfigureScreenState extends State<ConfigureScreen> {
             ),
           ),
           const SizedBox(height: PGSpacing.groupGap),
-          const PGPrimaryButton(
-            label: 'Send to Pro_Grafiz',
-            onPressed: null, // intentionally inert — see file header comment
+          PGPrimaryButton(
+            label: _submitting ? 'Sending…' : 'Send to Pro_Grafiz',
+            onPressed: _submitting ? null : _submit,
           ),
           const SizedBox(height: 8),
           Text(
-            'Pricing is now live from the quote engine — once a Super Admin '
-            'configures rates, a real total will appear above. Sending the '
-            'request to Pro_Grafiz arrives in a later stage of the build '
-            '(Quote Request/Intake).',
+            'Sending creates a request for Pro_Grafiz to review — you\'ll be '
+            'notified once it\'s accepted or declined. A live estimate shows '
+            'above when pricing is configured, but isn\'t required to send.',
             style: PGTextStyles.caption.copyWith(color: PGColors.textFaint),
           ),
           const SizedBox(height: PGSpacing.screenBottomForNav),

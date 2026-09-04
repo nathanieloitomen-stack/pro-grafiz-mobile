@@ -40,16 +40,18 @@ pro-grafiz/
 
 **PG-001 (Foundation), PG-002 (Design System), PG-003 (Database),
 PG-004 (Authentication), PG-005 (Authorization/RLS), PG-006 (PGLC
-Catalogue), and PG-007 (Quote Engine) complete.** The Configure screen
-now shows a live estimate from the real quote engine — but see
-[`docs/quote-engine.md`](./docs/quote-engine.md) for **seven explicit
-open decisions** (pricing formula details, VAT/deposit rates, and a
-genuine V1/V2 spec conflict around sheet-count estimation) that were
-deliberately reported rather than silently resolved; the engine
-honestly refuses to price anything until a Super Admin configures real
-rates. **PG-005 has still not been executed against a live database**
-— see [`docs/authorization.md`](./docs/authorization.md). No quote
-*submission* flow, no payment integration, no job-flow screens exist
+Catalogue), PG-007 (Quote Engine), and PG-008 (Customer Job Flow)
+complete.** Customers can now submit a real quote request, and track
+their jobs through all 8 stages, including approving or requesting
+changes to a design — see
+[`docs/customer-job-flow.md`](./docs/customer-job-flow.md), which also
+flags a task-boundary decision (no staff Intake UI was built; only the
+server-side decision logic) rather than presenting it as certain. **All
+seven pricing decisions from PG-007 remain open** — see
+[`docs/quote-engine.md`](./docs/quote-engine.md); nothing in this task
+resolved any of them. **PG-005 has still not been executed against a
+live database** — see [`docs/authorization.md`](./docs/authorization.md).
+No payment integration, no staff-facing screens, no documents exist
 yet. See [`PRO_GRAFIZ_MASTER_SPEC.md`](./PRO_GRAFIZ_MASTER_SPEC.md#17-development-sequence)
 for the full task sequence. Do not implement tasks beyond the currently
 authorized one in a single pass.

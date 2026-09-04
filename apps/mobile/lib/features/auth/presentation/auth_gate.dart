@@ -4,6 +4,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../shared/design_system/design_system.dart';
 import '../../catalogue/data/catalogue_repository.dart';
 import '../../home/presentation/home_screen.dart';
+import '../../jobs/data/job_repository.dart';
+import '../../jobs/presentation/jobs_screen.dart';
 import '../data/auth_repository.dart';
 import 'customer_phone_sign_in_screen.dart';
 import 'staff_sign_in_sheet.dart';
@@ -95,12 +97,26 @@ class _BrowsingShell extends StatelessWidget {
           top: 8,
           right: 8,
           child: SafeArea(
-            child: TextButton(
-              onPressed: signedIn ? authRepository.signOut : () => _showSignInChoice(context),
-              child: Text(
-                signedIn ? 'Sign out' : 'Sign in',
-                style: PGTextStyles.button.copyWith(color: PGColors.ember),
-              ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (signedIn)
+                  TextButton(
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => JobsScreen(jobRepository: JobRepository(Supabase.instance.client)),
+                      ),
+                    ),
+                    child: Text('My jobs', style: PGTextStyles.button.copyWith(color: PGColors.ink)),
+                  ),
+                TextButton(
+                  onPressed: signedIn ? authRepository.signOut : () => _showSignInChoice(context),
+                  child: Text(
+                    signedIn ? 'Sign out' : 'Sign in',
+                    style: PGTextStyles.button.copyWith(color: PGColors.ember),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
