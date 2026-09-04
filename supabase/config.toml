@@ -26,3 +26,28 @@ port = 54323
 enabled = true
 # Buckets are created via migration, not here, once PG-003/PG-011 define
 # the private storage layout (previews vs. production DXF vs. documents).
+
+[auth]
+enabled = true
+# PG-004 decision: staff PINs ARE their Supabase Auth password (see
+# 20260904000013_staff_authentication.sql). This requires a shorter
+# minimum than Supabase's usual default (6) — 4 digits, matching the
+# approved design's PIN field exactly. Do not raise this without also
+# reworking the staff auth design; do not lower it further, 4 is
+# already the approved minimum.
+minimum_password_length = 4
+
+[auth.sms]
+enabled = true
+# Customer sign-in is phone OTP (see
+# 20260904000014_customer_authentication.sql). No provider is
+# configured here — Supabase requires a real SMS provider (Twilio,
+# MessageBird, Termii, etc.) with real API credentials, which this
+# environment has no way to create or verify (see .env.example and the
+# "prohibited actions" around creating accounts / entering credentials).
+# Configure a provider and its secrets directly in the Supabase project
+# dashboard or via `supabase secrets set` before phone auth will
+# actually send an OTP anywhere. "twilio" below is only an example value
+# to keep this file valid TOML — no SMS vendor has actually been chosen;
+# that's a commercial decision for the product owner, not made here.
+provider = "twilio"

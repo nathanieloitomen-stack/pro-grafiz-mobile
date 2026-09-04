@@ -1,15 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'app/env.dart';
+import 'features/auth/data/auth_repository.dart';
+import 'features/auth/presentation/auth_gate.dart';
 import 'shared/design_system/design_system.dart';
 
 /// Pro_Grafiz mobile entry point.
 ///
-/// PG-001 (Foundation) + PG-002 (Design System): the app now has a real
-/// theme and a small library of generic, content-free components
-/// (`shared/design_system/`), but still no screens, navigation, or
-/// business logic. Customer and staff feature screens are built starting
-/// with later PG tasks (PG-006 onward).
-void main() {
+/// PG-001 (Foundation) + PG-002 (Design System) + PG-004
+/// (Authentication): the app now has a real theme, a small library of
+/// generic components, and working (if untested against a live
+/// backend) staff PIN sign-in and customer phone-OTP sign-in. Still no
+/// feature screens, no catalogue/job/payment data, no navigation
+/// framework beyond the minimum needed to reach the auth screens — that
+/// starts with later PG tasks (PG-006 onward).
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  if (Env.isConfigured) {
+    await Supabase.initialize(url: Env.supabaseUrl, anonKey: Env.supabaseAnonKey);
+  }
+  // If not configured, the app still runs — see _MissingEnvPlaceholder
+  // below — rather than crashing on a bare `flutter run` with no
+  // --dart-define flags supplied.
+
   runApp(const ProGrafizApp());
 }
 
@@ -22,16 +37,17 @@ class ProGrafizApp extends StatelessWidget {
       title: 'Pro_Grafiz',
       debugShowCheckedModeBanner: false,
       theme: PGTheme.light(),
-      home: const _DesignSystemPlaceholder(),
+      home: Env.isConfigured
+          ? AuthGate(authRepository: AuthRepository(Supabase.instance.client))
+          : const _MissingEnvPlaceholder(),
     );
   }
 }
 
-/// Temporary home screen proving the theme and a few base components
-/// render correctly. Replaced by the real customer Home screen in a
-/// later PG task — do not extend this with feature content.
-class _DesignSystemPlaceholder extends StatelessWidget {
-  const _DesignSystemPlaceholder();
+/// Shown when the app is run without SUPABASE_URL / SUPABASE_ANON_KEY
+/// --dart-define values — see apps/mobile/README.md "Environment".
+class _MissingEnvPlaceholder extends StatelessWidget {
+  const _MissingEnvPlaceholder();
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +63,14 @@ class _DesignSystemPlaceholder extends StatelessWidget {
             children: [
               Text('Pro_Grafiz', style: PGTextStyles.hero.copyWith(color: PGColors.ink)),
               const SizedBox(height: PGSpacing.groupGap),
-              const PGLabel('Design system — PG-002'),
+              const PGLabel('Missing configuration'),
+              const SizedBox(height: PGSpacing.sectionGap),
+              Text(
+                'Run with --dart-define=SUPABASE_URL=... '
+                '--dart-define=SUPABASE_ANON_KEY=... to reach sign-in. '
+                'See apps/mobile/README.md.',
+                style: PGTextStyles.body.copyWith(color: PGColors.textMid),
+              ),
               const SizedBox(height: PGSpacing.sectionGap),
               Wrap(
                 spacing: 8,
@@ -61,12 +84,10 @@ class _DesignSystemPlaceholder extends StatelessWidget {
               const SizedBox(height: PGSpacing.sectionGap),
               PGHeroCard(
                 child: Text(
-                  'Deposit confirmed',
+                  'Design system — PG-002',
                   style: PGTextStyles.cardTitle.copyWith(color: PGColors.paper),
                 ),
               ),
-              const Spacer(),
-              PGPrimaryButton(label: 'Primary action', onPressed: () {}),
             ],
           ),
         ),

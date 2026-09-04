@@ -47,3 +47,12 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install -r requirements.txt
+
+  lint-supabase-functions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+      - run: deno check supabase/functions/**/index.ts

@@ -5,11 +5,26 @@ Flutter app carrying both the customer surface and the staff surface
 
 ## Status
 
-PG-001 (Foundation) and PG-002 (Design System) complete. `lib/main.dart`
-wires the real theme and a temporary placeholder screen that exercises a
-few base components — it is not a real screen and will be replaced when
-feature work starts. No navigation, no state management wiring, no
-Supabase/Drift data layer, no business logic yet.
+PG-001 (Foundation), PG-002 (Design System), and PG-004 (Authentication)
+complete. Staff PIN sign-in (`features/auth/presentation/staff_sign_in_sheet.dart`,
+the approved design's screen #11) and customer phone-OTP sign-in are
+wired to Supabase Auth and the PG-004 Edge Functions — see
+`docs/authentication.md` for the design decisions behind both. Still no
+navigation framework, no catalogue/job/payment screens, no offline sync.
+
+## Environment
+
+The app needs `SUPABASE_URL` and `SUPABASE_ANON_KEY` at build/run time,
+via `--dart-define` (see `lib/app/env.dart`):
+
+```bash
+flutter run \
+  --dart-define=SUPABASE_URL=https://xyz.supabase.co \
+  --dart-define=SUPABASE_ANON_KEY=eyJ...
+```
+
+Without these, the app still runs but shows a placeholder screen instead
+of the sign-in flow — it won't crash on a bare `flutter run`.
 
 ## Setup
 
@@ -45,18 +60,21 @@ build break). Before shipping:
 ```
 lib/
 ├── main.dart
+├── app/
+│   └── env.dart          # --dart-define environment config
+├── features/
+│   └── auth/
+│       ├── data/          # AuthRepository, StaffIdentity — wraps Supabase Auth + PG-004 Edge Functions
+│       └── presentation/  # staff sign-in sheet (approved #11), set-PIN screen, customer phone/OTP screens, AuthGate
 ├── shared/
 │   └── design_system/
 │       ├── design_system.dart   # single import point
 │       ├── theme.dart           # ThemeData built from tokens
 │       ├── tokens/              # colors, typography, spacing, radius, shadows, motion
 │       └── widgets/             # generic components: buttons, pills/tags, cards, section header, toast, bottom sheet
-├── app/            # app-level config, routing (later PG task)
-├── features/        # one folder per feature area (catalogue, quote, jobs, staff/*) — not started
-└── data/            # Supabase clients, repositories, Drift schema (PG-003+) — not started
+└── data/            # Drift schema (later PG task) — not started
 ```
 
-`shared/design_system/` contains **no business logic and no screen
-content** — it's the generic token/component layer only, matching PG-002
-scope. Feature screens (Home, Patterns, Job queue, etc.) are built in
-later PG tasks against these components, not inside this folder.
+`shared/design_system/` still contains no business logic. `features/auth/`
+is the first feature folder — catalogue, jobs, queue, etc. follow the
+same `data/` + `presentation/` split in later PG tasks.

@@ -38,12 +38,14 @@ pro-grafiz/
 
 ## Status
 
-**PG-001 (Foundation), PG-002 (Design System), and PG-003 (Database)
-complete.** Schema is 28 tables (26 from the Master Spec + 2 flagged
-gap-fill tables) across 12 migrations — see
-[`docs/database-schema.md`](./docs/database-schema.md). No RLS (PG-005),
-no authentication (PG-004), no payment integration, and no feature
-screens exist yet. See [`PRO_GRAFIZ_MASTER_SPEC.md`](./PRO_GRAFIZ_MASTER_SPEC.md#17-development-sequence)
+**PG-001 (Foundation), PG-002 (Design System), PG-003 (Database), and
+PG-004 (Authentication) complete.** Staff PIN sign-in (Supabase
+Auth-backed) and customer phone-OTP sign-in are wired end-to-end — see
+[`docs/authentication.md`](./docs/authentication.md) for the design
+decisions. **No RLS yet (PG-005)** — every table is still wide open on
+a real deployment; do not point this at a live Supabase project until
+that lands. No payment integration, no feature screens exist yet. See
+[`PRO_GRAFIZ_MASTER_SPEC.md`](./PRO_GRAFIZ_MASTER_SPEC.md#17-development-sequence)
 for the full task sequence. Do not implement tasks beyond the currently
 authorized one in a single pass.
 

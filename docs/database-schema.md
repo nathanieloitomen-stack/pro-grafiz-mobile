@@ -23,6 +23,8 @@ trusting it applies cleanly.
 | `20260904000010_documents_and_dxf.sql` | `documents`, `dxf_release_grants`, `dxf_download_logs` |
 | `20260904000011_notifications_and_offline.sql` | `notifications`, `devices`, `offline_actions` |
 | `20260904000012_audit.sql` | `audit_events` |
+| `20260904000013_staff_authentication.sql` | Drops `profiles.pin_hash`; adds `auth_login_handle`, `invite_token_hash`, `invite_token_expires_at`; invite-token crypto helpers |
+| `20260904000014_customer_authentication.sql` | Provisional `customer_ref` generator; `auth.users` trigger auto-provisioning `customers` on phone signup |
 
 All 26 tables from `PRO_GRAFIZ_MASTER_SPEC.md` §7 exist, plus two
 gap-fill tables (below). UUID primary keys (`gen_random_uuid()`,
@@ -58,12 +60,12 @@ generator functions with column defaults (or a `BEFORE INSERT` trigger
 for documents, since the prefix depends on the row's own `type` column).
 
 Three reference-like columns exist in the schema with **no format given
-anywhere in the provided docs**: `customers.customer_ref`,
-`quotes.quote_ref`, `payments.payment_ref`. These are plain unique `text`
-columns with no auto-generator — confirm a format with the product owner
-rather than inventing one. `PGMXxxxx`, listed in `CLAUDE.md` but not
-mapped to any specific table in the Master Spec's §7 list, is in the
-same position — not wired to anything yet.
+anywhere in the provided docs**: `quotes.quote_ref`, `payments.payment_ref`,
+and `customers.customer_ref` — the last of these now has a **provisional**
+generator (`CUST-xxxxxx`) added in PG-004 to unblock customer signup;
+see `docs/authentication.md`. `PGMXxxxx`, listed in `CLAUDE.md` but not
+mapped to any specific table in the Master Spec's §7 list, is still
+unaddressed.
 
 ## Columns left as plain `text` instead of an enum
 

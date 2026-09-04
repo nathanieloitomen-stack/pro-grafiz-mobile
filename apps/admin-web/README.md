@@ -6,16 +6,19 @@ Section 6 for V1 scope split).
 
 ## Status
 
-PG-001 (Foundation) and PG-002 (Design System) complete: design tokens
-(`src/styles/tokens.css`), base typography (`src/styles/globals.css`),
-and a small set of generic components (`src/components/ui/` — Button,
-Card, Badge, Pill) matching the approved design's colour, type, spacing,
-radius, shadow, and motion tokens. Still one placeholder route, no auth,
-no data fetching, no real admin screens.
+PG-001, PG-002, and PG-004 (Authentication) complete. `src/app/sign-in`
+is a minimal staff sign-in page (no approved design exists for admin-web
+specifically — see `docs/authentication.md`), reusing the same
+PIN-as-password backend as mobile. `package.json` dependency versions
+were declared without access to a live npm registry — run `npm install`
+then check for updates before relying on exact versions.
 
-`package.json` dependency versions were declared without access to a
-live npm registry — run `npm install` then check for updates before
-relying on exact versions.
+## Environment
+
+Needs `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (see
+root `.env.example`) — the `NEXT_PUBLIC_` prefix is required for Next.js
+to expose a value to browser code; these are the same URL/anon key used
+server-side, just re-exposed under the name the browser client reads.
 
 ## Fonts
 
@@ -39,7 +42,11 @@ npm run dev
 src/
 ├── app/
 │   ├── layout.tsx      # fonts + global styles
-│   └── page.tsx        # placeholder route exercising the design system
+│   ├── page.tsx        # placeholder route exercising the design system
+│   └── sign-in/         # minimal staff sign-in (PG-004, no approved design)
+├── lib/
+│   └── supabase/
+│       └── client.ts    # browser Supabase client
 ├── styles/
 │   ├── tokens.css       # design tokens as CSS custom properties
 │   └── globals.css      # base typography/reset built on tokens
