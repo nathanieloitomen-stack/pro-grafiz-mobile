@@ -38,13 +38,15 @@ pro-grafiz/
 
 ## Status
 
-**PG-001 (Foundation), PG-002 (Design System), PG-003 (Database), and
-PG-004 (Authentication) complete.** Staff PIN sign-in (Supabase
-Auth-backed) and customer phone-OTP sign-in are wired end-to-end — see
-[`docs/authentication.md`](./docs/authentication.md) for the design
-decisions. **No RLS yet (PG-005)** — every table is still wide open on
-a real deployment; do not point this at a live Supabase project until
-that lands. No payment integration, no feature screens exist yet. See
+**PG-001 (Foundation), PG-002 (Design System), PG-003 (Database),
+PG-004 (Authentication), and PG-005 (Authorization/RLS) complete.**
+Every table has Row Level Security enabled with an explicit policy —
+see [`docs/authorization.md`](./docs/authorization.md) for the full
+authorization matrix, design decisions, and — critically — exactly
+which claims are verified locally vs. still require a live Supabase
+project to confirm. **PG-005 has not been executed against a live
+database** — treat it as a thorough, reviewable draft, not proof.
+No payment gateway integration, no feature screens exist yet. See
 [`PRO_GRAFIZ_MASTER_SPEC.md`](./PRO_GRAFIZ_MASTER_SPEC.md#17-development-sequence)
 for the full task sequence. Do not implement tasks beyond the currently
 authorized one in a single pass.

@@ -1,17 +1,13 @@
 # Security
 
-**Status: policy defined in `CLAUDE.md`; PG-004 (Authentication)
-implemented; PG-005 (Authorization/RLS) not started — see the warning
-below before deploying anything.**
-
-## Critical: no RLS yet, interim exposure
-
-Every table exists (PG-003) with Row Level Security **disabled**. On a
-real Supabase project this typically means the `anon`/`authenticated`
-PostgREST roles can read/write these tables directly depending on
-default grants, regardless of the authentication work done in PG-004.
-**Do not point a real mobile/web build at a real deployed instance of
-this schema until PG-005 lands.** Full detail in `docs/authentication.md`.
+**Status: PG-004 (Authentication) and PG-005 (Authorization/RLS)
+complete.** See [`docs/authorization.md`](./docs/authorization.md) for
+the full RLS design, authorization matrix, and — critically — which
+claims are verified locally vs. require a live Supabase project.
+**PG-005 has not been executed against a live database** — every policy
+was written and statically checked, but none of it has run. Do not
+treat this as production-verified; follow the "REQUIRES LIVE SUPABASE
+VERIFICATION" checklist in that document before any real deployment.
 
 This document will become the working detail (threat model, RLS policy
 matrix, secrets inventory, signed-URL flow for DXF, audit event catalog)

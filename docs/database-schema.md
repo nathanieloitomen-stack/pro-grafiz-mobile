@@ -1,11 +1,13 @@
 # Database Schema
 
-**Status: PG-003 complete.** 28 tables across 12 migrations in
-`supabase/migrations/`. No Row Level Security — that's PG-005,
-deliberately separate. No authentication wiring — that's PG-004. This
-migration set was authored without a live Postgres instance or the
-Supabase CLI (no network access) — see "Verification" below before
-trusting it applies cleanly.
+**Status: PG-003 (schema) and PG-005 (RLS) complete.** 28 tables across
+24 migrations in `supabase/migrations/`. RLS is enabled on every table
+with explicit policies — see [`docs/authorization.md`](./authorization.md)
+for the full design and, critically, which claims are verified locally
+vs. still require a live Supabase project. This migration set was
+authored without a live Postgres instance or the Supabase CLI (no
+network access) — see "Verification" below before trusting it applies
+cleanly.
 
 ## Migration order
 
@@ -25,6 +27,8 @@ trusting it applies cleanly.
 | `20260904000012_audit.sql` | `audit_events` |
 | `20260904000013_staff_authentication.sql` | Drops `profiles.pin_hash`; adds `auth_login_handle`, `invite_token_hash`, `invite_token_expires_at`; invite-token crypto helpers |
 | `20260904000014_customer_authentication.sql` | Provisional `customer_ref` generator; `auth.users` trigger auto-provisioning `customers` on phone signup |
+| `20260904000015_authorization_helpers.sql` | SECURITY DEFINER role/branch-check functions (PG-005) |
+| `20260904000016`–`20260904000024` | RLS policies for all 28 tables (PG-005) — see `docs/authorization.md` |
 
 All 26 tables from `PRO_GRAFIZ_MASTER_SPEC.md` §7 exist, plus two
 gap-fill tables (below). UUID primary keys (`gen_random_uuid()`,
