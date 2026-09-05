@@ -30,7 +30,15 @@
 // advances the job to PAYMENT_CONFIRMED — Master Spec §13's own flow
 // diagram: "Payment Confirmation Workflow → PGJO → Job Progression."
 // Implementing that explicitly-given sequence, not inventing a new one.
-// No PGJO document is created here — that's PG-011, not built.
+// PG-011 update: a PGJO document is now generated here, once, when the
+// deposit is confirmed and the job actually advances — see
+// generateDocument() in _shared/document_generator.ts for what data it
+// contains (all queried fresh, nothing passed through from this
+// function's own state) and how it stays idempotent under a retried
+// call. Document generation is wrapped so a failure there never rolls
+// back or blocks the payment confirmation itself, which has already
+// fully succeeded by that point — a secondary audit artifact failing to
+// generate must not undo a real, confirmed financial transaction.
 //
 // UNTESTED: written without a live Supabase project or network access
 // to verify against. Review before deploying — this is the one
@@ -38,6 +46,7 @@
 // consequences.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.0';
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts';
+import { generateDocument } from '../_shared/document_generator.ts';
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
@@ -137,6 +146,21 @@ Deno.serve(async (req: Request) => {
           note: `Deposit payment ${payment.id} confirmed`,
         });
         jobAdvanced = true;
+
+        try {
+          await generateDocument(admin, {
+            jobId: job.id,
+            type: 'PGJO',
+            eventKey: `PGJO-${job.id}`,
+            authorisedBy: profile.id,
+            authorisationType: 'accountant_confirmation',
+          });
+        } catch (docError) {
+          // Deliberately swallowed — see the header comment. The
+          // payment is already confirmed; a document-generation failure
+          // is logged, not propagated as an error on this response.
+          console.error('PGJO generation failed:', docError);
+        }
       }
     }
   }

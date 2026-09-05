@@ -2,23 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../shared/design_system/design_system.dart';
+import '../../documents/data/document_repository.dart';
 import '../../payments/data/payment_repository.dart';
 import '../data/job_repository.dart';
 import '../data/models/job_summary.dart';
 
 /// Job detail — approved screen #7: current stage card, hold/cancel
 /// banner, eight-stage timeline, the approval card (Approve /
-/// Request a change) wired to `respond-to-design`, and (PG-009) a
-/// minimal payment section wired to `create-payment-request`.
+/// Request a change) wired to `respond-to-design`, a payment section
+/// (PG-009), and (PG-011) the generated documents list.
 ///
-/// Deliberately NOT shown here (needs a later task): the documents list
-/// (PG-011) — that table already has correct customer-read RLS from
-/// PG-005, so this screen queries it gracefully and shows nothing if
-/// empty, rather than faking data or blocking on that task. Payment is
-/// bank-transfer only (no gateway is specified — see docs/payments.md):
-/// this screen lets a customer request the deposit/balance and see its
-/// status, but cannot show a "Pay now" card for a card/USSD flow that
-/// doesn't exist.
+/// Payment is bank-transfer only (no gateway is specified — see
+/// docs/payments.md): this screen lets a customer request the
+/// deposit/balance and see its status, but cannot show a "Pay now" card
+/// for a card/USSD flow that doesn't exist. Documents (PGJO/PGAO) show
+/// a "View" button once generated — viewing opens a signed URL (shown
+/// in a dialog for now; no in-app document viewer was built).
 ///
 /// UNTESTED against a live backend.
 class JobDetailScreen extends StatefulWidget {
@@ -33,10 +32,12 @@ class JobDetailScreen extends StatefulWidget {
 
 class _JobDetailScreenState extends State<JobDetailScreen> {
   late final _paymentRepository = PaymentRepository(Supabase.instance.client);
+  late final _documentRepository = DocumentRepository(Supabase.instance.client);
 
   JobDetail? _detail;
   List<Map<String, dynamic>> _history = [];
   PaymentRecord? _depositPayment;
+  Set<String> _availableDocuments = {};
   String? _error;
   bool _submitting = false;
 
@@ -51,15 +52,35 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       final detail = await widget.jobRepository.fetchJobDetail(widget.jobId);
       final history = await widget.jobRepository.fetchStageHistory(widget.jobId);
       final deposit = await _paymentRepository.fetchLatestForJob(widget.jobId, 'deposit');
+      final documents = await _documentRepository.fetchAvailableTypes(widget.jobId);
       if (!mounted) return;
       setState(() {
         _detail = detail;
         _history = history;
         _depositPayment = deposit;
+        _availableDocuments = documents;
       });
     } catch (_) {
       if (!mounted) return;
       setState(() => _error = 'Could not load this job. Check your connection.');
+    }
+  }
+
+  Future<void> _viewDocument(String type) async {
+    try {
+      final url = await _documentRepository.requestUrl(widget.jobId, type);
+      if (!mounted) return;
+      showDialog<void>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('$type — signed URL (expires in 5 minutes)'),
+          content: SelectableText(url),
+          actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Close'))],
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      showPGToast(context, e.toString().replaceFirst('Exception: ', ''));
     }
   }
 
@@ -259,6 +280,26 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                         ),
                       ],
                     ),
+            ),
+          ],
+
+          if (_availableDocuments.isNotEmpty) ...[
+            const SizedBox(height: PGSpacing.sectionGap),
+            const PGSectionHeader(title: 'Documents'),
+            const SizedBox(height: PGSpacing.groupGap),
+            Row(
+              children: [
+                if (_availableDocuments.contains('PGJO'))
+                  Expanded(
+                    child: PGSecondaryButton(label: 'View PGJO', onPressed: () => _viewDocument('PGJO')),
+                  ),
+                if (_availableDocuments.contains('PGJO') && _availableDocuments.contains('PGAO'))
+                  const SizedBox(width: 8),
+                if (_availableDocuments.contains('PGAO'))
+                  Expanded(
+                    child: PGSecondaryButton(label: 'View PGAO', onPressed: () => _viewDocument('PGAO')),
+                  ),
+              ],
             ),
           ],
 

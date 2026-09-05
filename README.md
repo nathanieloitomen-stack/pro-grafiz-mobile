@@ -38,21 +38,20 @@ pro-grafiz/
 
 ## Status
 
-**PG-001 through PG-010 complete.** Staff (Designer role) can now start
-design work on a paid job, upload/review a real draft file, record the
-five mandatory checks manually, and release it — advancing the job to
-the customer's approval step (PG-008). See
-[`docs/design-desk.md`](./docs/design-desk.md), which leads with another
-genuine V1/V2 spec conflict found during inspection: automated SVG/DXF
-generation and manufacturing checks are explicitly V2 scope, so this
-task builds the review/release *workflow* only — no geometry or check
-result is synthesized anywhere in this codebase. **All payment/pricing
-decisions from PG-007/009 remain open** — see
+**PG-001 through PG-011 complete.** PGJO and PGAO documents now
+generate automatically — once, idempotently — at the exact moments
+already built in PG-008/PG-009 (design approval, deposit confirmation).
+Every field in a generated document traces to a real database query;
+none is invented — see [`docs/documents.md`](./docs/documents.md), which
+also flags the one unspecified decision found (document file format —
+built as HTML, since no format was ever specified and no PDF library is
+verified to work in this environment). **All pricing/payment decisions
+from PG-007/009 remain open** — see
 [`docs/quote-engine.md`](./docs/quote-engine.md) and
 [`docs/payments.md`](./docs/payments.md). **PG-005 has still not been
 executed against a live database** — see
-[`docs/authorization.md`](./docs/authorization.md). No documents
-(PGJO/PGAO), no staff Intake/Operations screens exist yet. See
+[`docs/authorization.md`](./docs/authorization.md). No staff Intake/
+Operations screens, no notifications exist yet. See
 [`PRO_GRAFIZ_MASTER_SPEC.md`](./PRO_GRAFIZ_MASTER_SPEC.md#17-development-sequence)
 for the full task sequence. Do not implement tasks beyond the currently
 authorized one in a single pass.

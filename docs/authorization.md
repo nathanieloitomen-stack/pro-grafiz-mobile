@@ -287,6 +287,21 @@ generation and manufacturing checks are V2; only the review/release
 *workflow* is V1) found and respected rather than resolved by inventing
 automation that isn't specified.
 
+## PG-011 addendum
+
+PG-011 (Documents) added zero new RLS policies — one migration creates
+a third, isolated Storage bucket (`job-documents`, zero client
+policies, same pattern as `job-drafts`). `documents`' existing RLS
+(`documents_select_own_or_staff`, zero write policies) is used
+entirely as-is by the new `get-document-url` function and by
+`generateDocument()`'s service-role insert. Two already-reviewed
+financial/approval functions (`confirm-payment`, `respond-to-design`)
+were modified — each gets exactly one new, non-fatal call added after
+its existing (unchanged) logic succeeds; verify with `git diff` against
+the PG-008/009 commits. See `docs/documents.md` for the full detail,
+including the document-format decision (HTML, not PDF — flagged,
+not specified anywhere) and the exact data source for every field.
+
 ## Verification status
 
 Per the explicit test requirement for this task, every claim below is

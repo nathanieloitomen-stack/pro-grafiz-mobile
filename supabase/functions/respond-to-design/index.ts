@@ -22,10 +22,16 @@
 // never actually released would be inconsistent with the CAD release
 // gate PG-005 already enforces (enforce_draft_release_gate trigger).
 //
+// PG-011 update: approving now also generates a PGAO document (once,
+// idempotently) — see _shared/document_generator.ts. Generation is
+// wrapped so a failure there never undoes the approval itself, which
+// has already fully succeeded by that point.
+//
 // UNTESTED: written without a live Supabase project or network access
 // to verify against. Review before deploying.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.0';
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts';
+import { generateDocument } from '../_shared/document_generator.ts';
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
@@ -117,6 +123,21 @@ Deno.serve(async (req: Request) => {
       stage: nextStage,
       customer_action: 'approved',
     });
+
+    try {
+      await generateDocument(admin, {
+        jobId: job.id,
+        type: 'PGAO',
+        eventKey: `PGAO-${job.id}`,
+        authorisedBy: null, // customer, not a profiles row — see PG-003's flagged gap
+        authorisationType: 'customer_approval',
+      });
+    } catch (docError) {
+      // Deliberately swallowed — see header comment. The approval is
+      // already recorded; a document-generation failure is logged, not
+      // propagated as an error on this response.
+      console.error('PGAO generation failed:', docError);
+    }
 
     return jsonResponse({ ok: true, current_stage: nextStage });
   }

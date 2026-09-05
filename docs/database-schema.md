@@ -36,6 +36,7 @@ cleanly.
 | `20260904000029_quote_ref_provisional.sql` | Provisional `quote_ref` generator (PG-007) |
 | `20260904000030_payment_ref_provisional.sql` | Provisional `payment_ref` generator (PG-009) |
 | `20260904000031_job_drafts_storage_and_dxf_gate.sql` | `job-drafts` Storage bucket; `staff_get_draft_dxf_path()` refined for Production role (PG-010) |
+| `20260904000032_job_documents_storage.sql` | `job-documents` Storage bucket (PG-011) |
 
 All 26 tables from `PRO_GRAFIZ_MASTER_SPEC.md` §7 exist, plus two
 gap-fill tables (below). UUID primary keys (`gen_random_uuid()`,
