@@ -35,8 +35,21 @@
 // PG-013 update: both paths also notify the customer (looked up via
 // customers.auth_user_id, never a client-supplied recipient).
 // Notification failures are swallowed — see _shared/notifier.ts — and
-// never block the decision itself. No other logic in this function
-// changed across either update; verify with git diff against e40dd8e.
+// never block the decision itself.
+//
+// PG-017 update: the accept path's quote_requests claim was moved to
+// the START of the operation (atomic compare-and-swap on status='pending'),
+// before any of the expensive downstream work (pricing, quote/job
+// creation) — closing a real concurrency gap PG-016 identified, where
+// the old version checked status non-atomically and only wrote the
+// final quote_requests update LAST, leaving the entire creation
+// sequence unprotected. If any downstream step now fails after the
+// atomic claim succeeds, the claim is rolled back (status restored to
+// 'pending') via a compensating update — see rollbackClaim() — rather
+// than leaving the request stuck "accepted" with no job. The decline
+// path got the same atomic-claim treatment for consistency, though it
+// had no multi-step sequence to protect. No other logic changed; verify
+// with git diff against e40dd8e.
 //
 // UNTESTED: written without a live Supabase project or network access
 // to verify against. Review before deploying.
@@ -106,12 +119,19 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: 'Not authorized to decide this quote request' }, 403);
   }
 
+  // PG-017: the atomic claim below (not this pre-check) is what actually
+  // prevents two concurrent decisions on the same quote_request — kept
+  // for a fast, friendly error in the common (non-racing) case.
   if (quoteRequest.status !== 'pending') {
     return jsonResponse({ error: `This quote request has already been decided (status: ${quoteRequest.status})` }, 409);
   }
 
   if (body.decision === 'decline') {
-    const { error: updateError } = await admin
+    // Atomic compare-and-swap: only succeeds if status is still exactly
+    // 'pending' at the moment of this UPDATE. A concurrent second
+    // request (accept or decline) matches zero rows and fails safely
+    // below.
+    const { data: claimed, error: updateError } = await admin
       .from('quote_requests')
       .update({
         status: 'declined',
@@ -119,8 +139,14 @@ Deno.serve(async (req: Request) => {
         decided_by: userData.user.id,
         decided_at: new Date().toISOString(),
       })
-      .eq('id', quoteRequest.id);
+      .eq('id', quoteRequest.id)
+      .eq('status', 'pending')
+      .select()
+      .maybeSingle();
     if (updateError) return jsonResponse({ error: updateError.message }, 500);
+    if (!claimed) {
+      return jsonResponse({ error: 'This quote request has already been decided by another request' }, 409);
+    }
 
     await admin.from('audit_events').insert({
       actor_user_id: userData.user.id,
@@ -155,8 +181,44 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ ok: true, status: 'declined' });
   }
 
-  // Accept: issue the quote (same logic as issue-quote — inlined rather
-  // than an HTTP call between functions) then create the job.
+  // Accept: claim the quote_request FIRST, atomically, before doing any
+  // of the more expensive downstream work (pricing, quote/job
+  // creation). This is what actually closes the concurrency gap PG-016
+  // identified — the older version of this function checked status
+  // non-atomically and only updated quote_requests LAST, which left the
+  // entire quote/job creation sequence unprotected against a race.
+  //
+  // If any downstream step fails after this claim succeeds, the claim
+  // is rolled back (status restored to 'pending') so the request isn't
+  // left stuck "accepted" with no job — see rollbackClaim() below. This
+  // is a compensating action, not a real multi-statement transaction
+  // (PostgREST doesn't expose one to this function) — the best available
+  // correctness guarantee given that constraint.
+  const { data: claimed, error: claimError } = await admin
+    .from('quote_requests')
+    .update({
+      status: 'accepted',
+      decided_by: userData.user.id,
+      decided_at: new Date().toISOString(),
+    })
+    .eq('id', quoteRequest.id)
+    .eq('status', 'pending')
+    .select()
+    .maybeSingle();
+  if (claimError) return jsonResponse({ error: claimError.message }, 500);
+  if (!claimed) {
+    return jsonResponse({ error: 'This quote request has already been decided by another request' }, 409);
+  }
+
+  const rollbackClaim = async () => {
+    await admin
+      .from('quote_requests')
+      .update({ status: 'pending', decided_by: null, decided_at: null })
+      .eq('id', quoteRequest.id);
+  };
+
+  // Issue the quote (same logic as issue-quote — inlined rather than an
+  // HTTP call between functions) then create the job.
   const result = await calculateQuote(admin, {
     materialId: quoteRequest.material_id,
     finishId: quoteRequest.finish_id,
@@ -167,6 +229,7 @@ Deno.serve(async (req: Request) => {
   });
 
   if (!result.available) {
+    await rollbackClaim();
     return jsonResponse({ error: result.reason }, 422);
   }
 
@@ -179,7 +242,10 @@ Deno.serve(async (req: Request) => {
   const nextVersion = existingVersions && existingVersions.length > 0 ? existingVersions[0].version + 1 : 1;
 
   const { data: quoteRef, error: refError } = await admin.rpc('generate_quote_ref_provisional');
-  if (refError) return jsonResponse({ error: refError.message }, 500);
+  if (refError) {
+    await rollbackClaim();
+    return jsonResponse({ error: refError.message }, 500);
+  }
 
   const { data: quote, error: quoteInsertError } = await admin
     .from('quotes')
@@ -208,6 +274,7 @@ Deno.serve(async (req: Request) => {
     .single();
 
   if (quoteInsertError) {
+    await rollbackClaim();
     return jsonResponse({ error: quoteInsertError.message }, 500);
   }
 
@@ -229,6 +296,7 @@ Deno.serve(async (req: Request) => {
     .single();
 
   if (jobInsertError) {
+    await rollbackClaim();
     return jsonResponse({ error: jobInsertError.message }, 500);
   }
 
@@ -238,16 +306,6 @@ Deno.serve(async (req: Request) => {
     advanced_by: userData.user.id,
     note: 'Job opened from accepted quote request',
   });
-
-  const { error: qrUpdateError } = await admin
-    .from('quote_requests')
-    .update({
-      status: 'accepted',
-      decided_by: userData.user.id,
-      decided_at: new Date().toISOString(),
-    })
-    .eq('id', quoteRequest.id);
-  if (qrUpdateError) return jsonResponse({ error: qrUpdateError.message }, 500);
 
   await admin.from('audit_events').insert({
     actor_user_id: userData.user.id,

@@ -18,6 +18,11 @@
 // row. current_stage is untouched — resuming does not advance the job,
 // it only un-pauses it.
 //
+// PG-017 update: the status update below is now an atomic compare-and-swap
+// (`.eq('status', 'on_hold')` in the same statement as `.update()`,
+// checking a row was actually returned) — closing the concurrency gap
+// PG-016 identified.
+//
 // UNTESTED: written without a live Supabase project or network access
 // to verify against. Review before deploying.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.0';
@@ -71,12 +76,18 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: `This job is ${job.status}, not on_hold — cannot resume` }, 409);
   }
 
-  const { error: updateError } = await admin
+  const { data: updated, error: updateError } = await admin
     .from('jobs')
     .update({ status: 'active', hold_reason: null, hold_note: null })
-    .eq('id', job.id);
+    .eq('id', job.id)
+    .eq('status', 'on_hold')
+    .select()
+    .maybeSingle();
   if (updateError) {
     return jsonResponse({ error: updateError.message }, 500);
+  }
+  if (!updated) {
+    return jsonResponse({ error: 'This job is no longer on_hold (already changed by another request) — cannot resume' }, 409);
   }
 
   await admin.from('audit_events').insert({

@@ -30,6 +30,17 @@
 // same treatment as every other post-transition side effect in this
 // codebase.
 //
+// PG-017 update: three fixes, required by the PG-016 audit. (1) The
+// drafts release update is now an atomic compare-and-swap
+// (`.neq('release_status', 'released')`) — a concurrent second release
+// attempt on the same draft matches zero rows and fails safely, rather
+// than asking the trigger to release an already-released draft twice.
+// (2) The job-advancement update is likewise atomic
+// (`.eq('current_stage', 'DESIGN_IN_PROGRESS').eq('status', 'active')`).
+// (3) A `draft.release` audit_events row is now written — this function
+// previously wrote none, one of the four transitions PG-016 flagged.
+// The CAD release gate itself (enforce_draft_release_gate) is untouched.
+//
 // UNTESTED: written without a live Supabase project or network access
 // to verify against. Review before deploying.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.0';
@@ -90,17 +101,38 @@ Deno.serve(async (req: Request) => {
   // UPDATE and will raise if an unresolved failure exists without
   // override_reason. That exception surfaces as updateError below,
   // unmodified.
-  const { error: updateError } = await admin
+  //
+  // PG-017: `.neq('release_status', 'released')` makes this an atomic
+  // compare-and-swap — a concurrent second release attempt on the same
+  // draft matches zero rows and fails safely below, rather than the
+  // trigger being asked to release an already-released draft twice.
+  const { data: releasedDraft, error: updateError } = await admin
     .from('drafts')
     .update({
       release_status: 'released',
       override_reason: body.override_reason ?? null,
     })
-    .eq('id', draft.id);
+    .eq('id', draft.id)
+    .neq('release_status', 'released')
+    .select()
+    .maybeSingle();
 
   if (updateError) {
     return jsonResponse({ error: updateError.message }, 422);
   }
+  if (!releasedDraft) {
+    return jsonResponse({ error: 'This draft has already been released by another request' }, 409);
+  }
+
+  await admin.from('audit_events').insert({
+    actor_user_id: userData.user.id,
+    action: 'draft.release',
+    entity_type: 'draft',
+    entity_id: draft.id,
+    before_state: { release_status: draft.release_status },
+    after_state: { release_status: 'released' },
+    reason: body.override_reason ?? null,
+  });
 
   const { data: job, error: jobError } = await admin
     .from('jobs')
@@ -109,12 +141,21 @@ Deno.serve(async (req: Request) => {
     .maybeSingle();
 
   let jobAdvanced = false;
-  if (!jobError && job?.status === 'active' && job.current_stage === 'DESIGN_IN_PROGRESS') {
-    const { error: jobUpdateError } = await admin
+  if (!jobError && job) {
+    // PG-017: atomic compare-and-swap — a concurrent call (e.g. two
+    // drafts for the same job somehow both being released, or a retried
+    // request) that finds the job no longer at DESIGN_IN_PROGRESS
+    // matches zero rows and simply doesn't re-advance or re-run the
+    // notification below.
+    const { data: advancedJob, error: jobUpdateError } = await admin
       .from('jobs')
       .update({ current_stage: 'DESIGN_SENT_FOR_APPROVAL', stage_started_at: new Date().toISOString() })
-      .eq('id', job.id);
-    if (!jobUpdateError) {
+      .eq('id', job.id)
+      .eq('current_stage', 'DESIGN_IN_PROGRESS')
+      .eq('status', 'active')
+      .select()
+      .maybeSingle();
+    if (!jobUpdateError && advancedJob) {
       await admin.from('job_stage_history').insert({
         job_id: job.id,
         stage: 'DESIGN_SENT_FOR_APPROVAL',

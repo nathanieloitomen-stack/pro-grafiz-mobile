@@ -38,19 +38,18 @@ pro-grafiz/
 
 ## Status
 
-**PG-001 through PG-015 complete.** The eight-stage job lifecycle is
-now fully implemented end-to-end — Production, Inventory, and Centre
-Manager can each perform their approved final transition
-(`IN_PRODUCTION`→`READY_FOR_DISPATCH`→`DISPATCHED`→`RELEASED`), with
-release blocked until the outstanding balance is confirmed paid. See
-[`docs/dispatch-release-implementation.md`](./docs/dispatch-release-implementation.md)
-and the discovery that preceded it,
-[`docs/dispatch-release-workflow-discovery.md`](./docs/dispatch-release-workflow-discovery.md).
-No new tables, document types, or payment rules were introduced. **All
+**PG-001 through PG-017 complete.** PG-016's audit found two issues;
+both are now fixed. Nine lifecycle-adjacent functions now use an atomic
+compare-and-swap (matching PG-015's pattern) instead of a non-atomic
+check-then-act sequence, and the four transitions that wrote no audit
+trail — including payment confirmation — now do. See
+[`docs/pg017-concurrency-audit-remediation.md`](./docs/pg017-concurrency-audit-remediation.md).
+**The actual concurrency property has not been verified live** — no
+Supabase project or Deno runtime has been available at any point in
+this project; only static structural checks were possible. **All
 pricing/payment/format/authority decisions from PG-007/009/011/012
 remain open.** **PG-005 has still not been executed against a live
-database** — see [`docs/authorization.md`](./docs/authorization.md).
-No offline sync, no automated CAD pipeline exist yet. See
+database.** No offline sync, no automated CAD pipeline exist yet. See
 [`PRO_GRAFIZ_MASTER_SPEC.md`](./PRO_GRAFIZ_MASTER_SPEC.md#17-development-sequence)
 for the full task sequence. Do not implement tasks beyond the currently
 authorized one in a single pass.

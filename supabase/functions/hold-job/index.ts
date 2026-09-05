@@ -31,6 +31,14 @@
 // PG-013 update: the customer is notified of the hold, including the
 // reason — matches Master Spec §16's "hold" event.
 //
+// PG-017 update: the status update below is now an atomic compare-and-swap
+// (`.eq('status', 'active')` in the same statement as `.update()`,
+// checking a row was actually returned) rather than a separate
+// check-then-update — closing the concurrency gap PG-016 identified.
+// The early pre-checks below are kept for a fast, friendly error message
+// in the common (non-racing) case; the atomic update is what actually
+// enforces correctness under a race.
+//
 // UNTESTED: written without a live Supabase project or network access
 // to verify against. Review before deploying.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.0';
@@ -91,12 +99,19 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: 'This job has already been released — cannot hold' }, 409);
   }
 
-  const { error: updateError } = await admin
+  const { data: updated, error: updateError } = await admin
     .from('jobs')
     .update({ status: 'on_hold', hold_reason: body.hold_reason, hold_note: body.hold_note ?? null })
-    .eq('id', job.id);
+    .eq('id', job.id)
+    .eq('status', 'active')
+    .neq('current_stage', 'RELEASED')
+    .select()
+    .maybeSingle();
   if (updateError) {
     return jsonResponse({ error: updateError.message }, 500);
+  }
+  if (!updated) {
+    return jsonResponse({ error: 'This job is no longer active (already changed by another request) — cannot hold' }, 409);
   }
 
   await admin.from('audit_events').insert({

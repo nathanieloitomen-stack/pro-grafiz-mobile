@@ -44,6 +44,19 @@
 // document generation both attempt to complete — same swallowed-failure
 // treatment, a notification failure never undoes the payment.
 //
+// PG-017 update: two fixes, both required by the PG-016 audit. (1) The
+// payment status update and the job stage update are now each an atomic
+// compare-and-swap — `.in('status', ['matched','no_match'])` and
+// `.eq('current_stage', 'SUBMITTED')` respectively, in the same
+// statement as their `.update()` call — closing the concurrency gap
+// where two simultaneous confirmation attempts could both proceed past
+// a non-atomic check. (2) A `payment.confirm` audit_events row is now
+// written immediately after the atomic confirmation succeeds — this
+// function previously wrote none at all, the single most concerning
+// instance of PG-016's audit-gap finding given how financially
+// significant this action is. Payment amounts, the Accountant PIN
+// process, and all other behavior are unchanged — verify with git diff.
+//
 // UNTESTED: written without a live Supabase project or network access
 // to verify against. Review before deploying — this is the one
 // function in this task where a subtle bug has direct financial
@@ -112,6 +125,9 @@ Deno.serve(async (req: Request) => {
   if (paymentError || !payment) {
     return jsonResponse({ error: 'Payment not found' }, 404);
   }
+  // PG-017: kept as a fast, friendly pre-check for the common case — the
+  // atomic update below (not this check) is what actually prevents two
+  // concurrent confirmations of the same payment.
   if (payment.status !== 'matched' && payment.status !== 'no_match') {
     return jsonResponse(
       { error: `This payment is ${payment.status} — only 'matched' or 'no_match' payments can be confirmed` },
@@ -119,17 +135,44 @@ Deno.serve(async (req: Request) => {
     );
   }
 
-  const { error: updateError } = await admin
+  // Atomic compare-and-swap: only succeeds if status is still exactly
+  // 'matched' or 'no_match' at the moment of this UPDATE. A concurrent
+  // second confirmation attempt matches zero rows and fails safely
+  // below — this is what actually closes PG-016's concurrency finding
+  // for this function, not the pre-check above.
+  const { data: confirmedPayment, error: updateError } = await admin
     .from('payments')
     .update({
       status: 'confirmed',
       confirmed_by: profile.id,
       confirmed_at: new Date().toISOString(),
     })
-    .eq('id', payment.id);
+    .eq('id', payment.id)
+    .in('status', ['matched', 'no_match'])
+    .select()
+    .maybeSingle();
   if (updateError) {
     return jsonResponse({ error: updateError.message }, 500);
   }
+  if (!confirmedPayment) {
+    return jsonResponse({ error: 'This payment has already been confirmed by another request' }, 409);
+  }
+
+  // PG-017: payment confirmation is financially significant and
+  // previously wrote no audit_events row at all — this is one of the
+  // four transitions PG-016 flagged. Recorded immediately after the
+  // atomic confirmation succeeds, identifying the payment, the job, the
+  // authenticated Accountant, and the timestamp — using only
+  // server-derived values (profile.id from the caller's own verified
+  // session, payment.job_id from the already-fetched payment row).
+  await admin.from('audit_events').insert({
+    actor_user_id: userData.user.id,
+    action: 'payment.confirm',
+    entity_type: 'payment',
+    entity_id: payment.id,
+    before_state: { status: payment.status },
+    after_state: { status: 'confirmed', job_id: payment.job_id },
+  });
 
   let jobAdvanced = false;
   if (payment.kind === 'deposit') {
@@ -139,11 +182,19 @@ Deno.serve(async (req: Request) => {
       .eq('id', payment.job_id)
       .maybeSingle();
     if (job?.current_stage === 'SUBMITTED') {
-      const { error: jobUpdateError } = await admin
+      // Atomic compare-and-swap on the job's own stage — a concurrent
+      // call (e.g. a retried request) that finds the job already
+      // advanced matches zero rows and simply doesn't re-advance or
+      // re-run the side effects below, rather than racing to do so
+      // twice.
+      const { data: advancedJob, error: jobUpdateError } = await admin
         .from('jobs')
         .update({ current_stage: 'PAYMENT_CONFIRMED', stage_started_at: new Date().toISOString() })
-        .eq('id', job.id);
-      if (!jobUpdateError) {
+        .eq('id', job.id)
+        .eq('current_stage', 'SUBMITTED')
+        .select()
+        .maybeSingle();
+      if (!jobUpdateError && advancedJob) {
         await admin.from('job_stage_history').insert({
           job_id: job.id,
           stage: 'PAYMENT_CONFIRMED',

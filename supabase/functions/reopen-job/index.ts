@@ -13,6 +13,11 @@
 // reasons," but only hold_reason/cancel_reason columns actually exist
 // on jobs; an optional note is recorded in the audit_events row.
 //
+// PG-017 update: the status update below is now an atomic compare-and-swap
+// (`.eq('status', 'cancelled')` in the same statement as `.update()`,
+// checking a row was actually returned) — closing the concurrency gap
+// PG-016 identified.
+//
 // UNTESTED: written without a live Supabase project or network access
 // to verify against. Review before deploying.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.0';
@@ -66,12 +71,18 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: `This job is ${job.status}, not cancelled — cannot reopen` }, 409);
   }
 
-  const { error: updateError } = await admin
+  const { data: updated, error: updateError } = await admin
     .from('jobs')
     .update({ status: 'active', cancel_reason: null, cancel_note: null })
-    .eq('id', job.id);
+    .eq('id', job.id)
+    .eq('status', 'cancelled')
+    .select()
+    .maybeSingle();
   if (updateError) {
     return jsonResponse({ error: updateError.message }, 500);
+  }
+  if (!updated) {
+    return jsonResponse({ error: 'This job is no longer cancelled (already changed by another request) — cannot reopen' }, 409);
   }
 
   await admin.from('audit_events').insert({

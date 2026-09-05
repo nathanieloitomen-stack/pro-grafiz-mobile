@@ -15,6 +15,15 @@
 // with every other job-stage transition in this codebase
 // (respond-to-design, confirm-payment).
 //
+// PG-017 update: two fixes, both required by the PG-016 audit. (1) The
+// stage update is now an atomic compare-and-swap
+// (`.eq('current_stage', 'PAYMENT_CONFIRMED').eq('status', 'active')`
+// in the same statement as `.update()`) — a concurrent second call
+// matches zero rows and fails safely rather than racing to advance
+// twice. (2) A `job.start_design` audit_events row is now written —
+// this function previously wrote none, one of the four transitions
+// PG-016 flagged. No authorization, branch, or business logic changed.
+//
 // UNTESTED: written without a live Supabase project or network access
 // to verify against. Review before deploying.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.0';
@@ -76,18 +85,37 @@ Deno.serve(async (req: Request) => {
     );
   }
 
-  const { error: updateError } = await admin
+  const { data: updatedJob, error: updateError } = await admin
     .from('jobs')
     .update({ current_stage: 'DESIGN_IN_PROGRESS', stage_started_at: new Date().toISOString() })
-    .eq('id', job.id);
+    .eq('id', job.id)
+    .eq('current_stage', 'PAYMENT_CONFIRMED')
+    .eq('status', 'active')
+    .select()
+    .maybeSingle();
   if (updateError) {
     return jsonResponse({ error: updateError.message }, 500);
+  }
+  if (!updatedJob) {
+    return jsonResponse(
+      { error: 'This job is no longer at PAYMENT_CONFIRMED (already changed by another request) — cannot start design' },
+      409,
+    );
   }
 
   await admin.from('job_stage_history').insert({
     job_id: job.id,
     stage: 'DESIGN_IN_PROGRESS',
     advanced_by: profile.id,
+  });
+
+  await admin.from('audit_events').insert({
+    actor_user_id: userData.user.id,
+    action: 'job.start_design',
+    entity_type: 'job',
+    entity_id: job.id,
+    before_state: { current_stage: 'PAYMENT_CONFIRMED' },
+    after_state: { current_stage: 'DESIGN_IN_PROGRESS' },
   });
 
   return jsonResponse({ ok: true, current_stage: 'DESIGN_IN_PROGRESS' });

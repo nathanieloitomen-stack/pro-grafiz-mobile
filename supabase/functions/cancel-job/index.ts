@@ -17,6 +17,13 @@
 // treatment applied consistently to cancellation too, since both are
 // operational actions a customer needs to know about immediately.
 //
+// PG-017 update: the status update below is now an atomic compare-and-swap
+// (`.neq('status', 'cancelled').neq('current_stage', 'RELEASED')` in the
+// same statement as `.update()`, checking a row was actually returned)
+// — closing the concurrency gap PG-016 identified. The pre-checks above
+// are kept for a fast, friendly error message in the common case; the
+// atomic update is what actually enforces correctness under a race.
+//
 // UNTESTED: written without a live Supabase project or network access
 // to verify against. Review before deploying.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.0';
@@ -77,12 +84,22 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: 'This job has already been released — cannot cancel' }, 409);
   }
 
-  const { error: updateError } = await admin
+  const { data: updated, error: updateError } = await admin
     .from('jobs')
     .update({ status: 'cancelled', cancel_reason: body.cancel_reason, cancel_note: body.cancel_note ?? null })
-    .eq('id', job.id);
+    .eq('id', job.id)
+    .neq('status', 'cancelled')
+    .neq('current_stage', 'RELEASED')
+    .select()
+    .maybeSingle();
   if (updateError) {
     return jsonResponse({ error: updateError.message }, 500);
+  }
+  if (!updated) {
+    return jsonResponse(
+      { error: 'This job is already cancelled or released (already changed by another request) — cannot cancel' },
+      409,
+    );
   }
 
   await admin.from('audit_events').insert({

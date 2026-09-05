@@ -34,6 +34,20 @@
 // notification was added here — that event ("design ready"/"approval
 // requested") is already covered at its actual source, release-draft.
 //
+// PG-017 update: three fixes, required by the PG-016 audit, applied to
+// BOTH branches (approve and request_change). (1) Each branch's job
+// stage update is now an atomic compare-and-swap
+// (`.eq('current_stage', 'DESIGN_SENT_FOR_APPROVAL').eq('status', 'active')`
+// in the same statement as `.update()`) — a concurrent second response
+// to the same job (e.g. approve and request_change racing, or the same
+// action retried) matches zero rows and fails safely rather than both
+// proceeding. (2) `job.approve_design` / `job.request_design_change`
+// audit_events rows are now written for each branch — this function
+// previously wrote none, one of the four transitions PG-016 flagged.
+// (3) No change to the approve path's released-draft precondition, the
+// request_change path's design_revisions insert, or any notification/
+// document logic — verify with git diff.
+//
 // UNTESTED: written without a live Supabase project or network access
 // to verify against. Review before deploying.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.0';
@@ -120,16 +134,38 @@ Deno.serve(async (req: Request) => {
     }
 
     const nextStage = 'IN_PRODUCTION';
-    const { error: updateError } = await admin
+    // PG-017: atomic compare-and-swap — a concurrent second
+    // approve/request_change call on the same job matches zero rows and
+    // fails safely below, rather than both racing to transition it.
+    const { data: updatedJob, error: updateError } = await admin
       .from('jobs')
       .update({ current_stage: nextStage, stage_started_at: new Date().toISOString() })
-      .eq('id', job.id);
+      .eq('id', job.id)
+      .eq('current_stage', 'DESIGN_SENT_FOR_APPROVAL')
+      .eq('status', 'active')
+      .select()
+      .maybeSingle();
     if (updateError) return jsonResponse({ error: updateError.message }, 500);
+    if (!updatedJob) {
+      return jsonResponse(
+        { error: 'This job is no longer at DESIGN_SENT_FOR_APPROVAL (already responded to by another request)' },
+        409,
+      );
+    }
 
     await admin.from('job_stage_history').insert({
       job_id: job.id,
       stage: nextStage,
       customer_action: 'approved',
+    });
+
+    await admin.from('audit_events').insert({
+      actor_user_id: userData.user.id,
+      action: 'job.approve_design',
+      entity_type: 'job',
+      entity_id: job.id,
+      before_state: { current_stage: 'DESIGN_SENT_FOR_APPROVAL' },
+      after_state: { current_stage: nextStage },
     });
 
     try {
@@ -160,17 +196,38 @@ Deno.serve(async (req: Request) => {
   if (revisionError) return jsonResponse({ error: revisionError.message }, 500);
 
   const nextStage = 'DESIGN_IN_PROGRESS';
-  const { error: updateError } = await admin
+  // PG-017: same atomic compare-and-swap as the approve branch above.
+  const { data: revertedJob, error: updateError } = await admin
     .from('jobs')
     .update({ current_stage: nextStage, stage_started_at: new Date().toISOString() })
-    .eq('id', job.id);
+    .eq('id', job.id)
+    .eq('current_stage', 'DESIGN_SENT_FOR_APPROVAL')
+    .eq('status', 'active')
+    .select()
+    .maybeSingle();
   if (updateError) return jsonResponse({ error: updateError.message }, 500);
+  if (!revertedJob) {
+    return jsonResponse(
+      { error: 'This job is no longer at DESIGN_SENT_FOR_APPROVAL (already responded to by another request)' },
+      409,
+    );
+  }
 
   await admin.from('job_stage_history').insert({
     job_id: job.id,
     stage: nextStage,
     customer_action: 'requested_change',
     note: body.request_note,
+  });
+
+  await admin.from('audit_events').insert({
+    actor_user_id: userData.user.id,
+    action: 'job.request_design_change',
+    entity_type: 'job',
+    entity_id: job.id,
+    before_state: { current_stage: 'DESIGN_SENT_FOR_APPROVAL' },
+    after_state: { current_stage: nextStage },
+    reason: body.request_note,
   });
 
   try {
