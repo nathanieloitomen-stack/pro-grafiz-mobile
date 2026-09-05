@@ -111,6 +111,37 @@ class OperationsRepository {
     _throwIfError(response.data);
   }
 
+  // PG-015: the three final lifecycle transitions. Each calls its own
+  // dedicated Edge Function — real authorization (role + branch scope)
+  // happens there, server-side; this repository makes no access
+  // decisions of its own, matching every other method here.
+
+  Future<void> markReadyForDispatch(String jobId) async {
+    final response = await _client.functions.invoke('mark-ready-for-dispatch', body: {'job_id': jobId});
+    _throwIfError(response.data);
+  }
+
+  Future<void> dispatch(String jobId) async {
+    final response = await _client.functions.invoke('dispatch-job', body: {'job_id': jobId});
+    _throwIfError(response.data);
+  }
+
+  Future<void> release(String jobId) async {
+    final response = await _client.functions.invoke('release-job', body: {'job_id': jobId});
+    _throwIfError(response.data);
+  }
+
+  /// The caller's own role — used ONLY to decide which action buttons
+  /// to render (e.g. don't show "Mark Dispatched" to a Designer). This
+  /// is a UI convenience, not a security boundary: every one of the
+  /// three functions above re-derives and re-checks the caller's role
+  /// and branch server-side regardless of what this returns or what the
+  /// client believes about itself.
+  Future<String?> fetchOwnRole() async {
+    final row = await _client.from('profiles').select('role').maybeSingle();
+    return row?['role'] as String?;
+  }
+
   /// Basic counts for the operations dashboard — no approved pixel
   /// design exists for this screen (Master Spec names "Basic management
   /// dashboard" as a V1 bullet with no further detail); this reflects

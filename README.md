@@ -38,21 +38,19 @@ pro-grafiz/
 
 ## Status
 
-**PG-001 through PG-013 complete.** In-app notifications now fire for
-every Master Spec §16 event that has a real trigger mechanism, plus a
-controlled WhatsApp handoff link — see
-[`docs/notifications.md`](./docs/notifications.md), which leads with a
-significant finding: **three of the eight job stages
-(`READY_FOR_DISPATCH`, `DISPATCHED`, `RELEASED`) have no transition
-mechanism anywhere in this codebase**, and no task in the development
-sequence explicitly owns building one — flagged for your decision
-rather than filled in. Real push delivery (FCM) is not wired up — no
-Firebase project/credentials exist in this environment; only the
-in-app inbox works currently. **All pricing/payment/format/authority
-decisions from PG-007/009/011/012 remain open.** **PG-005 has still not
-been executed against a live database** — see
-[`docs/authorization.md`](./docs/authorization.md). No offline sync, no
-CAD pipeline automation exist yet. See
+**PG-001 through PG-015 complete.** The eight-stage job lifecycle is
+now fully implemented end-to-end — Production, Inventory, and Centre
+Manager can each perform their approved final transition
+(`IN_PRODUCTION`→`READY_FOR_DISPATCH`→`DISPATCHED`→`RELEASED`), with
+release blocked until the outstanding balance is confirmed paid. See
+[`docs/dispatch-release-implementation.md`](./docs/dispatch-release-implementation.md)
+and the discovery that preceded it,
+[`docs/dispatch-release-workflow-discovery.md`](./docs/dispatch-release-workflow-discovery.md).
+No new tables, document types, or payment rules were introduced. **All
+pricing/payment/format/authority decisions from PG-007/009/011/012
+remain open.** **PG-005 has still not been executed against a live
+database** — see [`docs/authorization.md`](./docs/authorization.md).
+No offline sync, no automated CAD pipeline exist yet. See
 [`PRO_GRAFIZ_MASTER_SPEC.md`](./PRO_GRAFIZ_MASTER_SPEC.md#17-development-sequence)
 for the full task sequence. Do not implement tasks beyond the currently
 authorized one in a single pass.

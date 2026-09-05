@@ -331,6 +331,24 @@ transition mechanism anywhere in this codebase, and no task in the
 sequence explicitly owns building one — reported rather than filled in
 under "Notifications."
 
+## PG-015 addendum
+
+PG-015 (final job stage transitions) added zero new RLS policies and
+zero migrations. Three new Edge Functions
+(`mark-ready-for-dispatch`, `dispatch-job`, `release-job`) write to
+`jobs`/`job_stage_history`/`audit_events` via service-role, exactly
+matching the existing zero-client-write pattern — verified via `git
+diff` to add no migration file. One new shared helper
+(`authorizeBranchScopedRole`, additive to `_shared/staff_auth.ts`)
+reuses `profiles.branch_id` — already present for every role — to scope
+Production/Inventory to their own branch for these two specific
+actions; the existing `authorizeOperationalAction` export is unchanged
+and is reused as-is for `release-job` (Centre Manager), since that
+actor set was already approved for other operational actions. See
+`docs/dispatch-release-implementation.md` for the full detail,
+including a deliberately stricter atomic-transition pattern used only
+for these three new functions.
+
 ## Verification status
 
 Per the explicit test requirement for this task, every claim below is

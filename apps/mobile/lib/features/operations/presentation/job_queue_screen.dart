@@ -16,6 +16,14 @@ import '../data/operations_repository.dart';
 /// the docs (confirmed by direct search — see docs/operations.md); this
 /// screen does not invent one.
 ///
+/// PG-015 update: adds the three final lifecycle actions (Mark Ready
+/// for Dispatch / Mark Dispatched / Release Job) to this SAME existing
+/// screen rather than a new dispatch dashboard, per that task's
+/// explicit instruction. Buttons are shown only when the caller's own
+/// role plausibly matches AND the job is at the matching stage — this
+/// is UI convenience only; the actual authorization (role + branch) is
+/// re-checked server-side by each Edge Function regardless.
+///
 /// UNTESTED against a live backend.
 class JobQueueScreen extends StatefulWidget {
   const JobQueueScreen({super.key, required this.repository});
@@ -28,6 +36,7 @@ class JobQueueScreen extends StatefulWidget {
 
 class _JobQueueScreenState extends State<JobQueueScreen> {
   List<OperationalJob>? _jobs;
+  String? _ownRole;
   String? _error;
   bool _busy = false;
 
@@ -40,8 +49,12 @@ class _JobQueueScreenState extends State<JobQueueScreen> {
   Future<void> _load() async {
     try {
       final jobs = await widget.repository.fetchActiveJobs();
+      final role = await widget.repository.fetchOwnRole();
       if (!mounted) return;
-      setState(() => _jobs = jobs);
+      setState(() {
+        _jobs = jobs;
+        _ownRole = role;
+      });
     } catch (_) {
       if (!mounted) return;
       setState(() => _error = 'Could not load jobs.');
@@ -96,6 +109,16 @@ class _JobQueueScreenState extends State<JobQueueScreen> {
 
   Future<void> _resume(OperationalJob job) => _run(() => widget.repository.resume(job.id), 'Resumed.');
   Future<void> _reopen(OperationalJob job) => _run(() => widget.repository.reopen(job.id), 'Reopened.');
+
+  // PG-015: the three final lifecycle actions. Each just calls its own
+  // Edge Function via _run — no client-side stage or role logic beyond
+  // deciding whether to SHOW the button (see build() below).
+  Future<void> _markReady(OperationalJob job) =>
+      _run(() => widget.repository.markReadyForDispatch(job.id), 'Marked ready for dispatch.');
+  Future<void> _dispatch(OperationalJob job) =>
+      _run(() => widget.repository.dispatch(job.id), 'Dispatched.');
+  Future<void> _release(OperationalJob job) =>
+      _run(() => widget.repository.release(job.id), 'Released.');
 
   Future<void> _run(Future<void> Function() action, String successMessage) async {
     setState(() => _busy = true);
@@ -172,6 +195,34 @@ class _JobQueueScreenState extends State<JobQueueScreen> {
                                     ],
                                     if (job.status == 'cancelled')
                                       PGPrimaryButton(label: 'Reopen', expand: false, onPressed: _busy ? null : () => _reopen(job)),
+                                    // PG-015: shown only when the caller's own role
+                                    // plausibly matches AND the job is at the exact
+                                    // matching stage — UI convenience only, see
+                                    // this file's class-level comment.
+                                    if (job.status == 'active' &&
+                                        job.currentStage == 'IN_PRODUCTION' &&
+                                        (_ownRole == 'production' || _ownRole == 'super_admin'))
+                                      PGPrimaryButton(
+                                        label: 'Mark Ready for Dispatch',
+                                        expand: false,
+                                        onPressed: _busy ? null : () => _markReady(job),
+                                      ),
+                                    if (job.status == 'active' &&
+                                        job.currentStage == 'READY_FOR_DISPATCH' &&
+                                        (_ownRole == 'inventory' || _ownRole == 'super_admin'))
+                                      PGPrimaryButton(
+                                        label: 'Mark Dispatched',
+                                        expand: false,
+                                        onPressed: _busy ? null : () => _dispatch(job),
+                                      ),
+                                    if (job.status == 'active' &&
+                                        job.currentStage == 'DISPATCHED' &&
+                                        (_ownRole == 'centre_manager' || _ownRole == 'super_admin'))
+                                      PGPrimaryButton(
+                                        label: 'Release Job',
+                                        expand: false,
+                                        onPressed: _busy ? null : () => _release(job),
+                                      ),
                                   ],
                                 ),
                               ],
