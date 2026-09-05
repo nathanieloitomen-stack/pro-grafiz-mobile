@@ -28,6 +28,11 @@
 // function does not relax that in any way. If pricing isn't configured,
 // accepting fails with the same honest reason, and no job is created.
 //
+// PG-012 update: both the accept and decline paths now write an
+// audit_events row — "operational actions must be audited" (PG-012's
+// explicit requirement). No other logic in this function changed;
+// verify with git diff against e40dd8e.
+//
 // UNTESTED: written without a live Supabase project or network access
 // to verify against. Review before deploying.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.0';
@@ -110,6 +115,17 @@ Deno.serve(async (req: Request) => {
       })
       .eq('id', quoteRequest.id);
     if (updateError) return jsonResponse({ error: updateError.message }, 500);
+
+    await admin.from('audit_events').insert({
+      actor_user_id: userData.user.id,
+      action: 'quote_request.decline',
+      entity_type: 'quote_request',
+      entity_id: quoteRequest.id,
+      before_state: { status: 'pending' },
+      after_state: { status: 'declined' },
+      reason: body.decision_reason,
+    });
+
     return jsonResponse({ ok: true, status: 'declined' });
   }
 
@@ -206,6 +222,15 @@ Deno.serve(async (req: Request) => {
     })
     .eq('id', quoteRequest.id);
   if (qrUpdateError) return jsonResponse({ error: qrUpdateError.message }, 500);
+
+  await admin.from('audit_events').insert({
+    actor_user_id: userData.user.id,
+    action: 'quote_request.accept',
+    entity_type: 'quote_request',
+    entity_id: quoteRequest.id,
+    before_state: { status: 'pending' },
+    after_state: { status: 'accepted', job_id: job.id },
+  });
 
   return jsonResponse({ ok: true, status: 'accepted', quote, job });
 });

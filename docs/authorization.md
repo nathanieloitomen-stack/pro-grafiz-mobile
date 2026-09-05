@@ -302,6 +302,21 @@ the PG-008/009 commits. See `docs/documents.md` for the full detail,
 including the document-format decision (HTML, not PDF — flagged,
 not specified anywhere) and the exact data source for every field.
 
+## PG-012 addendum
+
+PG-012 (Operations) added zero new RLS policies and zero schema
+changes. Four new Edge Functions (`hold-job`, `resume-job`,
+`cancel-job`, `reopen-job`) write to `jobs` and `audit_events` via
+service-role — both tables retain zero client write policies, unchanged
+from PG-005. `decide-quote-request` (PG-008) was modified to add
+`audit_events` logging — verified via `git diff` to be exactly that and
+nothing else. Authority for the four new functions is narrower than
+this codebase's usual "any central staff" pattern (Centre Manager
+own-branch + Super Admin only) — a deliberate, flagged decision since
+no broader authority is specified anywhere. See `docs/operations.md`
+for the full detail, including confirmation (by direct search) that no
+SLA threshold exists anywhere in the governing documents.
+
 ## Verification status
 
 Per the explicit test requirement for this task, every claim below is

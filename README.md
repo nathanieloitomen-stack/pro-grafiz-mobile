@@ -38,20 +38,19 @@ pro-grafiz/
 
 ## Status
 
-**PG-001 through PG-011 complete.** PGJO and PGAO documents now
-generate automatically — once, idempotently — at the exact moments
-already built in PG-008/PG-009 (design approval, deposit confirmation).
-Every field in a generated document traces to a real database query;
-none is invented — see [`docs/documents.md`](./docs/documents.md), which
-also flags the one unspecified decision found (document file format —
-built as HTML, since no format was ever specified and no PDF library is
-verified to work in this environment). **All pricing/payment decisions
-from PG-007/009 remain open** — see
-[`docs/quote-engine.md`](./docs/quote-engine.md) and
-[`docs/payments.md`](./docs/payments.md). **PG-005 has still not been
-executed against a live database** — see
-[`docs/authorization.md`](./docs/authorization.md). No staff Intake/
-Operations screens, no notifications exist yet. See
+**PG-001 through PG-012 complete.** Staff can now review Intake
+requests, manage the Job Queue (hold/resume/cancel/reopen, all
+audited), and see a basic operations dashboard — see
+[`docs/operations.md`](./docs/operations.md), which confirms by direct
+search that **no SLA threshold exists anywhere in either governing
+document** and none was invented; authority for these operational
+actions was deliberately narrowed to Centre Manager (own branch) and
+Super Admin only, flagged as this task's own interpretation since none
+is specified. **All pricing/payment/format decisions from
+PG-007/009/011 remain open.** **PG-005 has still not been executed
+against a live database** — see
+[`docs/authorization.md`](./docs/authorization.md). No notifications,
+no offline sync, no CAD pipeline automation exist yet. See
 [`PRO_GRAFIZ_MASTER_SPEC.md`](./PRO_GRAFIZ_MASTER_SPEC.md#17-development-sequence)
 for the full task sequence. Do not implement tasks beyond the currently
 authorized one in a single pass.

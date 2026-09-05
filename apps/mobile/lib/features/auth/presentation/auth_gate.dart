@@ -8,6 +8,10 @@ import '../../design_desk/presentation/design_desk_screen.dart';
 import '../../home/presentation/home_screen.dart';
 import '../../jobs/data/job_repository.dart';
 import '../../jobs/presentation/jobs_screen.dart';
+import '../../operations/data/operations_repository.dart';
+import '../../operations/presentation/intake_screen.dart';
+import '../../operations/presentation/job_queue_screen.dart';
+import '../../operations/presentation/operations_dashboard_screen.dart';
 import '../../payments/data/payment_repository.dart';
 import '../../payments/presentation/staff_payments_screen.dart';
 import '../data/auth_repository.dart';
@@ -181,8 +185,7 @@ class _StaffSignedInPlaceholder extends StatelessWidget {
               Text('Signed in — staff', style: PGTextStyles.screenTitle.copyWith(color: PGColors.ink)),
               const SizedBox(height: PGSpacing.groupGap),
               Text(
-                'Staff feature screens (Intake, Job queue, Design desk, '
-                'Admin) start in later PG tasks.',
+                'Admin (staff account management) starts in a later PG task.',
                 style: PGTextStyles.body.copyWith(color: PGColors.textMid),
               ),
               const SizedBox(height: PGSpacing.groupGap),
@@ -200,6 +203,33 @@ class _StaffSignedInPlaceholder extends StatelessWidget {
                 onPressed: () => Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) => DesignDeskScreen(repository: DesignDeskRepository(Supabase.instance.client)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: PGSpacing.groupGap),
+              PGSecondaryButton(
+                label: 'Intake',
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => IntakeScreen(repository: OperationsRepository(Supabase.instance.client)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: PGSpacing.groupGap),
+              PGSecondaryButton(
+                label: 'Job Queue',
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => JobQueueScreen(repository: OperationsRepository(Supabase.instance.client)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: PGSpacing.groupGap),
+              PGSecondaryButton(
+                label: 'Dashboard',
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => OperationsDashboardScreen(repository: OperationsRepository(Supabase.instance.client)),
                   ),
                 ),
               ),
