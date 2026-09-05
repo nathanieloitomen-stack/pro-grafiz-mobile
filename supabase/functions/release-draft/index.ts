@@ -24,10 +24,17 @@
 // authorization changes, which is what staff_get_draft_dxf_path()'s
 // PG-010 refinement (Production role requires released) actually gates.
 //
+// PG-013 update: the customer is notified once the job successfully
+// advances to DESIGN_SENT_FOR_APPROVAL — matches Master Spec §16's
+// "design ready"/"approval requested" events. Swallowed on failure,
+// same treatment as every other post-transition side effect in this
+// codebase.
+//
 // UNTESTED: written without a live Supabase project or network access
 // to verify against. Review before deploying.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.0';
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts';
+import { notify } from '../_shared/notifier.ts';
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
@@ -97,7 +104,7 @@ Deno.serve(async (req: Request) => {
 
   const { data: job, error: jobError } = await admin
     .from('jobs')
-    .select('id, current_stage, status')
+    .select('id, current_stage, status, job_ref, customer_id')
     .eq('id', draft.job_id)
     .maybeSingle();
 
@@ -115,6 +122,26 @@ Deno.serve(async (req: Request) => {
         note: `Draft ${draft.id} released`,
       });
       jobAdvanced = true;
+
+      try {
+        const { data: customer } = await admin
+          .from('customers')
+          .select('auth_user_id')
+          .eq('id', job.customer_id)
+          .maybeSingle();
+        if (customer?.auth_user_id) {
+          await notify(admin, {
+            recipientUserId: customer.auth_user_id,
+            type: 'design.ready_for_approval',
+            title: 'Your design is ready',
+            body: `${job.job_ref} is ready for your review.`,
+            entityType: 'job',
+            entityId: job.id,
+          });
+        }
+      } catch (notifyError) {
+        console.error('Notification failed:', notifyError);
+      }
     }
   }
 

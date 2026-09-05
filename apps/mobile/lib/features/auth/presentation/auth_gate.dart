@@ -8,6 +8,8 @@ import '../../design_desk/presentation/design_desk_screen.dart';
 import '../../home/presentation/home_screen.dart';
 import '../../jobs/data/job_repository.dart';
 import '../../jobs/presentation/jobs_screen.dart';
+import '../../notifications/data/notification_repository.dart';
+import '../../notifications/presentation/notifications_screen.dart';
 import '../../operations/data/operations_repository.dart';
 import '../../operations/presentation/intake_screen.dart';
 import '../../operations/presentation/job_queue_screen.dart';
@@ -116,6 +118,15 @@ class _BrowsingShell extends StatelessWidget {
                       ),
                     ),
                     child: Text('My jobs', style: PGTextStyles.button.copyWith(color: PGColors.ink)),
+                  ),
+                if (signedIn)
+                  TextButton(
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => NotificationsScreen(repository: NotificationRepository(Supabase.instance.client)),
+                      ),
+                    ),
+                    child: Text('Notifications', style: PGTextStyles.button.copyWith(color: PGColors.ink)),
                   ),
                 TextButton(
                   onPressed: signedIn ? authRepository.signOut : () => _showSignInChoice(context),
@@ -230,6 +241,15 @@ class _StaffSignedInPlaceholder extends StatelessWidget {
                 onPressed: () => Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) => OperationsDashboardScreen(repository: OperationsRepository(Supabase.instance.client)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: PGSpacing.groupGap),
+              PGSecondaryButton(
+                label: 'Notifications',
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => NotificationsScreen(repository: NotificationRepository(Supabase.instance.client)),
                   ),
                 ),
               ),

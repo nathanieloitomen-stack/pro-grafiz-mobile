@@ -12,11 +12,17 @@
 // Allowed from either 'active' or 'on_hold' — cancelling a currently
 // held job is a normal operational path (no need to resume it first).
 //
+// PG-013 update: the customer is notified of the cancellation,
+// including the reason — matches Master Spec §16's "hold" event
+// treatment applied consistently to cancellation too, since both are
+// operational actions a customer needs to know about immediately.
+//
 // UNTESTED: written without a live Supabase project or network access
 // to verify against. Review before deploying.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.0';
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts';
 import { authorizeOperationalAction } from '../_shared/staff_auth.ts';
+import { notify } from '../_shared/notifier.ts';
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
@@ -52,7 +58,7 @@ Deno.serve(async (req: Request) => {
 
   const { data: job, error: jobError } = await admin
     .from('jobs')
-    .select('id, branch_id, status, current_stage')
+    .select('id, branch_id, status, current_stage, job_ref, customer_id')
     .eq('id', body.job_id)
     .maybeSingle();
   if (jobError || !job) {
@@ -88,6 +94,26 @@ Deno.serve(async (req: Request) => {
     after_state: { status: 'cancelled' },
     reason: body.cancel_reason,
   });
+
+  try {
+    const { data: customer } = await admin
+      .from('customers')
+      .select('auth_user_id')
+      .eq('id', job.customer_id)
+      .maybeSingle();
+    if (customer?.auth_user_id) {
+      await notify(admin, {
+        recipientUserId: customer.auth_user_id,
+        type: 'job.cancelled',
+        title: 'Your job has been cancelled',
+        body: `${job.job_ref}: ${body.cancel_reason}`,
+        entityType: 'job',
+        entityId: job.id,
+      });
+    }
+  } catch (notifyError) {
+    console.error('Notification failed:', notifyError);
+  }
 
   return jsonResponse({ ok: true, status: 'cancelled' });
 });

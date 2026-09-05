@@ -84,6 +84,28 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     }
   }
 
+  /// "Controlled WhatsApp handoff" (Master Spec §6 V1 bullet, distinct
+  /// from V2's "Transactional WhatsApp" — this is a manual link to a
+  /// human conversation, not automated messaging). Uses the company's
+  /// already-known WhatsApp number (visible on HomeScreen, PG-006), not
+  /// a new company detail invented here. Shows the wa.me link rather
+  /// than launching it directly — no URL-launching package is declared
+  /// in this project, and adding an unverified new dependency felt
+  /// riskier than showing the link for the person to open themselves,
+  /// matching the same choice made for signed URLs throughout PG-010/011.
+  void _openWhatsAppHandoff(String jobRef) {
+    final message = Uri.encodeComponent('Hi, I need help with job $jobRef.');
+    final url = 'https://wa.me/2349152493122?text=$message';
+    showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Continue on WhatsApp'),
+        content: SelectableText(url),
+        actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Close'))],
+      ),
+    );
+  }
+
   Future<void> _approve() async {
     setState(() => _submitting = true);
     try {
@@ -302,6 +324,12 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               ],
             ),
           ],
+
+          const SizedBox(height: PGSpacing.sectionGap),
+          PGSecondaryButton(
+            label: 'Need help? Continue on WhatsApp',
+            onPressed: () => _openWhatsAppHandoff(detail.jobRef),
+          ),
 
           if (detail.currentStage == 'DESIGN_SENT_FOR_APPROVAL' && detail.status == 'active') ...[
             const SizedBox(height: PGSpacing.sectionGap),

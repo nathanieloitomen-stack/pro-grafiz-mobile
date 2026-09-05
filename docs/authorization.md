@@ -317,6 +317,20 @@ no broader authority is specified anywhere. See `docs/operations.md`
 for the full detail, including confirmation (by direct search) that no
 SLA threshold exists anywhere in the governing documents.
 
+## PG-013 addendum
+
+PG-013 (Notifications) added zero new RLS policies — one migration adds
+a trigger (not a policy) notifying a branch's Centre Manager on new
+`quote_request` submissions. `notifications` retains zero client INSERT
+policy, unchanged from PG-005; six existing functions were modified to
+add one notification call each after their existing logic succeeds —
+verified via `git diff` to be exactly that in each case. See
+`docs/notifications.md` for a significant finding: three of the eight
+job stages (`READY_FOR_DISPATCH`, `DISPATCHED`, `RELEASED`) have no
+transition mechanism anywhere in this codebase, and no task in the
+sequence explicitly owns building one — reported rather than filled in
+under "Notifications."
+
 ## Verification status
 
 Per the explicit test requirement for this task, every claim below is

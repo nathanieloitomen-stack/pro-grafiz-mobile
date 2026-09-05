@@ -40,6 +40,10 @@
 // fully succeeded by that point — a secondary audit artifact failing to
 // generate must not undo a real, confirmed financial transaction.
 //
+// PG-013 update: the customer is also notified once confirmation and
+// document generation both attempt to complete — same swallowed-failure
+// treatment, a notification failure never undoes the payment.
+//
 // UNTESTED: written without a live Supabase project or network access
 // to verify against. Review before deploying — this is the one
 // function in this task where a subtle bug has direct financial
@@ -47,6 +51,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.0';
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts';
 import { generateDocument } from '../_shared/document_generator.ts';
+import { notify } from '../_shared/notifier.ts';
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
@@ -130,7 +135,7 @@ Deno.serve(async (req: Request) => {
   if (payment.kind === 'deposit') {
     const { data: job } = await admin
       .from('jobs')
-      .select('id, current_stage')
+      .select('id, current_stage, job_ref, customer_id')
       .eq('id', payment.job_id)
       .maybeSingle();
     if (job?.current_stage === 'SUBMITTED') {
@@ -160,6 +165,26 @@ Deno.serve(async (req: Request) => {
           // payment is already confirmed; a document-generation failure
           // is logged, not propagated as an error on this response.
           console.error('PGJO generation failed:', docError);
+        }
+
+        try {
+          const { data: customer } = await admin
+            .from('customers')
+            .select('auth_user_id')
+            .eq('id', job.customer_id)
+            .maybeSingle();
+          if (customer?.auth_user_id) {
+            await notify(admin, {
+              recipientUserId: customer.auth_user_id,
+              type: 'payment.confirmed',
+              title: 'Payment confirmed',
+              body: `Your deposit for ${job.job_ref} has been confirmed.`,
+              entityType: 'job',
+              entityId: job.id,
+            });
+          }
+        } catch (notifyError) {
+          console.error('Notification failed:', notifyError);
         }
       }
     }

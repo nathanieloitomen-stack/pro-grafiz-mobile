@@ -38,19 +38,21 @@ pro-grafiz/
 
 ## Status
 
-**PG-001 through PG-012 complete.** Staff can now review Intake
-requests, manage the Job Queue (hold/resume/cancel/reopen, all
-audited), and see a basic operations dashboard — see
-[`docs/operations.md`](./docs/operations.md), which confirms by direct
-search that **no SLA threshold exists anywhere in either governing
-document** and none was invented; authority for these operational
-actions was deliberately narrowed to Centre Manager (own branch) and
-Super Admin only, flagged as this task's own interpretation since none
-is specified. **All pricing/payment/format decisions from
-PG-007/009/011 remain open.** **PG-005 has still not been executed
-against a live database** — see
-[`docs/authorization.md`](./docs/authorization.md). No notifications,
-no offline sync, no CAD pipeline automation exist yet. See
+**PG-001 through PG-013 complete.** In-app notifications now fire for
+every Master Spec §16 event that has a real trigger mechanism, plus a
+controlled WhatsApp handoff link — see
+[`docs/notifications.md`](./docs/notifications.md), which leads with a
+significant finding: **three of the eight job stages
+(`READY_FOR_DISPATCH`, `DISPATCHED`, `RELEASED`) have no transition
+mechanism anywhere in this codebase**, and no task in the development
+sequence explicitly owns building one — flagged for your decision
+rather than filled in. Real push delivery (FCM) is not wired up — no
+Firebase project/credentials exist in this environment; only the
+in-app inbox works currently. **All pricing/payment/format/authority
+decisions from PG-007/009/011/012 remain open.** **PG-005 has still not
+been executed against a live database** — see
+[`docs/authorization.md`](./docs/authorization.md). No offline sync, no
+CAD pipeline automation exist yet. See
 [`PRO_GRAFIZ_MASTER_SPEC.md`](./PRO_GRAFIZ_MASTER_SPEC.md#17-development-sequence)
 for the full task sequence. Do not implement tasks beyond the currently
 authorized one in a single pass.

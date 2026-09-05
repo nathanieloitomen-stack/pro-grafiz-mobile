@@ -27,11 +27,19 @@
 // wrapped so a failure there never undoes the approval itself, which
 // has already fully succeeded by that point.
 //
+// PG-013 update: requesting a change notifies whoever created the
+// job's most recent draft (drafts.created_by, a profiles.id — usable
+// directly as a recipient since profiles.id = auth.users.id). Matches
+// Master Spec §16's "design change requested" event. No approve-side
+// notification was added here — that event ("design ready"/"approval
+// requested") is already covered at its actual source, release-draft.
+//
 // UNTESTED: written without a live Supabase project or network access
 // to verify against. Review before deploying.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.0';
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts';
 import { generateDocument } from '../_shared/document_generator.ts';
+import { notify } from '../_shared/notifier.ts';
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
@@ -164,6 +172,28 @@ Deno.serve(async (req: Request) => {
     customer_action: 'requested_change',
     note: body.request_note,
   });
+
+  try {
+    const { data: latestDraft } = await admin
+      .from('drafts')
+      .select('created_by')
+      .eq('job_id', job.id)
+      .order('version', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (latestDraft?.created_by) {
+      await notify(admin, {
+        recipientUserId: latestDraft.created_by,
+        type: 'design.change_requested',
+        title: 'Change requested',
+        body: body.request_note,
+        entityType: 'job',
+        entityId: job.id,
+      });
+    }
+  } catch (notifyError) {
+    console.error('Notification failed:', notifyError);
+  }
 
   return jsonResponse({ ok: true, current_stage: nextStage });
 });

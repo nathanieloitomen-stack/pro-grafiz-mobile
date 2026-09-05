@@ -28,15 +28,21 @@
 // function does not relax that in any way. If pricing isn't configured,
 // accepting fails with the same honest reason, and no job is created.
 //
-// PG-012 update: both the accept and decline paths now write an
+// PG-012 update: both the accept and decline paths write an
 // audit_events row — "operational actions must be audited" (PG-012's
-// explicit requirement). No other logic in this function changed;
-// verify with git diff against e40dd8e.
+// explicit requirement).
+//
+// PG-013 update: both paths also notify the customer (looked up via
+// customers.auth_user_id, never a client-supplied recipient).
+// Notification failures are swallowed — see _shared/notifier.ts — and
+// never block the decision itself. No other logic in this function
+// changed across either update; verify with git diff against e40dd8e.
 //
 // UNTESTED: written without a live Supabase project or network access
 // to verify against. Review before deploying.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.0';
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts';
+import { notify } from '../_shared/notifier.ts';
 import { calculateQuote } from '../_shared/quote_calculator.ts';
 
 Deno.serve(async (req: Request) => {
@@ -125,6 +131,26 @@ Deno.serve(async (req: Request) => {
       after_state: { status: 'declined' },
       reason: body.decision_reason,
     });
+
+    try {
+      const { data: declinedCustomer } = await admin
+        .from('customers')
+        .select('auth_user_id')
+        .eq('id', quoteRequest.customer_id)
+        .maybeSingle();
+      if (declinedCustomer?.auth_user_id) {
+        await notify(admin, {
+          recipientUserId: declinedCustomer.auth_user_id,
+          type: 'quote_request.declined',
+          title: 'Your request was declined',
+          body: body.decision_reason,
+          entityType: 'quote_request',
+          entityId: quoteRequest.id,
+        });
+      }
+    } catch (notifyError) {
+      console.error('Notification failed:', notifyError);
+    }
 
     return jsonResponse({ ok: true, status: 'declined' });
   }
@@ -231,6 +257,26 @@ Deno.serve(async (req: Request) => {
     before_state: { status: 'pending' },
     after_state: { status: 'accepted', job_id: job.id },
   });
+
+  try {
+    const { data: acceptedCustomer } = await admin
+      .from('customers')
+      .select('auth_user_id')
+      .eq('id', quoteRequest.customer_id)
+      .maybeSingle();
+    if (acceptedCustomer?.auth_user_id) {
+      await notify(admin, {
+        recipientUserId: acceptedCustomer.auth_user_id,
+        type: 'quote_request.accepted',
+        title: 'Your request was accepted',
+        body: `Job ${job.job_ref} has been opened.`,
+        entityType: 'job',
+        entityId: job.id,
+      });
+    }
+  } catch (notifyError) {
+    console.error('Notification failed:', notifyError);
+  }
 
   return jsonResponse({ ok: true, status: 'accepted', quote, job });
 });
