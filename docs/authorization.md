@@ -273,6 +273,20 @@ existing zero-client-write-policy design from PG-005 exactly. See
 `docs/payments.md` for the full detail, including the payment-provider
 stop-and-report and the fresh-challenge confirmation mechanism.
 
+## PG-010 addendum
+
+PG-010 (Design Desk/CAD QA) added zero new RLS policies — one migration
+creates a new, isolated Storage bucket (`job-drafts`, zero client
+policies, access only via service-role Edge Functions) and *tightens*
+one existing SECURITY DEFINER function
+(`staff_get_draft_dxf_path`, PG-005) so the Production role additionally
+requires a draft to be `released` — Designer/Super-Admin/customer access
+is byte-for-byte unchanged. See `docs/design-desk.md` for the full
+detail, including a real V1/V2 spec conflict (automated SVG/DXF
+generation and manufacturing checks are V2; only the review/release
+*workflow* is V1) found and respected rather than resolved by inventing
+automation that isn't specified.
+
 ## Verification status
 
 Per the explicit test requirement for this task, every claim below is

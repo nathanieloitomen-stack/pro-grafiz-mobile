@@ -3,6 +3,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../shared/design_system/design_system.dart';
 import '../../catalogue/data/catalogue_repository.dart';
+import '../../design_desk/data/design_desk_repository.dart';
+import '../../design_desk/presentation/design_desk_screen.dart';
 import '../../home/presentation/home_screen.dart';
 import '../../jobs/data/job_repository.dart';
 import '../../jobs/presentation/jobs_screen.dart';
@@ -189,6 +191,15 @@ class _StaffSignedInPlaceholder extends StatelessWidget {
                 onPressed: () => Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) => StaffPaymentsScreen(paymentRepository: PaymentRepository(Supabase.instance.client)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: PGSpacing.groupGap),
+              PGSecondaryButton(
+                label: 'Design Desk',
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => DesignDeskScreen(repository: DesignDeskRepository(Supabase.instance.client)),
                   ),
                 ),
               ),
