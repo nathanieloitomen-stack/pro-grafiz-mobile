@@ -1,0 +1,2316 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><meta name="design_doc_mode" content="canvas"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Karla:ital,wght@0,300..800;1,400&display=swap" rel="stylesheet"><style>
+body{margin:0;background:#E9DFD2;font-family:Karla,system-ui,sans-serif}
+a{color:#C33B22;text-decoration:none}a:hover{color:#9E2C16}
+*{-webkit-tap-highlight-color:transparent}
+::-webkit-scrollbar{width:0;height:0}
+@keyframes pgPulse{0%,100%{opacity:.35;transform:scale(1)}50%{opacity:1;transform:scale(1.35)}}
+@keyframes pgRise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes pgToast{0%{opacity:0;transform:translateY(14px)}12%{opacity:1;transform:none}88%{opacity:1;transform:none}100%{opacity:0;transform:translateY(8px)}}
+</style></helmet>
+<div style="min-height:100%;display:flex;flex-direction:column;align-items:center;gap:18px;padding:44px 24px 60px;box-sizing:border-box">
+<div style="display:flex;align-items:center;gap:14px;color:#5C4B3F;font-size:12px;letter-spacing:.14em;text-transform:uppercase">
+<img src="assets/logo-on-light.png" alt="ProGrafiz Designs" style="height:20px;width:auto;display:block">
+<span style="width:1px;height:16px;background:rgba(30,22,19,.2)"></span>
+<span>Mobile app — warm direction</span>
+</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+<div style="height:100%;display:flex;flex-direction:column;overflow:hidden;background:#FBF4EA;font-family:Karla,system-ui,sans-serif;color:#1E1613">
+
+<div style="flex:none;padding:58px 18px 10px;display:flex;align-items:center;gap:10px;background:#FBF4EA;border-bottom:1px solid rgba(30,22,19,.07);z-index:5">
+<sc-if value="{{ canBack }}" hint-placeholder-val="{{ false }}">
+<button onClick="{{ goBack }}" style="width:38px;height:38px;flex:none;border:1px solid rgba(30,22,19,.12);background:#fff;border-radius:999px;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0" style-active="transform:scale(.92)">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="#1E1613" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
+</sc-if>
+<sc-if value="{{ showLogo }}" hint-placeholder-val="{{ true }}">
+<img src="assets/logo-on-light.png" alt="ProGrafiz" style="height:19px;width:auto;display:block">
+</sc-if>
+<div style="flex:1;font-family:'Instrument Serif',Georgia,serif;font-size:22px;line-height:1;letter-spacing:-.01em">{{ headerTitle }}</div>
+<sc-if value="{{ showBell }}" hint-placeholder-val="{{ true }}">
+<button onClick="{{ openNotifs }}" style="position:relative;width:34px;height:34px;flex:none;border:1px solid rgba(30,22,19,.12);background:#fff;border-radius:999px;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0" style-active="transform:scale(.92)">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6.5 10a5.5 5.5 0 0111 0c0 4 1.5 5.4 1.5 5.4H5s1.5-1.4 1.5-5.4z" stroke="#1E1613" stroke-width="1.6" stroke-linejoin="round"/><path d="M10.2 18.6a2 2 0 003.6 0" stroke="#1E1613" stroke-width="1.6" stroke-linecap="round"/></svg>
+<sc-if value="{{ unreadCount }}" hint-placeholder-val="{{ false }}">
+<span style="position:absolute;top:-2px;right:-2px;min-width:17px;height:17px;border-radius:999px;background:#C33B22;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px;box-sizing:border-box">{{ unreadCount }}</span>
+</sc-if>
+</button>
+</sc-if>
+<button onClick="{{ toggleStaff }}" style="height:34px;padding:0 13px;border-radius:999px;border:1px solid rgba(30,22,19,.12);background:{{ staffChipBg }};color:{{ staffChipFg }};font-family:Karla;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;gap:6px" style-active="transform:scale(.94)">
+<span style="width:6px;height:6px;border-radius:999px;background:{{ staffDotBg }}"></span>{{ modeLabel }}
+</button>
+</div>
+
+<div style="flex:1;overflow-y:auto;overscroll-behavior:contain">
+
+<sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+<div style="padding:18px 18px 130px;display:flex;flex-direction:column;gap:22px">
+
+<div style="display:flex;flex-direction:column;gap:6px">
+<div style="font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">{{ greeting }}, Amara</div>
+<h1 style="margin:0;font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:38px;line-height:1.02;letter-spacing:-.02em">Metal, made<br><em style="color:#C33B22">into something warm.</em></h1>
+</div>
+
+<div onClick="{{ openActiveJob }}" style="position:relative;overflow:hidden;border-radius:28px;background:#1E1613;color:#FBF4EA;padding:20px 20px 18px;cursor:pointer;box-shadow:0 14px 30px -18px rgba(30,22,19,.85)" style-active="transform:scale(.985)">
+<div style="position:absolute;inset:0;opacity:.16;pointer-events:none">{{ heroPlate }}</div>
+<div style="position:relative;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:center;gap:8px">
+<span style="width:7px;height:7px;border-radius:999px;background:#E8452B;animation:pgPulse 1.8s ease-in-out infinite"></span>
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(251,244,234,.62)">Your job {{ activeJobId }}</span>
+</div>
+<div style="font-family:'Instrument Serif',Georgia,serif;font-size:25px;line-height:1.12">{{ activeStageLabel }}</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="height:5px;border-radius:999px;background:rgba(251,244,234,.16);overflow:hidden">
+<div style="height:100%;border-radius:999px;background:linear-gradient(90deg,#E8452B,#F0A03C);width:{{ activeProgress }};transition:width .6s cubic-bezier(.4,0,.2,1)"></div>
+</div>
+<div style="display:flex;justify-content:space-between;font-size:12px;color:rgba(251,244,234,.6)">
+<span>{{ activeStageStep }}</span><span>Tap to follow along</span>
+</div>
+</div>
+</div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<button onClick="{{ goQuote }}" style="text-align:left;border:1px solid rgba(30,22,19,.1);background:#fff;border-radius:24px;padding:15px 16px;cursor:pointer;font-family:Karla;display:flex;flex-direction:column;gap:10px" style-active="transform:scale(.96)">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 20l3.2-.6L19 7.6a2.3 2.3 0 00-3.3-3.3L4 16.1 3.4 19.3z" stroke="#C33B22" stroke-width="1.6" stroke-linejoin="round"/><path d="M14 6.3l3.4 3.4" stroke="#C33B22" stroke-width="1.6"/></svg>
+<span style="font-size:14px;font-weight:700">Start a job</span>
+<span style="font-size:11.5px;color:#8A7566;line-height:1.35">Sketch, material, thickness</span>
+</button>
+<button onClick="{{ goPatterns }}" style="text-align:left;border:1px solid rgba(30,22,19,.1);background:#fff;border-radius:24px;padding:15px 16px;cursor:pointer;font-family:Karla;display:flex;flex-direction:column;gap:10px" style-active="transform:scale(.96)">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.2" stroke="#C33B22" stroke-width="1.6"/><path d="M12 3.8v16.4M3.8 12h16.4M6.2 6.2l11.6 11.6M17.8 6.2L6.2 17.8" stroke="#C33B22" stroke-width="1.2"/></svg>
+<span style="font-size:14px;font-weight:700">Browse patterns</span>
+<span style="font-size:11.5px;color:#8A7566;line-height:1.35">1,000 laser-cut designs</span>
+</button>
+</div>
+
+<button onClick="{{ openScan }}" style="text-align:left;border:0;background:#F2E4D2;border-radius:26px;padding:17px 18px;cursor:pointer;font-family:Karla;display:flex;align-items:center;gap:14px" style-active="transform:scale(.98)">
+<span style="width:44px;height:44px;flex:none;border-radius:16px;background:#1E1613;display:flex;align-items:center;justify-content:center">
+<svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="M4 8.4a1.4 1.4 0 011.4-1.4h2.2l1.2-2h6.4l1.2 2h2.2A1.4 1.4 0 0120 8.4v9.2a1.4 1.4 0 01-1.4 1.4H5.4A1.4 1.4 0 014 17.6z" stroke="#FBF4EA" stroke-width="1.5" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.4" stroke="#F0A03C" stroke-width="1.5"/></svg>
+</span>
+<span style="flex:1;display:flex;flex-direction:column;gap:3px">
+<span style="font-size:14px;font-weight:700">Scan a sketch</span>
+<span style="font-size:11.5px;color:#6E5A4C;line-height:1.4">Photograph a drawing on paper. We straighten it, clean the lines and match it against the catalogue.</span>
+</span>
+</button>
+
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:baseline;justify-content:space-between">
+<h2 style="margin:0;font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:23px">Picked for your gate</h2>
+<button onClick="{{ goPatterns }}" style="border:0;background:none;padding:0;font-family:Karla;font-size:12.5px;font-weight:700;color:#C33B22;cursor:pointer">See all</button>
+</div>
+<div style="display:flex;gap:12px;overflow-x:auto;padding:2px 18px 4px;margin:0 -18px;scroll-snap-type:x mandatory">
+<sc-for list="{{ railDesigns }}" as="d" hint-placeholder-count="4">
+<div onClick="{{ d.open }}" style="flex:none;width:146px;scroll-snap-align:start;cursor:pointer;display:flex;flex-direction:column;gap:8px" style-active="transform:scale(.96)">
+<div style="height:146px;border-radius:24px;overflow:hidden;background:#EDE2D4;border:1px solid rgba(30,22,19,.08);display:flex;align-items:center;justify-content:center">{{ d.tile }}</div>
+<div style="display:flex;flex-direction:column;gap:2px">
+<span style="font-size:13px;font-weight:700;line-height:1.2">{{ d.name }}</span>
+<span style="font-size:11px;color:#8A7566;letter-spacing:.06em">{{ d.id }}</span>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:12px">
+<h2 style="margin:0;font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:23px">What we make</h2>
+<div style="display:flex;flex-direction:column;gap:1px;background:rgba(30,22,19,.09);border-radius:26px;overflow:hidden;border:1px solid rgba(30,22,19,.09)">
+<sc-for list="{{ services }}" as="s" hint-placeholder-count="6">
+<div onClick="{{ s.tap }}" style="background:#fff;padding:15px 17px;display:flex;align-items:center;gap:13px;cursor:pointer" style-active="background:#F6EDE1">
+<span style="font-family:'Instrument Serif',Georgia,serif;font-size:15px;color:#C33B22;width:22px">{{ s.n }}</span>
+<span style="flex:1;display:flex;flex-direction:column;gap:2px">
+<span style="font-size:14px;font-weight:700">{{ s.name }}</span>
+<span style="font-size:11.5px;color:#8A7566;line-height:1.35">{{ s.blurb }}</span>
+</span>
+<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="#C3B2A3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="border-radius:28px;background:#F2E4D2;padding:20px;display:flex;flex-direction:column;gap:12px">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">From our customers</span>
+<p style="margin:0;font-family:'Instrument Serif',Georgia,serif;font-size:21px;line-height:1.3;text-wrap:pretty">“They are great at what they do. Good customer service too”</p>
+<span style="font-size:12.5px;color:#6E5A4C">Abednego Oghenechovwi · Google review</span>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:6px;padding:4px 2px">
+<span style="font-size:12.5px;color:#8A7566;line-height:1.5">Victor Ayemere Street, Idu Industrial District, Abuja</span>
+<button onClick="{{ toastWhatsApp }}" style="align-self:flex-start;border:0;padding:0;background:none;font-family:Karla;font-size:13px;font-weight:700;color:#C33B22;cursor:pointer">Message us on WhatsApp →</button>
+</div>
+
+</div>
+</sc-if>
+
+<sc-if value="{{ isPatterns }}" hint-placeholder-val="{{ false }}">
+<div style="padding:16px 18px 130px;display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid rgba(30,22,19,.1);border-radius:999px;padding:11px 16px">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.8" stroke="#8A7566" stroke-width="1.6"/><path d="M10.6 10.6L14 14" stroke="#8A7566" stroke-width="1.6" stroke-linecap="round"/></svg>
+<input value="{{ query }}" onChange="{{ setQuery }}" placeholder="Search PGLC ID, name or category" style="flex:1;border:0;outline:0;background:none;font-family:Karla;font-size:13.5px;color:#1E1613;min-width:0">
+</div>
+<button onClick="{{ openScan }}" style="border:0;background:#F2E4D2;border-radius:22px;padding:14px 16px;cursor:pointer;font-family:Karla;display:flex;align-items:center;gap:12px;text-align:left" style-active="transform:scale(.98)">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="flex:none"><path d="M4 8.4a1.4 1.4 0 011.4-1.4h2.2l1.2-2h6.4l1.2 2h2.2A1.4 1.4 0 0120 8.4v9.2a1.4 1.4 0 01-1.4 1.4H5.4A1.4 1.4 0 014 17.6z" stroke="#1E1613" stroke-width="1.5" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.4" stroke="#C33B22" stroke-width="1.5"/></svg>
+<span style="flex:1;font-size:12.5px;font-weight:700;line-height:1.35">Have it on paper? Scan the sketch to find the closest match</span>
+<svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex:none"><path d="M6 3l5 5-5 5" stroke="#8A7566" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
+<div style="display:flex;gap:8px;overflow-x:auto;margin:0 -18px;padding:0 18px 2px">
+<sc-for list="{{ categories }}" as="c" hint-placeholder-count="6">
+<button onClick="{{ c.tap }}" style="flex:none;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.fg }};border-radius:999px;padding:8px 15px;font-family:Karla;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .18s" style-active="transform:scale(.94)">{{ c.name }}</button>
+</sc-for>
+</div>
+<div style="display:flex;align-items:center;gap:10px">
+<span style="flex:1;font-size:12px;color:#8A7566">{{ resultCount }}</span>
+<button onClick="{{ toggleFavFilter }}" style="border:0;background:none;padding:0;font-family:Karla;font-size:12.5px;font-weight:700;color:{{ favFilterColor }};cursor:pointer">{{ favFilterLabel }}</button>
+<button onClick="{{ toggleMerge }}" style="border:1.5px solid {{ mergeBtnBorder }};background:{{ mergeBtnBg }};color:{{ mergeBtnFg }};border-radius:999px;padding:7px 14px;font-family:Karla;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px" style-active="transform:scale(.94)">
+<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="12" r="6.4" stroke="currentColor" stroke-width="1.7"/><circle cx="15" cy="12" r="6.4" stroke="currentColor" stroke-width="1.7"/></svg>
+{{ mergeBtnLabel }}
+</button>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<sc-for list="{{ filtered }}" as="d" hint-placeholder-count="6">
+<div onClick="{{ d.open }}" style="cursor:pointer;display:flex;flex-direction:column;gap:8px;animation:pgRise .3s ease both" style-active="transform:scale(.96)">
+<div style="position:relative;aspect-ratio:1;border-radius:24px;overflow:hidden;background:#EDE2D4;border:1px solid rgba(30,22,19,.08);display:flex;align-items:center;justify-content:center">
+{{ d.tile }}
+<button onClick="{{ d.fav }}" style="position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:999px;border:0;background:rgba(251,244,234,.9);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0" style-active="transform:scale(.86)">{{ d.heart }}</button>
+<sc-if value="{{ d.selected }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;border-radius:24px;border:2.5px solid #C33B22;box-shadow:inset 0 0 0 5px rgba(251,244,234,.55);pointer-events:none"></div>
+<div style="position:absolute;left:8px;top:8px;width:25px;height:25px;border-radius:999px;background:#C33B22;color:#FBF4EA;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;pointer-events:none">{{ d.selIndex }}</div>
+</sc-if>
+</div>
+<div style="display:flex;flex-direction:column;gap:1px">
+<span style="font-size:13px;font-weight:700;line-height:1.2">{{ d.name }}</span>
+<span style="font-size:10.5px;color:#8A7566;letter-spacing:.08em">{{ d.id }} · {{ d.cat }}</span>
+</div>
+</div>
+</sc-for>
+</div>
+<sc-if value="{{ hasMore }}" hint-placeholder-val="{{ true }}">
+<button onClick="{{ loadMore }}" style="height:50px;border-radius:999px;border:1.5px solid rgba(30,22,19,.14);background:#fff;font-family:Karla;font-size:13.5px;font-weight:700;color:#1E1613;cursor:pointer" style-active="transform:scale(.97)">{{ moreLabel }}</button>
+</sc-if>
+<sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+<div style="padding:40px 10px;text-align:center;color:#8A7566;font-size:13.5px;line-height:1.5">Nothing matches that yet.<br>Try a category, or send us a sketch.</div>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+<div style="padding:0 0 130px;display:flex;flex-direction:column;gap:18px">
+<div style="position:relative;background:{{ previewBg }};padding:22px 18px 18px;transition:background .3s">
+<div onPointerDown="{{ dragStart }}" style="aspect-ratio:1;border-radius:30px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.35);touch-action:none">
+<div style="width:{{ zoomPct }};height:{{ zoomPct }};display:flex;align-items:center;justify-content:center;transition:width .25s cubic-bezier(.4,0,.2,1),height .25s cubic-bezier(.4,0,.2,1)">{{ detailTile }}</div>
+</div>
+<div style="display:flex;align-items:center;gap:12px;padding:14px 4px 0">
+<button onClick="{{ prevDesign }}" style="width:36px;height:36px;border-radius:999px;border:1px solid rgba(30,22,19,.14);background:rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0" style-active="transform:scale(.9)"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="#1E1613" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+<input type="range" min="1" max="4" step="1" value="{{ zoom }}" onChange="{{ setZoom }}" style="flex:1;accent-color:#C33B22;height:26px">
+<button onClick="{{ nextDesign }}" style="width:36px;height:36px;border-radius:999px;border:1px solid rgba(30,22,19,.14);background:rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0" style-active="transform:scale(.9)"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="#1E1613" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+</div>
+<div style="display:flex;gap:8px;padding:4px 4px 0">
+<sc-for list="{{ swatches }}" as="s" hint-placeholder-count="4">
+<button onClick="{{ s.tap }}" style="flex:1;height:34px;border-radius:999px;border:1.5px solid {{ s.border }};background:{{ s.color }};color:{{ s.fg }};font-family:Karla;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer" style-active="transform:scale(.95)">{{ s.name }}</button>
+</sc-for>
+</div>
+</div>
+
+<div style="padding:0 18px;display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;align-items:flex-start;gap:12px">
+<div style="flex:1;display:flex;flex-direction:column;gap:4px">
+<h1 style="margin:0;font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:30px;line-height:1.05">{{ detailName }}</h1>
+<span style="font-size:12px;color:#8A7566;letter-spacing:.1em">{{ detailId }} · {{ detailCat }}</span>
+</div>
+<button onClick="{{ favDetail }}" style="width:44px;height:44px;flex:none;border-radius:999px;border:1px solid rgba(30,22,19,.12);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0" style-active="transform:scale(.9)">{{ detailHeart }}</button>
+</div>
+
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<span style="border-radius:999px;background:#E4EFE7;color:#2F6B57;padding:7px 13px;font-size:11.5px;font-weight:700">SVG ready</span>
+<span style="border-radius:999px;background:{{ dxfBg }};color:{{ dxfFg }};padding:7px 13px;font-size:11.5px;font-weight:700">{{ dxfLabel }}</span>
+<span style="border-radius:999px;background:#F2E4D2;color:#6E5A4C;padding:7px 13px;font-size:11.5px;font-weight:700">Cut-ready geometry</span>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:1px;background:rgba(30,22,19,.09);border-radius:24px;overflow:hidden;border:1px solid rgba(30,22,19,.09)">
+<div style="background:#fff;padding:14px 16px;display:flex;justify-content:space-between;font-size:13.5px"><span style="color:#8A7566">Recommended materials</span><span style="font-weight:700">{{ detailMaterials }}</span></div>
+<div style="background:#fff;padding:14px 16px;display:flex;justify-content:space-between;font-size:13.5px"><span style="color:#8A7566">Thickness</span><span style="font-weight:700">{{ detailThickness }}</span></div>
+<div style="background:#fff;padding:14px 16px;display:flex;justify-content:space-between;font-size:13.5px"><span style="color:#8A7566">Typical use</span><span style="font-weight:700">{{ detailUse }}</span></div>
+</div>
+
+<p style="margin:0;font-size:13.5px;line-height:1.55;color:#5C4B3F;text-wrap:pretty">{{ detailBlurb }}</p>
+
+<div style="border-radius:22px;background:#F6EDE1;padding:14px 16px;display:flex;gap:11px;align-items:flex-start">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex:none;margin-top:1px"><circle cx="12" cy="12" r="8.6" stroke="#8A7566" stroke-width="1.6"/><path d="M12 11v5.4M12 7.7v.5" stroke="#8A7566" stroke-width="1.8" stroke-linecap="round"/></svg>
+<span style="font-size:12.5px;line-height:1.5;color:#5C4B3F">{{ detailSpecNote }}</span>
+</div>
+
+<div style="display:flex;gap:10px">
+<button onClick="{{ goQuoteFromDetail }}" style="flex:1;height:52px;border-radius:999px;border:0;background:#C33B22;color:#FBF4EA;font-family:Karla;font-size:14.5px;font-weight:700;cursor:pointer;box-shadow:0 10px 22px -12px rgba(195,59,34,.9)" style-active="transform:scale(.97)">Request a quote</button>
+<button onClick="{{ dxfTap }}" style="width:52px;height:52px;flex:none;border-radius:999px;border:1px solid rgba(30,22,19,.14);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0" style-active="transform:scale(.92)">
+<svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 3.5v12m0 0l-4.2-4.2M12 15.5l4.2-4.2" stroke="#1E1613" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 17.5v1.6a1.4 1.4 0 001.4 1.4h12.2a1.4 1.4 0 001.4-1.4v-1.6" stroke="#1E1613" stroke-width="1.7" stroke-linecap="round"/></svg>
+</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isMerged }}" hint-placeholder-val="{{ false }}">
+<div style="padding:0 0 130px;display:flex;flex-direction:column;gap:18px">
+<div style="background:{{ mergedBg }};padding:22px 18px 18px;transition:background .3s">
+<div style="aspect-ratio:1;border-radius:30px;overflow:hidden;background:rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center">{{ mergedTile }}</div>
+<div style="display:flex;gap:8px;padding:14px 2px 0">
+<sc-for list="{{ mergeStyles }}" as="m" hint-placeholder-count="3">
+<button onClick="{{ m.tap }}" style="flex:1;height:38px;border-radius:999px;border:1.5px solid {{ m.border }};background:{{ m.bg }};color:{{ m.fg }};font-family:Karla;font-size:12px;font-weight:700;cursor:pointer" style-active="transform:scale(.95)">{{ m.name }}</button>
+</sc-for>
+</div>
+</div>
+
+<div style="padding:0 18px;display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;flex-direction:column;gap:4px">
+<h1 style="margin:0;font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:30px;line-height:1.05">{{ mergedName }}</h1>
+<span style="font-size:12px;color:#8A7566;letter-spacing:.1em">{{ mergedRef }} · custom blend</span>
+</div>
+
+<p style="margin:0;font-size:13.5px;line-height:1.55;color:#5C4B3F;text-wrap:pretty">{{ mergedBlurb }}</p>
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">Built from</span>
+<sc-for list="{{ mergedParts }}" as="p" hint-placeholder-count="2">
+<div style="display:flex;align-items:center;gap:12px">
+<span style="width:26px;height:26px;flex:none;border-radius:999px;background:#C33B22;color:#FBF4EA;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ p.n }}</span>
+<div style="width:44px;height:44px;flex:none;border-radius:14px;overflow:hidden;background:#EDE2D4;display:flex;align-items:center;justify-content:center">{{ p.tile }}</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:2px">
+<span style="font-size:13.5px;font-weight:700">{{ p.name }}</span>
+<span style="font-size:11px;color:#8A7566;letter-spacing:.08em">{{ p.id }} · {{ p.role }}</span>
+</div>
+<button onClick="{{ p.drop }}" style="width:32px;height:32px;flex:none;border-radius:999px;border:1px solid rgba(30,22,19,.14);background:#fff;color:#8A7566;font-family:Karla;font-size:15px;line-height:1;cursor:pointer;padding:0" style-active="transform:scale(.9)">×</button>
+</div>
+</sc-for>
+</div>
+
+<div style="border-radius:24px;background:#F6EDE1;padding:16px;font-size:12.5px;line-height:1.5;color:#5C4B3F">Custom blends are drawn to order. The design desk redraws the joins so the cut path stays continuous — expect one extra working day.</div>
+
+<div style="display:flex;gap:10px">
+<button onClick="{{ mergedQuote }}" style="flex:1;height:52px;border-radius:999px;border:0;background:#C33B22;color:#FBF4EA;font-family:Karla;font-size:14.5px;font-weight:700;cursor:pointer;box-shadow:0 10px 22px -12px rgba(195,59,34,.9)" style-active="transform:scale(.97)">Quote this blend</button>
+<button onClick="{{ mergedSave }}" style="width:52px;height:52px;flex:none;border-radius:999px;border:1px solid rgba(30,22,19,.14);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0" style-active="transform:scale(.92)">{{ mergedHeart }}</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isQuote }}" hint-placeholder-val="{{ false }}">
+<div style="padding:16px 18px 130px;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:6px">
+<h1 style="margin:0;font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:30px;line-height:1.05">Build your panel</h1>
+<p style="margin:0;font-size:13px;color:#8A7566;line-height:1.5">Everything updates as you go. The estimate is indicative — we confirm it after sheet-count.</p>
+</div>
+
+<div style="border-radius:28px;background:{{ configBg }};padding:18px;display:flex;flex-direction:column;gap:12px;transition:background .3s">
+<div style="aspect-ratio:{{ configRatio }};border-radius:20px;overflow:hidden;background:rgba(255,255,255,.32);display:flex;align-items:center;justify-content:center;transition:aspect-ratio .3s">{{ configTile }}</div>
+<div style="display:flex;justify-content:space-between;font-size:11.5px;color:#5C4B3F;letter-spacing:.06em">
+<span>{{ configPatternName }}</span><span>{{ configDims }}</span>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:9px">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">Material</span>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+<sc-for list="{{ materials }}" as="m" hint-placeholder-count="4">
+<button onClick="{{ m.tap }}" style="text-align:left;border:1.5px solid {{ m.border }};background:{{ m.bg }};border-radius:20px;padding:12px 14px;cursor:pointer;font-family:Karla;display:flex;flex-direction:column;gap:3px" style-active="transform:scale(.96)">
+<span style="font-size:13.5px;font-weight:700;color:{{ m.fg }}">{{ m.name }}</span>
+<span style="font-size:11px;color:{{ m.sub }}">{{ m.note }}</span>
+</button>
+</sc-for>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:9px">
+<div style="display:flex;justify-content:space-between;align-items:baseline">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">Thickness</span>
+<span style="font-family:'Instrument Serif',Georgia,serif;font-size:19px;color:{{ thicknessColor }}">{{ thicknessLabel }}</span>
+</div>
+<input type="range" min="1" max="6" step="1" value="{{ thickness }}" onChange="{{ setThickness }}" style="width:100%;accent-color:#C33B22;height:26px">
+<sc-if value="{{ thinWarning }}" hint-placeholder-val="{{ false }}">
+<div style="border-radius:18px;background:#F6E3DE;padding:12px 14px;font-size:12px;line-height:1.45;color:#5C4B3F">{{ thinWarning }}</div>
+</sc-if>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:9px">
+<div style="display:flex;justify-content:space-between;align-items:baseline">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">Width</span>
+<span style="font-family:'Instrument Serif',Georgia,serif;font-size:19px">{{ widthLabel }}</span>
+</div>
+<input type="range" min="600" max="3000" step="100" value="{{ panelW }}" onChange="{{ setPanelW }}" style="width:100%;accent-color:#C33B22;height:26px">
+<div style="display:flex;justify-content:space-between;align-items:baseline">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">Height</span>
+<span style="font-family:'Instrument Serif',Georgia,serif;font-size:19px">{{ heightLabel }}</span>
+</div>
+<input type="range" min="600" max="3000" step="100" value="{{ panelH }}" onChange="{{ setPanelH }}" style="width:100%;accent-color:#C33B22;height:26px">
+</div>
+
+<div style="display:flex;flex-direction:column;gap:9px">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">Finish</span>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<sc-for list="{{ finishes }}" as="f" hint-placeholder-count="3">
+<button onClick="{{ f.tap }}" style="border:1.5px solid {{ f.border }};background:{{ f.bg }};color:{{ f.fg }};border-radius:999px;padding:9px 15px;font-family:Karla;font-size:12.5px;font-weight:700;cursor:pointer" style-active="transform:scale(.95)">{{ f.name }}</button>
+</sc-for>
+</div>
+</div>
+
+<div style="border-radius:28px;background:#1E1613;color:#FBF4EA;padding:20px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;justify-content:space-between;align-items:flex-end">
+<div style="display:flex;flex-direction:column;gap:4px">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(251,244,234,.55)">Estimate</span>
+<span style="font-family:'Instrument Serif',Georgia,serif;font-size:34px;line-height:1;transition:color .2s">{{ priceLabel }}</span>
+</div>
+<span style="font-size:11.5px;color:rgba(251,244,234,.55);text-align:right;line-height:1.4">{{ sheetLabel }}<br>{{ leadLabel }}</span>
+</div>
+<button onClick="{{ submitJob }}" style="height:52px;border-radius:999px;border:0;background:#E8452B;color:#fff;font-family:Karla;font-size:14.5px;font-weight:700;cursor:pointer" style-active="transform:scale(.97)">Send to Pro_Grafiz</button>
+<span style="font-size:11.5px;color:rgba(251,244,234,.5);text-align:center;line-height:1.4">Goes to the Idu centre manager for billing. You'll get a WhatsApp confirmation.</span>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isJobs }}" hint-placeholder-val="{{ false }}">
+<div style="padding:16px 18px 130px;display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;gap:8px">
+<sc-for list="{{ jobTabs }}" as="j" hint-placeholder-count="3">
+<button onClick="{{ j.tap }}" style="flex:1;border:1.5px solid {{ j.border }};background:{{ j.bg }};color:{{ j.fg }};border-radius:999px;padding:11px 8px;font-family:Karla;font-size:12.5px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;gap:2px" style-active="transform:scale(.96)">
+<span>{{ j.id }}</span><span style="font-size:10.5px;font-weight:400;opacity:.75">{{ j.short }}</span>
+</button>
+</sc-for>
+</div>
+
+<div style="border-radius:28px;background:#fff;border:1px solid rgba(30,22,19,.09);padding:20px;display:flex;flex-direction:column;gap:6px">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">{{ jobTitle }}</span>
+<h1 style="margin:0;font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:27px;line-height:1.1">{{ jobStageLabel }}</h1>
+<span style="font-size:13px;color:#5C4B3F;line-height:1.5">{{ jobStageNote }}</span>
+</div>
+
+<sc-if value="{{ hasDocs }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:10px">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">Documents</span>
+<sc-for list="{{ jobDocs }}" as="d" hint-placeholder-count="1">
+<div onClick="{{ d.open }}" style="border-radius:24px;background:#fff;border:1px solid rgba(30,22,19,.1);padding:15px 16px;display:flex;align-items:center;gap:13px;cursor:pointer" style-active="transform:scale(.98)">
+<span style="width:38px;height:38px;flex:none;border-radius:12px;background:{{ d.bg }};display:flex;align-items:center;justify-content:center">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M6.5 3.5h8l4 4V20a.5.5 0 01-.5.5h-11a.5.5 0 01-.5-.5z" stroke="{{ d.fg }}" stroke-width="1.6" stroke-linejoin="round"/><path d="M14.5 3.5v4h4M9 13h6M9 16.5h4" stroke="{{ d.fg }}" stroke-width="1.6" stroke-linecap="round"/></svg>
+</span>
+<span style="flex:1;display:flex;flex-direction:column;gap:2px">
+<span style="font-size:13.5px;font-weight:700">{{ d.title }}</span>
+<span style="font-size:11.5px;color:#8A7566;letter-spacing:.04em">{{ d.num }} · {{ d.issued }}</span>
+</span>
+<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="#C3B2A3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ jobHeld }}" hint-placeholder-val="{{ false }}">
+<div style="border-radius:28px;background:{{ heldBg }};border:1px solid {{ heldBorder }};padding:18px;display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;align-items:center;gap:9px">
+<span style="width:7px;height:7px;border-radius:999px;background:{{ heldDot }}"></span>
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:{{ heldDot }}">{{ heldLabel }}</span>
+</div>
+<span style="font-size:14px;font-weight:700;line-height:1.35">{{ heldReason }}</span>
+<span style="font-size:12.5px;color:#5C4B3F;line-height:1.5">{{ heldNote }}</span>
+<button onClick="{{ toastWhatsApp }}" style="align-self:flex-start;border:0;background:none;padding:2px 0;font-family:Karla;font-size:12.5px;font-weight:700;color:#C33B22;cursor:pointer">Ask us about this →</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ needsPayment }}" hint-placeholder-val="{{ false }}">
+<div style="border-radius:28px;background:#fff;border:1px solid rgba(30,22,19,.1);padding:18px;display:flex;flex-direction:column;gap:13px">
+<div style="display:flex;flex-direction:column;gap:3px">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">{{ payKindLabel }} due</span>
+<span style="font-family:'Instrument Serif',Georgia,serif;font-size:27px;line-height:1">{{ balanceAmount }}</span>
+</div>
+<div style="display:flex;gap:7px">
+<sc-for list="{{ payMethods }}" as="m" hint-placeholder-count="3">
+<button onClick="{{ m.tap }}" style="flex:1;height:40px;border-radius:999px;border:1.5px solid {{ m.border }};background:{{ m.bg }};color:{{ m.fg }};font-family:Karla;font-size:12px;font-weight:700;cursor:pointer;transition:background .18s" style-active="transform:scale(.95)">{{ m.name }}</button>
+</sc-for>
+</div>
+
+<sc-if value="{{ isTransfer }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;flex-direction:column;gap:1px;background:rgba(30,22,19,.09);border-radius:18px;overflow:hidden;border:1px solid rgba(30,22,19,.09)">
+<div style="background:#F6EDE1;padding:11px 14px;display:flex;justify-content:space-between;font-size:12.5px"><span style="color:#8A7566">Pay to</span><span style="font-weight:700">Pro_Grafiz Designs Ltd</span></div>
+<div style="background:#F6EDE1;padding:11px 14px;display:flex;justify-content:space-between;font-size:12.5px"><span style="color:#8A7566">Use this reference</span><span style="font-weight:700;letter-spacing:.04em">{{ payExpected }}</span></div>
+</div>
+<span style="font-size:12px;color:#5C4B3F;line-height:1.5">Enter the reference exactly as it appears on your transfer. We match it against the bank record — no screenshot needed.</span>
+<input value="{{ payRef }}" onChange="{{ setPayRef }}" placeholder="PGD-0000-0000" style="height:48px;border-radius:999px;border:1.5px solid {{ payBorder }};background:#FBF4EA;padding:0 18px;font-family:Karla;font-size:15px;letter-spacing:.06em;color:#1E1613;outline:0">
+<sc-if value="{{ payError }}" hint-placeholder-val="{{ false }}">
+<span style="font-size:12.5px;color:#C33B22;padding:0 6px">{{ payError }}</span>
+</sc-if>
+<button onClick="{{ submitPayRef }}" style="height:50px;border-radius:999px;border:0;background:#C33B22;color:#FBF4EA;font-family:Karla;font-size:14px;font-weight:700;cursor:pointer" style-active="transform:scale(.97)">Submit reference</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ isCard }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:10px">
+<input value="{{ cardNo }}" onChange="{{ setCardNo }}" placeholder="Card number" style="height:48px;border-radius:999px;border:1.5px solid rgba(30,22,19,.14);background:#FBF4EA;padding:0 18px;font-family:Karla;font-size:15px;letter-spacing:.04em;color:#1E1613;outline:0">
+<div style="display:flex;gap:10px">
+<input value="{{ cardExp }}" onChange="{{ setCardExp }}" placeholder="MM / YY" style="flex:1;height:48px;border-radius:999px;border:1.5px solid rgba(30,22,19,.14);background:#FBF4EA;padding:0 18px;font-family:Karla;font-size:15px;color:#1E1613;outline:0;min-width:0">
+<input value="{{ cardCvv }}" onChange="{{ setCardCvv }}" placeholder="CVV" type="password" style="width:110px;flex:none;height:48px;border-radius:999px;border:1.5px solid rgba(30,22,19,.14);background:#FBF4EA;padding:0 18px;font-family:Karla;font-size:15px;color:#1E1613;outline:0">
+</div>
+<button onClick="{{ payCard }}" style="height:50px;border-radius:999px;border:0;background:#C33B22;color:#FBF4EA;font-family:Karla;font-size:14px;font-weight:700;cursor:pointer" style-active="transform:scale(.97)">{{ payNowLabel }}</button>
+<span style="font-size:11.5px;color:#A08F80;line-height:1.45">Card details go straight to the payment processor. Pro_Grafiz never sees or stores them.</span>
+</div>
+</sc-if>
+
+<sc-if value="{{ isUssd }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="border-radius:20px;background:#F6EDE1;padding:18px;display:flex;flex-direction:column;gap:5px;align-items:center">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">Dial this</span>
+<span style="font-family:'Instrument Serif',Georgia,serif;font-size:27px;line-height:1;letter-spacing:.02em">{{ ussdCode }}</span>
+</div>
+<button onClick="{{ copyUssd }}" style="height:50px;border-radius:999px;border:1.5px solid rgba(30,22,19,.16);background:none;font-family:Karla;font-size:14px;font-weight:700;color:#1E1613;cursor:pointer" style-active="transform:scale(.97)">Copy USSD string</button>
+<span style="font-size:11.5px;color:#A08F80;line-height:1.45">Dial from the phone number on your account. The payment is matched automatically.</span>
+</div>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ needsApproval }}" hint-placeholder-val="{{ false }}">
+<div style="border-radius:28px;background:#F2E4D2;padding:18px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;gap:14px;align-items:center">
+<div style="width:76px;height:76px;flex:none;border-radius:20px;overflow:hidden;background:#E5D5C0;display:flex;align-items:center;justify-content:center">{{ approvalTile }}</div>
+<div style="display:flex;flex-direction:column;gap:4px">
+<span style="font-size:14px;font-weight:700">Your design is ready</span>
+<span style="font-size:12px;color:#6E5A4C;line-height:1.45">Revision 2 · uploaded by the design desk 40 minutes ago</span>
+</div>
+</div>
+<div style="display:flex;gap:10px">
+<button onClick="{{ approve }}" style="flex:1;height:46px;border-radius:999px;border:0;background:#1E1613;color:#FBF4EA;font-family:Karla;font-size:13.5px;font-weight:700;cursor:pointer" style-active="transform:scale(.96)">Approve</button>
+<button onClick="{{ requestRevision }}" style="flex:1;height:46px;border-radius:999px;border:1.5px solid rgba(30,22,19,.2);background:none;color:#1E1613;font-family:Karla;font-size:13.5px;font-weight:700;cursor:pointer" style-active="transform:scale(.96)">Request a change</button>
+</div>
+</div>
+</sc-if>
+
+<div style="display:flex;flex-direction:column;gap:0">
+<sc-for list="{{ timeline }}" as="t" hint-placeholder-count="8">
+<div style="display:flex;gap:14px;align-items:stretch">
+<div style="width:22px;flex:none;display:flex;flex-direction:column;align-items:center">
+<span style="width:11px;height:11px;border-radius:999px;background:{{ t.dot }};border:2px solid {{ t.ring }};margin-top:4px;animation:{{ t.anim }}"></span>
+<span style="flex:1;width:2px;background:{{ t.line }};min-height:22px"></span>
+</div>
+<div style="flex:1;padding-bottom:20px;display:flex;flex-direction:column;gap:3px">
+<span style="font-size:13.5px;font-weight:{{ t.weight }};color:{{ t.fg }}">{{ t.label }}</span>
+<span style="font-size:11.5px;color:#A08F80">{{ t.time }}</span>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isAbout }}" hint-placeholder-val="{{ false }}">
+<div style="padding:0 0 130px;display:flex;flex-direction:column;gap:24px">
+<div style="position:relative;overflow:hidden;background:#141010;color:#FBF4EA;padding:28px 20px 30px">
+<div style="position:absolute;inset:0;opacity:.2;pointer-events:none">{{ aboutPlate }}</div>
+<div style="position:relative;display:flex;flex-direction:column;gap:16px">
+<img src="assets/logo-on-dark.png" alt="ProGrafiz Designs" style="height:30px;width:auto;align-self:flex-start">
+<h1 style="margin:0;font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:34px;line-height:1.06">Precision engineering,<br><em style="color:#F0A03C">artistic craftsmanship.</em></h1>
+<p style="margin:0;font-size:13.5px;line-height:1.6;color:rgba(251,244,234,.72);text-wrap:pretty">ProGrafiz Designs is a metal fabrication and design company in Abuja. We turn steel into functional works of art.</p>
+</div>
+</div>
+
+<div style="padding:0 18px;display:flex;flex-direction:column;gap:24px">
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">Our story</span>
+<h2 style="margin:0;font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:26px;line-height:1.12">Strong, but stunning</h2>
+<p style="margin:0;font-size:13.5px;line-height:1.6;color:#5C4B3F;text-wrap:pretty">We were founded to challenge the boundaries of traditional metalwork. What began in a small workshop is now one of Nigeria's leading metal fabrication companies.</p>
+<p style="margin:0;font-size:13.5px;line-height:1.6;color:#5C4B3F;text-wrap:pretty">Builders, designers and homeowners come to us for more than a product — they come for a statement piece that lasts a lifetime.</p>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div style="border-radius:26px;background:#F2E4D2;padding:18px;display:flex;flex-direction:column;gap:2px">
+<span style="font-family:'Instrument Serif',Georgia,serif;font-size:38px;line-height:1;color:#C33B22">36K</span>
+<span style="font-size:12px;color:#6E5A4C;line-height:1.35">Satisfied clients across Nigeria</span>
+</div>
+<div style="border-radius:26px;background:#F2E4D2;padding:18px;display:flex;flex-direction:column;gap:2px">
+<span style="font-family:'Instrument Serif',Georgia,serif;font-size:38px;line-height:1;color:#C33B22">642</span>
+<span style="font-size:12px;color:#6E5A4C;line-height:1.35">Projects completed in many states</span>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:12px">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">From concept to completion</span>
+<sc-for list="{{ process }}" as="p" hint-placeholder-count="4">
+<div style="display:flex;gap:14px;align-items:flex-start">
+<span style="font-family:'Instrument Serif',Georgia,serif;font-size:19px;color:#C33B22;width:26px;flex:none">{{ p.n }}</span>
+<span style="display:flex;flex-direction:column;gap:2px">
+<span style="font-size:14px;font-weight:700">{{ p.name }}</span>
+<span style="font-size:12.5px;color:#8A7566;line-height:1.45">{{ p.blurb }}</span>
+</span>
+</div>
+</sc-for>
+</div>
+
+<div style="border-radius:28px;border:1px solid rgba(30,22,19,.12);padding:20px;display:flex;flex-direction:column;gap:12px">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">Our mission</span>
+<p style="margin:0;font-family:'Instrument Serif',Georgia,serif;font-size:21px;line-height:1.25;text-wrap:pretty">High-quality, precision-engineered metal solutions that combine strength, creativity and sustainability.</p>
+<div style="display:flex;flex-direction:column;gap:9px;padding-top:2px">
+<sc-for list="{{ mission }}" as="m" hint-placeholder-count="4">
+<div style="display:flex;gap:10px;align-items:flex-start">
+<svg width="15" height="15" viewBox="0 0 16 16" fill="none" style="flex:none;margin-top:2px"><path d="M3 8.4l3.2 3.1L13 4.8" stroke="#C33B22" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+<span style="font-size:13px;line-height:1.45;color:#5C4B3F">{{ m.text }}</span>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="border-radius:28px;background:#1E1613;color:#FBF4EA;padding:20px;display:flex;flex-direction:column;gap:10px">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(251,244,234,.5)">Our vision</span>
+<p style="margin:0;font-family:'Instrument Serif',Georgia,serif;font-size:21px;line-height:1.28;text-wrap:pretty">To be Africa's leading brand in innovative metal fabrication — turning ideas into durable, functional, stunning design.</p>
+</div>
+
+<div style="border-radius:28px;background:#F2E4D2;padding:22px;display:flex;flex-direction:column;gap:12px">
+<h2 style="margin:0;font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:25px;line-height:1.15">Ready to transform your space?</h2>
+<span style="font-size:13px;color:#6E5A4C;line-height:1.5">Victor Ayemere Street, Idu Industrial District, Abuja</span>
+<button onClick="{{ goQuote }}" style="align-self:flex-start;height:48px;padding:0 24px;border-radius:999px;border:0;background:#C33B22;color:#FBF4EA;font-family:Karla;font-size:14px;font-weight:700;cursor:pointer" style-active="transform:scale(.96)">Get a quote</button>
+</div>
+
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isStaffQueue }}" hint-placeholder-val="{{ false }}">
+<div style="padding:16px 18px 130px;display:flex;flex-direction:column;gap:16px">
+<div style="border-radius:22px;background:#fff;border:1px solid rgba(30,22,19,.09);padding:14px 16px;display:flex;align-items:center;gap:12px">
+<span style="width:34px;height:34px;flex:none;border-radius:999px;background:#1E1613;color:#FBF4EA;font-family:'Instrument Serif',Georgia,serif;font-size:14px;display:flex;align-items:center;justify-content:center">{{ userInitials }}</span>
+<span style="flex:1;display:flex;flex-direction:column;gap:2px">
+<span style="font-size:13px;font-weight:700">{{ signedInLabel }}</span>
+<span style="font-size:11.5px;color:#8A7566;line-height:1.4">{{ queueOwnerLabel }}</span>
+</span>
+<span style="flex:none;border-radius:999px;background:#EDE2D4;color:#5C4B3F;padding:6px 11px;font-size:10.5px;font-weight:700;letter-spacing:.06em;white-space:nowrap">{{ scopeBadge }}</span>
+</div>
+
+<sc-if value="{{ showBranchFilter }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;gap:7px;overflow-x:auto;margin:0 -18px;padding:0 18px 2px">
+<sc-for list="{{ branchTabs }}" as="b" hint-placeholder-count="8">
+<button onClick="{{ b.tap }}" style="flex:none;border:1.5px solid {{ b.border }};background:{{ b.bg }};color:{{ b.fg }};border-radius:999px;padding:8px 14px;font-family:Karla;font-size:12px;font-weight:700;cursor:pointer;transition:background .18s" style-active="transform:scale(.94)">{{ b.name }}</button>
+</sc-for>
+</div>
+</sc-if>
+
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+<div style="border-radius:20px;background:#fff;border:1px solid rgba(30,22,19,.09);padding:13px;display:flex;flex-direction:column;gap:2px">
+<span style="font-family:'Instrument Serif',Georgia,serif;font-size:24px;line-height:1">{{ statQueue }}</span>
+<span style="font-size:10.5px;color:#8A7566;line-height:1.3">In queue</span>
+</div>
+<div style="border-radius:20px;background:#fff;border:1px solid rgba(30,22,19,.09);padding:13px;display:flex;flex-direction:column;gap:2px">
+<span style="font-family:'Instrument Serif',Georgia,serif;font-size:24px;line-height:1;color:#C33B22">{{ statStalled }}</span>
+<span style="font-size:10.5px;color:#8A7566;line-height:1.3">Over SLA</span>
+</div>
+<div style="border-radius:20px;background:#fff;border:1px solid rgba(30,22,19,.09);padding:13px;display:flex;flex-direction:column;gap:2px">
+<span style="font-family:'Instrument Serif',Georgia,serif;font-size:24px;line-height:1;color:#2F6B57">{{ statStock }}</span>
+<span style="font-size:10.5px;color:#8A7566;line-height:1.3">{{ statStockLabel }}</span>
+</div>
+</div>
+
+<sc-for list="{{ queue }}" as="q" hint-placeholder-count="4">
+<div style="border-radius:26px;background:{{ q.cardBg }};border:1px solid {{ q.cardBorder }};padding:16px 17px;display:flex;flex-direction:column;gap:12px;opacity:{{ q.opacity }};transition:opacity .25s">
+<div style="display:flex;align-items:flex-start;gap:12px">
+<div style="width:44px;height:44px;flex:none;border-radius:14px;overflow:hidden;background:#EDE2D4;display:flex;align-items:center;justify-content:center">{{ q.tile }}</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:3px">
+<span style="font-size:13.5px;font-weight:700">{{ q.id }} · {{ q.customer }}</span>
+<span style="font-size:11.5px;color:#8A7566;line-height:1.4">{{ q.spec }}</span>
+</div>
+<span style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
+<span style="font-size:11px;font-weight:700;color:{{ q.timerColor }};white-space:nowrap">{{ q.elapsed }}</span>
+<span style="font-size:10px;color:#A08F80;letter-spacing:.06em;white-space:nowrap">{{ q.branch }}</span>
+</span>
+</div>
+<sc-if value="{{ q.held }}" hint-placeholder-val="{{ false }}">
+<div style="border-radius:16px;background:{{ q.heldBg }};padding:10px 13px;display:flex;flex-direction:column;gap:2px">
+<span style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:{{ q.heldFg }};font-weight:700">{{ q.heldLabel }}</span>
+<span style="font-size:12px;color:#5C4B3F;line-height:1.4">{{ q.heldReason }}</span>
+</div>
+</sc-if>
+<div style="display:flex;align-items:center;gap:8px">
+<span style="border-radius:999px;background:{{ q.stageBg }};color:{{ q.stageFg }};padding:6px 12px;font-size:11px;font-weight:700;letter-spacing:.04em">{{ q.stage }}</span>
+<span style="flex:1"></span>
+<button onClick="{{ q.openHold }}" style="width:38px;height:38px;flex:none;border-radius:999px;border:1px solid rgba(30,22,19,.14);background:#fff;color:#5C4B3F;font-family:Karla;font-size:15px;font-weight:700;line-height:1;cursor:pointer;padding:0" style-active="transform:scale(.9)">⋯</button>
+<button onClick="{{ q.act }}" style="height:38px;padding:0 18px;border-radius:999px;border:0;background:{{ q.btnBg }};color:{{ q.btnFg }};font-family:Karla;font-size:12.5px;font-weight:700;cursor:{{ q.cursor }}" style-active="transform:scale(.95)">{{ q.action }}</button>
+</div>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ isStaffIntake }}" hint-placeholder-val="{{ false }}">
+<div style="padding:16px 18px 130px;display:flex;flex-direction:column;gap:20px">
+<sc-if value="{{ showBranchFilter }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;gap:7px;overflow-x:auto;margin:0 -18px;padding:0 18px 2px">
+<sc-for list="{{ branchTabs }}" as="b" hint-placeholder-count="8">
+<button onClick="{{ b.tap }}" style="flex:none;border:1.5px solid {{ b.border }};background:{{ b.bg }};color:{{ b.fg }};border-radius:999px;padding:8px 14px;font-family:Karla;font-size:12px;font-weight:700;cursor:pointer;transition:background .18s" style-active="transform:scale(.94)">{{ b.name }}</button>
+</sc-for>
+</div>
+</sc-if>
+<div style="border-radius:28px;background:#1E1613;color:#FBF4EA;padding:20px;display:flex;flex-direction:column;gap:10px">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(251,244,234,.5)">{{ signedInLabel }}</span>
+<div style="display:flex;align-items:flex-end;gap:14px">
+<span style="font-family:'Instrument Serif',Georgia,serif;font-size:40px;line-height:.9">{{ intakeCount }}</span>
+<span style="font-size:12.5px;color:rgba(251,244,234,.6);line-height:1.4;padding-bottom:4px">quote requests to review<br>{{ payPendingLabel }}</span>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:12px">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">Quote requests</span>
+<sc-for list="{{ quoteQueue }}" as="r" hint-placeholder-count="3">
+<div style="border-radius:26px;background:#fff;border:1px solid rgba(30,22,19,.09);padding:16px 17px;display:flex;flex-direction:column;gap:13px;opacity:{{ r.opacity }};transition:opacity .25s">
+<div style="display:flex;gap:12px;align-items:flex-start">
+<div style="width:44px;height:44px;flex:none;border-radius:14px;overflow:hidden;background:#EDE2D4;display:flex;align-items:center;justify-content:center">{{ r.tile }}</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:3px">
+<span style="font-size:13.5px;font-weight:700">{{ r.id }} · {{ r.customer }}</span>
+<span style="font-size:11.5px;color:#8A7566;line-height:1.4">{{ r.spec }}</span>
+<span style="font-size:10.5px;color:#A08F80;letter-spacing:.04em">{{ r.branch }} · {{ r.src }} · {{ r.when }}</span>
+</div>
+</div>
+<sc-if value="{{ r.decided }}" hint-placeholder-val="{{ false }}">
+<div style="border-radius:16px;background:#F6EDE1;padding:11px 13px;font-size:12.5px;color:#5C4B3F;line-height:1.4">{{ r.decision }}</div>
+</sc-if>
+<sc-if value="{{ r.open }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;gap:9px">
+<button onClick="{{ r.bill }}" style="flex:1;height:44px;border-radius:999px;border:0;background:#C33B22;color:#FBF4EA;font-family:Karla;font-size:13px;font-weight:700;cursor:pointer" style-active="transform:scale(.96)">Bill and open job</button>
+<button onClick="{{ r.decline }}" style="height:44px;padding:0 16px;border-radius:999px;border:1.5px solid rgba(30,22,19,.16);background:none;font-family:Karla;font-size:13px;font-weight:700;color:#1E1613;cursor:pointer" style-active="transform:scale(.96)">Decline</button>
+</div>
+</sc-if>
+</div>
+</sc-for>
+</div>
+
+<button onClick="{{ openScan }}" style="border:1.5px dashed rgba(30,22,19,.2);background:none;border-radius:26px;padding:18px;cursor:pointer;font-family:Karla;display:flex;align-items:center;gap:14px;text-align:left" style-active="transform:scale(.98)">
+<span style="width:42px;height:42px;flex:none;border-radius:15px;background:#EDE2D4;display:flex;align-items:center;justify-content:center">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 8.4a1.4 1.4 0 011.4-1.4h2.2l1.2-2h6.4l1.2 2h2.2A1.4 1.4 0 0120 8.4v9.2a1.4 1.4 0 01-1.4 1.4H5.4A1.4 1.4 0 014 17.6z" stroke="#1E1613" stroke-width="1.5" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.4" stroke="#C33B22" stroke-width="1.5"/></svg>
+</span>
+<span style="flex:1;display:flex;flex-direction:column;gap:3px">
+<span style="font-size:13.5px;font-weight:700">Scan a walk-in sketch</span>
+<span style="font-size:11.5px;color:#8A7566;line-height:1.4">Photograph the customer's drawing at the counter and open it as a request.</span>
+</span>
+</button>
+<span style="font-size:11.5px;color:#A08F80;line-height:1.45">Billing and job creation only. Payment confirmation belongs to the accountant.</span>
+</div>
+</sc-if>
+
+<sc-if value="{{ isStaffPay }}" hint-placeholder-val="{{ false }}">
+<div style="padding:16px 18px 130px;display:flex;flex-direction:column;gap:18px">
+<sc-if value="{{ showBranchFilter }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;gap:7px;overflow-x:auto;margin:0 -18px;padding:0 18px 2px">
+<sc-for list="{{ branchTabs }}" as="b" hint-placeholder-count="8">
+<button onClick="{{ b.tap }}" style="flex:none;border:1.5px solid {{ b.border }};background:{{ b.bg }};color:{{ b.fg }};border-radius:999px;padding:8px 14px;font-family:Karla;font-size:12px;font-weight:700;cursor:pointer;transition:background .18s" style-active="transform:scale(.94)">{{ b.name }}</button>
+</sc-for>
+</div>
+</sc-if>
+<div style="border-radius:28px;background:#1E1613;color:#FBF4EA;padding:20px;display:flex;flex-direction:column;gap:10px">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(251,244,234,.5)">{{ signedInLabel }}</span>
+<div style="display:flex;align-items:flex-end;gap:14px">
+<span style="font-family:'Instrument Serif',Georgia,serif;font-size:40px;line-height:.9">{{ payQueueCount }}</span>
+<span style="font-size:12.5px;color:rgba(251,244,234,.6);line-height:1.4;padding-bottom:4px">references awaiting<br>confirmation {{ payPendingLabel }}</span>
+</div>
+</div>
+<sc-for list="{{ paymentQueue }}" as="p" hint-placeholder-count="3">
+<div style="border-radius:26px;background:#fff;border:1px solid rgba(30,22,19,.09);padding:16px 17px;display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:flex-start;gap:12px">
+<div style="flex:1;display:flex;flex-direction:column;gap:3px">
+<span style="font-size:13.5px;font-weight:700">{{ p.id }} · {{ p.customer }}</span>
+<span style="font-size:11.5px;color:#8A7566">{{ p.branch }} · {{ p.kind }} · {{ p.amount }}</span>
+<span style="font-size:11px;color:#A08F80;letter-spacing:.06em">Ref {{ p.ref }}</span>
+</div>
+<span style="border-radius:999px;background:{{ p.tagBg }};color:{{ p.tagFg }};padding:6px 11px;font-size:10.5px;font-weight:700;white-space:nowrap">{{ p.tag }}</span>
+</div>
+<button onClick="{{ p.act }}" style="height:44px;border-radius:999px;border:0;background:{{ p.btnBg }};color:{{ p.btnFg }};font-family:Karla;font-size:13px;font-weight:700;cursor:pointer" style-active="transform:scale(.97)">{{ p.action }}</button>
+</div>
+</sc-for>
+<span style="font-size:11.5px;color:#A08F80;line-height:1.45">Bank-reference matching replaces screenshot approval. Confirmation asks for your PIN every time, and an unmatched reference cannot be confirmed here at all.</span>
+</div>
+</sc-if>
+
+<sc-if value="{{ isStaffAdmin }}" hint-placeholder-val="{{ false }}">
+<div style="padding:16px 18px 130px;display:flex;flex-direction:column;gap:20px">
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">Contact of record</span>
+<div style="border-radius:24px;background:#fff;border:1px solid rgba(30,22,19,.09);padding:16px 17px;display:flex;align-items:center;gap:13px">
+<span style="width:36px;height:36px;flex:none;border-radius:999px;background:#E4EFE7;display:flex;align-items:center;justify-content:center">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4.5 12a7.5 7.5 0 1113.2 4.8l1 3.3-3.4-1A7.5 7.5 0 014.5 12z" stroke="#2F6B57" stroke-width="1.6" stroke-linejoin="round"/></svg>
+</span>
+<span style="flex:1;display:flex;flex-direction:column;gap:2px">
+<span style="font-size:15px;font-weight:700;letter-spacing:.02em">{{ adminWhatsApp }}</span>
+<span style="font-size:11.5px;color:#8A7566">WhatsApp business line · used by every customer message</span>
+</span>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">DXF release code</span>
+<div style="border-radius:24px;background:#1E1613;color:#FBF4EA;padding:18px;display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px">
+<div style="display:flex;flex-direction:column;gap:4px">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(251,244,234,.5)">Active · {{ adminCodeMonth }}</span>
+<span style="font-family:'Instrument Serif',Georgia,serif;font-size:29px;line-height:1;letter-spacing:.01em">{{ adminCode }}</span>
+</div>
+<span style="flex:none;font-size:11.5px;color:rgba(251,244,234,.55);text-align:right;line-height:1.4;white-space:nowrap">Next<br>{{ adminNextCode }}<br>{{ adminNextMonth }} 1</span>
+</div>
+<button onClick="{{ rotateNow }}" style="height:42px;border-radius:999px;border:1.5px solid rgba(251,244,234,.25);background:none;color:#FBF4EA;font-family:Karla;font-size:12.5px;font-weight:700;cursor:pointer" style-active="transform:scale(.97)">Rotate early</button>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+<sc-for list="{{ adminCodeSchedule }}" as="c" hint-placeholder-count="12">
+<div style="border-radius:14px;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.fg }};padding:8px 6px;display:flex;flex-direction:column;gap:1px;align-items:center">
+<span style="font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;opacity:.8">{{ c.month }}</span>
+<span style="font-size:11px;font-weight:700;letter-spacing:.02em">{{ c.code }}</span>
+</div>
+</sc-for>
+</div>
+<span style="font-size:11.5px;color:#A08F80;line-height:1.45">Codes rotate automatically on the 1st. A code issued in one month stops working in the next.</span>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">Devices and sync</span>
+<div style="display:flex;flex-direction:column;gap:1px;background:rgba(30,22,19,.09);border-radius:24px;overflow:hidden;border:1px solid rgba(30,22,19,.09)">
+<sc-for list="{{ devices }}" as="d" hint-placeholder-count="4">
+<div onClick="{{ d.tap }}" style="background:#fff;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer" style-active="background:#F6EDE1">
+<span style="width:8px;height:8px;flex:none;border-radius:999px;background:{{ d.dot }}"></span>
+<span style="flex:1;display:flex;flex-direction:column;gap:2px">
+<span style="font-size:13px;font-weight:700">{{ d.name }}</span>
+<span style="font-size:11.5px;color:{{ d.fg }};line-height:1.4">{{ d.user }} · {{ d.synced }}</span>
+</span>
+</div>
+</sc-for>
+</div>
+<div style="border-radius:24px;background:#F2E4D2;padding:16px 17px;display:flex;align-items:center;gap:13px">
+<span style="flex:1;display:flex;flex-direction:column;gap:2px">
+<span style="font-size:13px;font-weight:700">Backup</span>
+<span style="font-size:11.5px;color:#6E5A4C;line-height:1.4">{{ backupLabel }}</span>
+</span>
+<button onClick="{{ runBackup }}" style="height:40px;padding:0 16px;border-radius:999px;border:0;background:#1E1613;color:#FBF4EA;font-family:Karla;font-size:12.5px;font-weight:700;cursor:pointer" style-active="transform:scale(.95)">Run now</button>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;align-items:baseline;justify-content:space-between">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">Staff accounts · {{ staffCount }}</span>
+<button onClick="{{ addStaff }}" style="border:0;background:none;padding:0;font-family:Karla;font-size:12.5px;font-weight:700;color:#C33B22;cursor:pointer">Invite</button>
+</div>
+<div style="display:flex;flex-direction:column;gap:1px;background:rgba(30,22,19,.09);border-radius:24px;overflow:hidden;border:1px solid rgba(30,22,19,.09)">
+<sc-for list="{{ staffList }}" as="u" hint-placeholder-count="6">
+<div onClick="{{ u.tap }}" style="background:#fff;padding:13px 16px;display:flex;align-items:center;gap:12px;cursor:pointer" style-active="background:#F6EDE1">
+<span style="width:32px;height:32px;flex:none;border-radius:999px;background:#EDE2D4;font-family:'Instrument Serif',Georgia,serif;font-size:13px;color:#5C4B3F;display:flex;align-items:center;justify-content:center">{{ u.initials }}</span>
+<span style="flex:1;display:flex;flex-direction:column;gap:1px">
+<span style="font-size:13px;font-weight:700">{{ u.name }}</span>
+<span style="font-size:11.5px;color:#8A7566">{{ u.role }}</span>
+</span>
+<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="#C3B2A3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</div>
+</sc-for>
+</div>
+</div>
+
+</div>
+</sc-if>
+
+<sc-if value="{{ isStaffDesk }}" hint-placeholder-val="{{ false }}">
+<div style="padding:16px 18px 130px;display:flex;flex-direction:column;gap:18px">
+<sc-if value="{{ showBranchFilter }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;gap:7px;overflow-x:auto;margin:0 -18px;padding:0 18px 2px">
+<sc-for list="{{ branchTabs }}" as="b" hint-placeholder-count="8">
+<button onClick="{{ b.tap }}" style="flex:none;border:1.5px solid {{ b.border }};background:{{ b.bg }};color:{{ b.fg }};border-radius:999px;padding:8px 14px;font-family:Karla;font-size:12px;font-weight:700;cursor:pointer;transition:background .18s" style-active="transform:scale(.94)">{{ b.name }}</button>
+</sc-for>
+</div>
+</sc-if>
+<div style="border-radius:28px;background:#1E1613;color:#FBF4EA;padding:20px;display:flex;flex-direction:column;gap:12px">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(251,244,234,.5)">{{ signedInLabel }}</span>
+<div style="display:flex;align-items:flex-end;gap:14px">
+<span style="flex:1;font-size:13px;color:rgba(251,244,234,.72);line-height:1.5">{{ deskCount }} waiting on a DXF<br>{{ deskRevisions }}</span>
+</div>
+</div>
+
+<sc-for list="{{ deskJobs }}" as="d" hint-placeholder-count="3">
+<div style="border-radius:26px;background:#fff;border:1px solid rgba(30,22,19,.09);padding:16px 17px;display:flex;flex-direction:column;gap:13px">
+<div style="display:flex;gap:12px;align-items:flex-start">
+<div style="width:48px;height:48px;flex:none;border-radius:14px;overflow:hidden;background:#EDE2D4;display:flex;align-items:center;justify-content:center">{{ d.tile }}</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:3px">
+<span style="font-size:13.5px;font-weight:700">{{ d.id }} · {{ d.customer }}</span>
+<span style="font-size:11.5px;color:#8A7566;line-height:1.4">{{ d.spec }}</span>
+<span style="font-size:10.5px;color:#A08F80;letter-spacing:.06em">{{ d.branch }}</span>
+</div>
+<span style="border-radius:999px;background:{{ d.tagBg }};color:{{ d.tagFg }};padding:5px 10px;font-size:10.5px;font-weight:700;white-space:nowrap">{{ d.tag }}</span>
+</div>
+<sc-if value="{{ d.isAuto }}" hint-placeholder-val="{{ false }}">
+<div style="border-radius:18px;background:#F3EFF7;padding:11px 14px;display:flex;align-items:center;gap:10px">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="flex:none"><path d="M12 3.5l1.9 4.4 4.6.5-3.5 3.1 1 4.6-4-2.4-4 2.4 1-4.6L5.5 8.4l4.6-.5z" stroke="#5B4A7A" stroke-width="1.5" stroke-linejoin="round"/></svg>
+<span style="font-size:12px;color:#5B4A7A;line-height:1.4">{{ d.autoLine }}</span>
+</div>
+</sc-if>
+<sc-if value="{{ d.hasNote }}" hint-placeholder-val="{{ false }}">
+<div style="border-radius:18px;background:#F6EDE1;padding:12px 14px;font-size:12.5px;line-height:1.45;color:#5C4B3F">{{ d.note }}</div>
+</sc-if>
+<div style="display:flex;gap:9px">
+<button onClick="{{ d.upload }}" style="flex:1;height:44px;border-radius:999px;border:0;background:#C33B22;color:#FBF4EA;font-family:Karla;font-size:13px;font-weight:700;cursor:pointer" style-active="transform:scale(.96)">{{ d.primary }}</button>
+<button onClick="{{ d.sheets }}" style="height:44px;padding:0 16px;border-radius:999px;border:1.5px solid rgba(30,22,19,.16);background:none;font-family:Karla;font-size:13px;font-weight:700;color:#1E1613;cursor:pointer" style-active="transform:scale(.96)">Sheets</button>
+</div>
+</div>
+</sc-for>
+
+<div style="border-radius:26px;border:1px dashed rgba(30,22,19,.2);padding:22px;display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 19.5V7m0 0L7.6 11.4M12 7l4.4 4.4" stroke="#8A7566" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+<span style="font-size:13px;font-weight:700">Drop a DXF here</span>
+<span style="font-size:11.5px;color:#8A7566;line-height:1.45">Versioned per job. Customers never see the file — only the preview.</span>
+</div>
+</div>
+</sc-if>
+
+</div>
+
+<div style="flex:none;position:relative;z-index:8;padding:8px 14px 30px;background:linear-gradient(to bottom,rgba(251,244,234,0),#FBF4EA 26%)">
+<div style="display:flex;gap:2px;background:#1E1613;border-radius:999px;padding:5px;box-shadow:0 14px 30px -16px rgba(30,22,19,.9)">
+<sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+<button onClick="{{ t.tap }}" style="flex:1;height:46px;border-radius:999px;border:0;background:{{ t.bg }};color:{{ t.fg }};font-family:Karla;font-size:11px;font-weight:700;letter-spacing:.04em;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;transition:background .22s,color .22s" style-active="transform:scale(.94)">
+{{ t.icon }}<span>{{ t.name }}</span>
+</button>
+</sc-for>
+</div>
+</div>
+
+<sc-if value="{{ docOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;z-index:66;background:rgba(20,16,16,.55);display:flex;align-items:flex-end;animation:pgRise .2s ease both">
+<div style="width:100%;max-height:88%;background:#FBF4EA;border-radius:32px 32px 0 0;display:flex;flex-direction:column;box-shadow:0 -20px 50px -20px rgba(30,22,19,.6)">
+
+<div style="flex:none;padding:18px 20px 12px;display:flex;align-items:center;gap:11px">
+<span style="width:38px;height:4px;border-radius:999px;background:rgba(30,22,19,.15);position:absolute;left:50%;transform:translateX(-50%);top:10px"></span>
+<span style="flex:1;font-family:'Instrument Serif',Georgia,serif;font-size:21px;line-height:1.1">{{ docTitle }}</span>
+<button onClick="{{ closeDoc }}" style="width:34px;height:34px;flex:none;border-radius:999px;border:1px solid rgba(30,22,19,.14);background:#fff;color:#5C4B3F;font-family:Karla;font-size:15px;line-height:1;cursor:pointer;padding:0" style-active="transform:scale(.9)">×</button>
+</div>
+
+<div style="flex:1;overflow-y:auto;padding:0 18px 18px">
+<div style="background:#fff;border:1px solid rgba(30,22,19,.12);border-radius:20px;padding:22px 20px;display:flex;flex-direction:column;gap:18px">
+
+<div style="display:flex;align-items:flex-start;gap:12px;padding-bottom:14px;border-bottom:1px solid rgba(30,22,19,.12)">
+<img src="assets/logo-on-light.png" alt="Pro_Grafiz Designs" style="height:20px;width:auto;display:block">
+<span style="flex:1"></span>
+<span style="display:flex;flex-direction:column;gap:2px;text-align:right">
+<span style="font-size:15px;font-weight:700;letter-spacing:.04em">{{ docNum }}</span>
+<span style="font-size:11px;color:#8A7566">{{ docIssued }}</span>
+</span>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:4px">
+<span style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">{{ docTitle }}</span>
+<span style="font-family:'Instrument Serif',Georgia,serif;font-size:26px;line-height:1.1">{{ docJob }}</span>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:1px;background:rgba(30,22,19,.1);border-radius:16px;overflow:hidden;border:1px solid rgba(30,22,19,.1)">
+<div style="background:#FBF4EA;padding:11px 14px;display:flex;justify-content:space-between;gap:12px;font-size:12.5px"><span style="color:#8A7566">Customer</span><span style="font-weight:700;text-align:right">{{ docCustomer }}</span></div>
+<div style="background:#FBF4EA;padding:11px 14px;display:flex;justify-content:space-between;gap:12px;font-size:12.5px"><span style="color:#8A7566">Centre</span><span style="font-weight:700;text-align:right">{{ docBranch }}</span></div>
+<div style="background:#FBF4EA;padding:11px 14px;display:flex;justify-content:space-between;gap:12px;font-size:12.5px"><span style="color:#8A7566">Specification</span><span style="font-weight:700;text-align:right">{{ docSpec }}</span></div>
+<div style="background:#FBF4EA;padding:11px 14px;display:flex;justify-content:space-between;gap:12px;font-size:12.5px"><span style="color:#8A7566">Amount</span><span style="font-weight:700;text-align:right">{{ docAmount }}</span></div>
+<div style="background:#FBF4EA;padding:11px 14px;display:flex;justify-content:space-between;gap:12px;font-size:12.5px"><span style="color:#8A7566">Payment reference</span><span style="font-weight:700;text-align:right;letter-spacing:.04em">{{ docRef }}</span></div>
+</div>
+
+<span style="font-size:12.5px;line-height:1.55;color:#5C4B3F;text-wrap:pretty">{{ docStatusLine }}</span>
+
+<div style="display:flex;flex-direction:column;gap:5px;padding-top:12px;border-top:1px solid rgba(30,22,19,.12)">
+<span style="font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">Authorised by</span>
+<span style="font-size:13px;font-weight:700">{{ docSignatory }}</span>
+<span style="font-size:11px;color:#A08F80;line-height:1.45">Generated automatically. Valid without a wet signature — verify at the Idu centre against the job reference.</span>
+</div>
+
+</div>
+</div>
+
+<div style="flex:none;padding:12px 18px 30px;display:flex;gap:10px">
+<button onClick="{{ shareDoc }}" style="flex:1;height:50px;border-radius:999px;border:1.5px solid rgba(30,22,19,.16);background:none;font-family:Karla;font-size:13.5px;font-weight:700;color:#1E1613;cursor:pointer" style-active="transform:scale(.96)">Send on WhatsApp</button>
+<button onClick="{{ downloadDoc }}" style="flex:1.4;height:50px;border-radius:999px;border:0;background:#C33B22;color:#FBF4EA;font-family:Karla;font-size:13.5px;font-weight:700;cursor:pointer" style-active="transform:scale(.96)">Download PDF</button>
+</div>
+
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ draftOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;z-index:68;background:#FBF4EA;display:flex;flex-direction:column;animation:pgRise .2s ease both">
+
+<div style="flex:none;padding:56px 18px 12px;display:flex;align-items:center;gap:11px;border-bottom:1px solid rgba(30,22,19,.07)">
+<button onClick="{{ closeDraft }}" style="width:38px;height:38px;flex:none;border-radius:999px;border:1px solid rgba(30,22,19,.12);background:#fff;color:#1E1613;font-family:Karla;font-size:16px;line-height:1;cursor:pointer;padding:0" style-active="transform:scale(.92)">×</button>
+<span style="flex:1;display:flex;flex-direction:column;gap:2px">
+<span style="font-family:'Instrument Serif',Georgia,serif;font-size:20px;line-height:1">Generated draft</span>
+<span style="font-size:11px;color:#8A7566;letter-spacing:.06em">{{ draftId }} · {{ draftDrawn }}</span>
+</span>
+<span style="flex:none;border-radius:999px;background:#EDE6F3;color:#5B4A7A;padding:6px 11px;font-size:10.5px;font-weight:700;letter-spacing:.06em">AUTO</span>
+</div>
+
+<div style="flex:1;overflow-y:auto;padding:18px 18px 34px;display:flex;flex-direction:column;gap:20px">
+
+<div style="border-radius:26px;background:#EDE2D4;padding:16px;display:flex;flex-direction:column;gap:12px">
+<div style="aspect-ratio:1;border-radius:20px;overflow:hidden;background:rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;opacity:{{ draftOpacity }};transition:opacity .3s">{{ draftTile }}</div>
+<div style="display:flex;justify-content:space-between;font-size:11.5px;color:#5C4B3F">
+<span>{{ draftPattern }}</span><span>{{ draftPanel }}</span>
+</div>
+</div>
+
+<div style="border-radius:22px;background:{{ draftVerdictBg }};padding:15px 17px;font-size:13px;line-height:1.5;color:#3A2E27">{{ draftVerdict }}</div>
+
+<div style="display:flex;flex-direction:column;gap:11px">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">Automated checks</span>
+<sc-for list="{{ draftChecks }}" as="c" hint-placeholder-count="5">
+<div style="display:flex;gap:12px;align-items:flex-start">
+<span style="width:24px;height:24px;flex:none;border-radius:999px;background:{{ c.bg }};color:{{ c.fg }};font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ c.mark }}</span>
+<span style="flex:1;display:flex;flex-direction:column;gap:2px">
+<span style="font-size:13.5px;font-weight:700;line-height:1.3">{{ c.label }}</span>
+<span style="font-size:12px;color:#6E5A4C;line-height:1.45">{{ c.detail }}</span>
+</span>
+</div>
+</sc-for>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:11px">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">Nest · {{ draftSheets }}</span>
+<div style="display:flex;gap:10px;overflow-x:auto;margin:0 -18px;padding:0 18px 2px">
+<sc-for list="{{ draftNest }}" as="n" hint-placeholder-count="3">
+<div style="flex:none;width:104px;display:flex;flex-direction:column;gap:6px">
+<div style="height:138px;border-radius:16px;overflow:hidden;background:#EDE2D4;border:1px solid rgba(30,22,19,.1);display:flex;align-items:center;justify-content:center">{{ n.tile }}</div>
+<span style="font-size:11px;color:#8A7566;letter-spacing:.04em">{{ n.label }}</span>
+</div>
+</sc-for>
+</div>
+<div style="display:flex;flex-direction:column;gap:1px;background:rgba(30,22,19,.09);border-radius:22px;overflow:hidden;border:1px solid rgba(30,22,19,.09)">
+<div style="background:#fff;padding:12px 15px;display:flex;justify-content:space-between;font-size:13px"><span style="color:#8A7566">Material</span><span style="font-weight:700">{{ draftMaterial }}</span></div>
+<div style="background:#fff;padding:12px 15px;display:flex;justify-content:space-between;font-size:13px"><span style="color:#8A7566">Offcut waste</span><span style="font-weight:700">{{ draftWaste }}</span></div>
+<div style="background:#fff;padding:12px 15px;display:flex;justify-content:space-between;font-size:13px"><span style="color:#8A7566">Cut length</span><span style="font-weight:700">{{ draftCutLength }}</span></div>
+<div style="background:#fff;padding:12px 15px;display:flex;justify-content:space-between;font-size:13px"><span style="color:#8A7566">Estimated cut time</span><span style="font-weight:700">{{ draftCutTime }}</span></div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:10px">
+<button onClick="{{ approveDraft }}" style="height:54px;border-radius:999px;border:0;background:#C33B22;color:#FBF4EA;font-family:Karla;font-size:14.5px;font-weight:700;cursor:pointer;box-shadow:0 10px 22px -12px rgba(195,59,34,.9)" style-active="transform:scale(.97)">{{ draftPrimaryLabel }}</button>
+<div style="display:flex;gap:10px">
+<button onClick="{{ regenDraft }}" style="flex:1;height:48px;border-radius:999px;border:1.5px solid rgba(30,22,19,.16);background:none;font-family:Karla;font-size:13px;font-weight:700;color:#1E1613;cursor:pointer" style-active="transform:scale(.96)">Redraw</button>
+<button onClick="{{ overrideDraft }}" style="flex:1;height:48px;border-radius:999px;border:1.5px solid rgba(30,22,19,.16);background:none;font-family:Karla;font-size:13px;font-weight:700;color:#1E1613;cursor:pointer" style-active="transform:scale(.96)">Upload my own</button>
+</div>
+<span style="font-size:11.5px;color:#A08F80;line-height:1.45;text-align:center">Nothing reaches the cutting floor without a name against it. Releasing signs the file as yours.</span>
+</div>
+
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ scanOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;z-index:70;background:#141010;display:flex;flex-direction:column;animation:pgRise .2s ease both">
+
+<div style="flex:none;padding:56px 18px 12px;display:flex;align-items:center;gap:12px">
+<button onClick="{{ closeScan }}" style="width:38px;height:38px;flex:none;border-radius:999px;border:1px solid rgba(251,244,234,.22);background:rgba(251,244,234,.06);color:#FBF4EA;font-family:Karla;font-size:16px;line-height:1;cursor:pointer;padding:0" style-active="transform:scale(.92)">×</button>
+<span style="flex:1;font-family:'Instrument Serif',Georgia,serif;font-size:20px;color:#FBF4EA;line-height:1">{{ scanTitle }}</span>
+</div>
+
+<sc-if value="{{ scanCapture }}" hint-placeholder-val="{{ true }}">
+<div style="flex:1;display:flex;flex-direction:column;min-height:0">
+<div style="flex:1;position:relative;margin:0 18px;border-radius:26px;overflow:hidden;background:#2A2320;display:flex;align-items:center;justify-content:center">
+<div style="position:absolute;inset:0;background:repeating-linear-gradient(115deg,#332B27 0 22px,#2E2723 22px 44px)"></div>
+<div style="position:absolute;inset:34px 26px;border-radius:8px;background:#EFE7DA;transform:rotate(-2.2deg);box-shadow:0 22px 46px -18px rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center">
+<svg viewBox="0 0 120 150" width="72%" height="72%" fill="none" stroke="#4A4038" stroke-width="1.6" stroke-linecap="round"><rect x="12" y="16" width="96" height="118" rx="3"/><path d="M12 46h96M12 104h96M60 16v118"/><path d="M36 60c8-9 16-9 24 0s16 9 24 0M36 90c8-9 16-9 24 0s16 9 24 0"/><path d="M24 26l8 10M96 26l-8 10"/></svg>
+</div>
+<div style="position:absolute;inset:22px;pointer-events:none">
+<span style="position:absolute;left:0;top:0;width:30px;height:30px;border-left:3px solid #F0A03C;border-top:3px solid #F0A03C;border-radius:10px 0 0 0"></span>
+<span style="position:absolute;right:0;top:0;width:30px;height:30px;border-right:3px solid #F0A03C;border-top:3px solid #F0A03C;border-radius:0 10px 0 0"></span>
+<span style="position:absolute;left:0;bottom:0;width:30px;height:30px;border-left:3px solid #F0A03C;border-bottom:3px solid #F0A03C;border-radius:0 0 0 10px"></span>
+<span style="position:absolute;right:0;bottom:0;width:30px;height:30px;border-right:3px solid #F0A03C;border-bottom:3px solid #F0A03C;border-radius:0 0 10px 0"></span>
+</div>
+<div style="position:absolute;left:22px;right:22px;bottom:16px;display:flex;align-items:center;gap:8px;background:rgba(20,16,16,.72);border-radius:999px;padding:9px 14px">
+<span style="width:7px;height:7px;border-radius:999px;background:#5FBF8F;animation:pgPulse 1.6s ease-in-out infinite"></span>
+<span style="font-size:11.5px;color:rgba(251,244,234,.85)">Paper edges found — hold steady</span>
+</div>
+</div>
+<div style="flex:none;padding:16px 18px 30px;display:flex;flex-direction:column;gap:16px;align-items:center">
+<span style="font-size:12px;color:rgba(251,244,234,.55);line-height:1.45;text-align:center;max-width:30em">{{ scanHint }}</span>
+<button onClick="{{ shutter }}" style="width:74px;height:74px;border-radius:999px;border:4px solid rgba(251,244,234,.35);background:#FBF4EA;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center" style-active="transform:scale(.9)">
+<span style="width:58px;height:58px;border-radius:999px;background:#C33B22"></span>
+</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ scanProcessing }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:26px;padding:0 26px 40px">
+<div style="align-self:center;width:130px;height:130px;border-radius:26px;overflow:hidden;background:#EFE7DA;display:flex;align-items:center;justify-content:center">
+<svg viewBox="0 0 120 150" width="76%" height="76%" fill="none" stroke="#4A4038" stroke-width="1.6" stroke-linecap="round"><rect x="12" y="16" width="96" height="118" rx="3"/><path d="M12 46h96M12 104h96M60 16v118"/><path d="M36 60c8-9 16-9 24 0s16 9 24 0M36 90c8-9 16-9 24 0s16 9 24 0"/></svg>
+</div>
+<div style="display:flex;flex-direction:column;gap:0">
+<sc-for list="{{ scanSteps }}" as="st" hint-placeholder-count="4">
+<div style="display:flex;gap:14px;align-items:stretch">
+<div style="width:20px;flex:none;display:flex;flex-direction:column;align-items:center">
+<span style="width:11px;height:11px;border-radius:999px;background:{{ st.dot }};border:2px solid {{ st.ring }};margin-top:3px;animation:{{ st.anim }}"></span>
+<span style="flex:1;width:2px;background:rgba(251,244,234,.14);min-height:14px"></span>
+</div>
+<div style="flex:1;padding-bottom:16px;display:flex;flex-direction:column;gap:2px">
+<span style="font-size:13.5px;font-weight:{{ st.weight }};color:{{ st.fg }};filter:invert(1) brightness(1.9)">{{ st.label }}</span>
+<span style="font-size:11.5px;color:rgba(251,244,234,.45)">{{ st.note }}</span>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ scanResult }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;overflow-y:auto;background:#FBF4EA;border-radius:28px 28px 0 0;margin-top:6px;padding:22px 18px 34px;display:flex;flex-direction:column;gap:20px">
+
+<div style="display:flex;flex-direction:column;gap:11px">
+<div style="display:flex;align-items:baseline;justify-content:space-between">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">{{ sketchCountLabel }} captured</span>
+<button onClick="{{ addAnother }}" style="border:0;background:none;padding:0;font-family:Karla;font-size:12.5px;font-weight:700;color:#C33B22;cursor:pointer">Add another</button>
+</div>
+<sc-for list="{{ sketches }}" as="sk" hint-placeholder-count="1">
+<div style="border-radius:24px;background:#fff;border:1px solid rgba(30,22,19,.1);padding:14px 15px;display:flex;flex-direction:column;gap:11px">
+<div style="display:flex;gap:13px;align-items:center">
+<div style="width:64px;height:64px;flex:none;border-radius:16px;overflow:hidden;background:#EDE2D4;display:flex;align-items:center;justify-content:center">{{ sk.tile }}</div>
+<span style="flex:1;display:flex;flex-direction:column;gap:2px">
+<span style="font-size:13.5px;font-weight:700">{{ sk.label }}</span>
+<span style="font-size:11.5px;color:#8A7566;line-height:1.4">Traced to a closed path. The design desk redraws it to cut tolerance.</span>
+</span>
+<button onClick="{{ sk.remove }}" style="width:32px;height:32px;flex:none;border-radius:999px;border:1px solid rgba(30,22,19,.14);background:#FBF4EA;color:#8A7566;font-family:Karla;font-size:15px;line-height:1;cursor:pointer;padding:0" style-active="transform:scale(.9)">×</button>
+</div>
+<textarea value="{{ sk.desc }}" onChange="{{ sk.setDesc }}" placeholder="{{ sk.placeholder }}" rows="3" style="border-radius:18px;border:1.5px solid rgba(30,22,19,.14);background:#FBF4EA;padding:12px 15px;font-family:Karla;font-size:13.5px;line-height:1.5;color:#1E1613;outline:0;resize:none;width:100%;box-sizing:border-box"></textarea>
+<span style="align-self:flex-end;font-size:11px;color:{{ sk.counterColor }}">{{ sk.counter }}</span>
+</div>
+</sc-for>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:11px">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">Closest catalogue matches</span>
+<sc-for list="{{ scanMatches }}" as="m" hint-placeholder-count="3">
+<div onClick="{{ m.tap }}" style="border-radius:22px;background:#fff;border:1px solid rgba(30,22,19,.1);padding:13px 15px;display:flex;align-items:center;gap:13px;cursor:pointer" style-active="transform:scale(.98)">
+<div style="width:46px;height:46px;flex:none;border-radius:14px;overflow:hidden;background:#EDE2D4;display:flex;align-items:center;justify-content:center">{{ m.tile }}</div>
+<span style="flex:1;display:flex;flex-direction:column;gap:2px">
+<span style="font-size:13.5px;font-weight:700">{{ m.name }}</span>
+<span style="font-size:11px;color:#8A7566;letter-spacing:.06em">{{ m.id }} · {{ m.cat }}</span>
+</span>
+<span style="border-radius:999px;background:#F6EDE1;color:#6E5A4C;padding:6px 11px;font-size:11px;font-weight:700;white-space:nowrap">{{ m.conf }}</span>
+</div>
+</sc-for>
+<span style="font-size:11.5px;color:#A08F80;line-height:1.45">Picking a match is cheaper and faster than a custom draw — it is already cut-ready.</span>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:11px">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">Or send the sketches as-is</span>
+<sc-if value="{{ scanIsStaff }}" hint-placeholder-val="{{ false }}">
+<input value="{{ scanCustomer }}" onChange="{{ setScanCustomer }}" placeholder="Customer name" style="height:48px;border-radius:999px;border:1.5px solid rgba(30,22,19,.14);background:#fff;padding:0 18px;font-family:Karla;font-size:14px;color:#1E1613;outline:0">
+</sc-if>
+<div style="display:flex;gap:10px">
+<button onClick="{{ retake }}" style="flex:1;height:50px;border-radius:999px;border:1.5px solid rgba(30,22,19,.16);background:none;font-family:Karla;font-size:14px;font-weight:700;color:#1E1613;cursor:pointer" style-active="transform:scale(.96)">Retake</button>
+<button onClick="{{ submitScan }}" style="flex:1.5;height:50px;border-radius:999px;border:0;background:#C33B22;color:#FBF4EA;font-family:Karla;font-size:14px;font-weight:700;cursor:pointer" style-active="transform:scale(.96)">Send to design desk</button>
+</div>
+</div>
+
+</div>
+</sc-if>
+
+</div>
+</sc-if>
+
+<sc-if value="{{ signInOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;z-index:62;background:rgba(20,16,16,.6);display:flex;align-items:flex-end;animation:pgRise .22s ease both">
+<div style="width:100%;background:#FBF4EA;border-radius:32px 32px 0 0;padding:22px 22px 32px;display:flex;flex-direction:column;gap:14px;box-shadow:0 -20px 50px -20px rgba(30,22,19,.6)">
+<div style="width:38px;height:4px;border-radius:999px;background:rgba(30,22,19,.15);align-self:center"></div>
+
+<sc-if value="{{ pinStep }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;flex-direction:column;gap:5px">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">{{ pinUserRole }}</span>
+<h2 style="margin:0;font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:26px;line-height:1.1">{{ pinUserName }}</h2>
+<p style="margin:0;font-size:12.5px;line-height:1.5;color:#5C4B3F">Enter your four-digit PIN. Every action you take is recorded against this account.</p>
+</div>
+<input type="password" value="{{ pinValue }}" onChange="{{ setPin }}" placeholder="••••" autoFocus style="height:54px;border-radius:999px;border:1.5px solid {{ pinBorder }};background:#fff;padding:0 22px;font-family:Karla;font-size:20px;letter-spacing:.4em;color:#1E1613;outline:0">
+<sc-if value="{{ pinError }}" hint-placeholder-val="{{ false }}">
+<span style="font-size:12.5px;color:#C33B22;padding:0 6px">{{ pinError }}</span>
+</sc-if>
+<div style="display:flex;gap:10px">
+<button onClick="{{ backToUsers }}" style="flex:1;height:50px;border-radius:999px;border:1.5px solid rgba(30,22,19,.16);background:none;font-family:Karla;font-size:14px;font-weight:700;color:#1E1613;cursor:pointer" style-active="transform:scale(.96)">Back</button>
+<button onClick="{{ submitPin }}" style="flex:1.4;height:50px;border-radius:999px;border:0;background:#C33B22;color:#FBF4EA;font-family:Karla;font-size:14px;font-weight:700;cursor:pointer" style-active="transform:scale(.96)">Sign in</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ userStep }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;flex-direction:column;gap:13px">
+<div style="display:flex;flex-direction:column;gap:5px">
+<h2 style="margin:0;font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:26px;line-height:1.1">Staff sign-in</h2>
+<p style="margin:0;font-size:12.5px;line-height:1.5;color:#5C4B3F">Pick your account. What you can do depends on your role, not on the device.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:1px;background:rgba(30,22,19,.09);border-radius:22px;overflow:hidden;border:1px solid rgba(30,22,19,.09);max-height:300px;overflow-y:auto">
+<sc-for list="{{ signInUsers }}" as="u" hint-placeholder-count="6">
+<button onClick="{{ u.tap }}" style="text-align:left;border:0;background:{{ u.bg }};padding:13px 15px;font-family:Karla;cursor:pointer;display:flex;align-items:center;gap:12px" style-active="background:#F2E4D2">
+<span style="width:32px;height:32px;flex:none;border-radius:999px;background:#EDE2D4;font-family:'Instrument Serif',Georgia,serif;font-size:13px;color:#5C4B3F;display:flex;align-items:center;justify-content:center">{{ u.initials }}</span>
+<span style="flex:1;display:flex;flex-direction:column;gap:1px">
+<span style="font-size:13.5px;font-weight:{{ u.weight }};color:#1E1613">{{ u.name }}</span>
+<span style="font-size:11.5px;color:#8A7566">{{ u.role }}</span>
+</span>
+<span style="width:17px;height:17px;flex:none;border-radius:999px;border:1.5px solid {{ u.ring }};background:{{ u.dot }}"></span>
+</button>
+</sc-for>
+</div>
+<button onClick="{{ cancelSignIn }}" style="height:50px;border-radius:999px;border:1.5px solid rgba(30,22,19,.16);background:none;font-family:Karla;font-size:14px;font-weight:700;color:#1E1613;cursor:pointer" style-active="transform:scale(.97)">Cancel</button>
+</div>
+</sc-if>
+
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ payGateOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;z-index:60;background:rgba(20,16,16,.58);display:flex;align-items:flex-end;animation:pgRise .22s ease both">
+<div style="width:100%;background:#FBF4EA;border-radius:32px 32px 0 0;padding:22px 22px 32px;display:flex;flex-direction:column;gap:14px;box-shadow:0 -20px 50px -20px rgba(30,22,19,.6)">
+<div style="width:38px;height:4px;border-radius:999px;background:rgba(30,22,19,.15);align-self:center"></div>
+<div style="display:flex;flex-direction:column;gap:5px">
+<span style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8A7566">Accountant confirmation</span>
+<h2 style="margin:0;font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:25px;line-height:1.1">Confirm {{ payGateJob }}</h2>
+<p style="margin:0;font-size:12.5px;line-height:1.5;color:#5C4B3F">Only the accountant can confirm a deposit or balance. Enter your PIN to countersign — this is what advances the job.</p>
+</div>
+<input type="password" value="{{ payGatePin }}" onChange="{{ setPayGatePin }}" placeholder="••••" autoFocus style="height:54px;border-radius:999px;border:1.5px solid {{ payGateBorder }};background:#fff;padding:0 22px;font-family:Karla;font-size:20px;letter-spacing:.4em;color:#1E1613;outline:0">
+<sc-if value="{{ payGateError }}" hint-placeholder-val="{{ false }}">
+<span style="font-size:12.5px;color:#C33B22;padding:0 6px">{{ payGateError }}</span>
+</sc-if>
+<div style="display:flex;gap:10px">
+<button onClick="{{ closePayGate }}" style="flex:1;height:50px;border-radius:999px;border:1.5px solid rgba(30,22,19,.16);background:none;font-family:Karla;font-size:14px;font-weight:700;color:#1E1613;cursor:pointer" style-active="transform:scale(.96)">Cancel</button>
+<button onClick="{{ submitPayGate }}" style="flex:1.4;height:50px;border-radius:999px;border:0;background:#C33B22;color:#FBF4EA;font-family:Karla;font-size:14px;font-weight:700;cursor:pointer" style-active="transform:scale(.96)">Confirm payment</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ notifOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;z-index:55;background:rgba(20,16,16,.5);display:flex;align-items:flex-end;animation:pgRise .22s ease both">
+<div style="width:100%;max-height:76%;background:#FBF4EA;border-radius:32px 32px 0 0;padding:22px 0 30px;display:flex;flex-direction:column;gap:12px;box-shadow:0 -20px 50px -20px rgba(30,22,19,.6)">
+<div style="width:38px;height:4px;border-radius:999px;background:rgba(30,22,19,.15);align-self:center"></div>
+<div style="display:flex;align-items:center;gap:10px;padding:4px 22px 0">
+<h2 style="margin:0;flex:1;font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:25px;line-height:1.1">Notifications</h2>
+<button onClick="{{ markAllRead }}" style="border:0;background:none;padding:4px;font-family:Karla;font-size:12.5px;font-weight:700;color:#C33B22;cursor:pointer">Mark all read</button>
+<button onClick="{{ closeNotifs }}" style="width:32px;height:32px;flex:none;border-radius:999px;border:1px solid rgba(30,22,19,.14);background:#fff;color:#5C4B3F;font-family:Karla;font-size:15px;line-height:1;cursor:pointer;padding:0" style-active="transform:scale(.9)">×</button>
+</div>
+<div style="flex:1;overflow-y:auto;padding:0 18px;display:flex;flex-direction:column;gap:9px">
+<sc-for list="{{ notifs }}" as="n" hint-placeholder-count="4">
+<div onClick="{{ n.tap }}" style="border-radius:22px;background:{{ n.bg }};border:1px solid {{ n.border }};padding:14px 16px;display:flex;gap:12px;align-items:flex-start;cursor:pointer" style-active="transform:scale(.985)">
+<span style="width:30px;height:30px;flex:none;border-radius:999px;background:{{ n.iconBg }};display:flex;align-items:center;justify-content:center">{{ n.icon }}</span>
+<span style="flex:1;display:flex;flex-direction:column;gap:3px">
+<span style="font-size:13.5px;font-weight:{{ n.weight }};line-height:1.3">{{ n.title }}</span>
+<span style="font-size:12px;color:#6E5A4C;line-height:1.45">{{ n.body }}</span>
+<span style="font-size:11px;color:#A08F80">{{ n.when }}</span>
+</span>
+<sc-if value="{{ n.unread }}" hint-placeholder-val="{{ false }}">
+<span style="width:8px;height:8px;flex:none;border-radius:999px;background:#C33B22;margin-top:5px"></span>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ holdOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;z-index:58;background:rgba(20,16,16,.55);display:flex;align-items:flex-end;animation:pgRise .22s ease both">
+<div style="width:100%;background:#FBF4EA;border-radius:32px 32px 0 0;padding:22px 22px 32px;display:flex;flex-direction:column;gap:14px;box-shadow:0 -20px 50px -20px rgba(30,22,19,.6)">
+<div style="width:38px;height:4px;border-radius:999px;background:rgba(30,22,19,.15);align-self:center"></div>
+<div style="display:flex;gap:6px;background:rgba(30,22,19,.07);border-radius:999px;padding:4px">
+<sc-for list="{{ holdKinds }}" as="k" hint-placeholder-count="2">
+<button onClick="{{ k.tap }}" style="flex:1;height:38px;border-radius:999px;border:0;background:{{ k.bg }};color:{{ k.fg }};font-family:Karla;font-size:12.5px;font-weight:700;cursor:pointer;transition:background .18s" style-active="transform:scale(.96)">{{ k.name }}</button>
+</sc-for>
+</div>
+<div style="display:flex;flex-direction:column;gap:5px">
+<h2 style="margin:0;font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:24px;line-height:1.1">{{ holdTitle }}</h2>
+<p style="margin:0;font-size:12.5px;line-height:1.5;color:#5C4B3F">{{ holdSubtitle }}</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:1px;background:rgba(30,22,19,.09);border-radius:22px;overflow:hidden;border:1px solid rgba(30,22,19,.09)">
+<sc-for list="{{ holdReasons }}" as="r" hint-placeholder-count="5">
+<button onClick="{{ r.tap }}" style="text-align:left;border:0;background:{{ r.bg }};padding:13px 15px;font-family:Karla;font-size:13px;font-weight:{{ r.weight }};color:#1E1613;cursor:pointer;display:flex;align-items:center;gap:11px" style-active="background:#F2E4D2">
+<span style="width:17px;height:17px;flex:none;border-radius:999px;border:1.5px solid {{ r.ring }};background:{{ r.dot }}"></span>{{ r.name }}
+</button>
+</sc-for>
+</div>
+<input value="{{ holdNote }}" onChange="{{ setHoldNote }}" placeholder="Add a note (optional)" style="height:46px;border-radius:999px;border:1.5px solid rgba(30,22,19,.14);background:#fff;padding:0 18px;font-family:Karla;font-size:13.5px;color:#1E1613;outline:0">
+<sc-if value="{{ holdError }}" hint-placeholder-val="{{ false }}">
+<span style="font-size:12.5px;color:#C33B22;padding:0 6px">{{ holdError }}</span>
+</sc-if>
+<div style="display:flex;gap:10px">
+<button onClick="{{ closeHold }}" style="flex:1;height:50px;border-radius:999px;border:1.5px solid rgba(30,22,19,.16);background:none;font-family:Karla;font-size:14px;font-weight:700;color:#1E1613;cursor:pointer" style-active="transform:scale(.96)">Back</button>
+<button onClick="{{ submitHold }}" style="flex:1.4;height:50px;border-radius:999px;border:0;background:{{ holdBtnBg }};color:{{ holdBtnFg }};font-family:Karla;font-size:14px;font-weight:700;cursor:pointer" style-active="transform:scale(.96)">{{ holdBtnLabel }}</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ showMergeBar }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;left:16px;right:16px;bottom:104px;z-index:30;background:#1E1613;color:#FBF4EA;border-radius:999px;padding:8px 8px 8px 20px;display:flex;align-items:center;gap:12px;box-shadow:0 18px 36px -18px rgba(30,22,19,.9);animation:pgRise .22s ease both">
+<span style="flex:1;font-size:12.5px;line-height:1.3">{{ mergeCountLabel }}</span>
+<button onClick="{{ clearMerge }}" style="border:0;background:none;padding:6px 8px;font-family:Karla;font-size:12.5px;font-weight:700;color:rgba(251,244,234,.6);cursor:pointer">Clear</button>
+<button onClick="{{ doMerge }}" style="height:40px;padding:0 20px;border-radius:999px;border:0;background:{{ mergeGoBg }};color:{{ mergeGoFg }};font-family:Karla;font-size:13px;font-weight:700;cursor:pointer" style-active="transform:scale(.95)">Merge</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ askPassword }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;z-index:60;background:rgba(20,16,16,.55);display:flex;align-items:flex-end;padding:0 0 0;animation:pgRise .22s ease both">
+<div style="width:100%;background:#FBF4EA;border-radius:32px 32px 0 0;padding:24px 22px 34px;display:flex;flex-direction:column;gap:16px;box-shadow:0 -20px 50px -20px rgba(30,22,19,.6)">
+<div style="width:38px;height:4px;border-radius:999px;background:rgba(30,22,19,.15);align-self:center"></div>
+<div style="display:flex;flex-direction:column;gap:6px">
+<h2 style="margin:0;font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:26px;line-height:1.1">Release code required</h2>
+<p style="margin:0;font-size:13px;line-height:1.5;color:#5C4B3F;text-wrap:pretty">DXF files are production drawings. Enter this month's code, issued by your centre manager, to download <strong>{{ pwDesignId }}</strong>.</p>
+</div>
+<input type="password" value="{{ pwValue }}" onChange="{{ setPw }}" placeholder="PGDL2021-••" autoFocus style="height:52px;border-radius:999px;border:1.5px solid {{ pwBorder }};background:#fff;padding:0 20px;font-family:Karla;font-size:16px;letter-spacing:.16em;color:#1E1613;outline:0">
+<sc-if value="{{ pwError }}" hint-placeholder-val="{{ false }}">
+<span style="font-size:12.5px;color:#C33B22;padding:0 6px">{{ pwError }}</span>
+</sc-if>
+<div style="display:flex;gap:10px">
+<button onClick="{{ cancelPw }}" style="flex:1;height:50px;border-radius:999px;border:1.5px solid rgba(30,22,19,.16);background:none;font-family:Karla;font-size:14px;font-weight:700;color:#1E1613;cursor:pointer" style-active="transform:scale(.96)">Cancel</button>
+<button onClick="{{ submitPw }}" style="flex:1.4;height:50px;border-radius:999px;border:0;background:#C33B22;color:#FBF4EA;font-family:Karla;font-size:14px;font-weight:700;cursor:pointer" style-active="transform:scale(.96)">Unlock DXF</button>
+</div>
+<button onClick="{{ requestCode }}" style="align-self:center;border:0;background:none;padding:4px;font-family:Karla;font-size:12.5px;font-weight:700;color:#8A7566;cursor:pointer">Request a code on WhatsApp</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;left:20px;right:20px;bottom:110px;z-index:40;background:#1E1613;color:#FBF4EA;border-radius:20px;padding:14px 18px;font-size:13px;line-height:1.4;box-shadow:0 18px 36px -18px rgba(30,22,19,.9);animation:pgToast 2.6s ease forwards">{{ toast }}</div>
+</sc-if>
+
+</div>
+</x-import>
+<div style="max-width:402px;font-size:11.5px;line-height:1.6;color:#6E5A4C;text-align:center">Tap through: patterns → detail (zoom + material swatches) → quote builder. The badge top-right switches between the customer app and the staff surfaces.</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:460,&quot;height&quot;:1010},&quot;dxfDownloadEnabled&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Admin flags&quot;},&quot;dxfReleaseCode&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Admin flags&quot;},&quot;priceEstimateVisible&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Admin flags&quot;}}">
+const R = React;
+
+const CATS = ['All','Geometric Lattice','Hexagonal','Floral Rosette','Botanical Leaf','Waves & Curves','Chevron','Islamic Star','Arabesque','3D Optical','Organic Dots'];
+
+function holes(kind, n) {
+  const B = 120, out = [];
+  const push = (t, p) => out.push(R.createElement(t, Object.assign({ key: out.length, fill: '#000' }, p)));
+  const s = B / n;
+  if (kind === 'lattice') {
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+      const cx = (i + .5) * s, cy = (j + .5) * s, r = s * .36;
+      push('polygon', { points: `${cx},${cy - r} ${cx + r},${cy} ${cx},${cy + r} ${cx - r},${cy}` });
+    }
+    for (let i = 0; i <= n; i++) for (let j = 0; j <= n; j++) {
+      const r = s * .1;
+      push('rect', { x: i * s - r, y: j * s - r, width: r * 2, height: r * 2 });
+    }
+  } else if (kind === 'hex') {
+    const r = s * .42;
+    for (let j = 0; j <= n; j++) for (let i = 0; i <= n; i++) {
+      const cx = i * s + (j % 2 ? s / 2 : 0), cy = j * s * .88;
+      const pts = [];
+      for (let k = 0; k < 6; k++) { const a = Math.PI / 180 * (60 * k - 30); pts.push(`${(cx + r * Math.cos(a)).toFixed(2)},${(cy + r * Math.sin(a)).toFixed(2)}`); }
+      push('polygon', { points: pts.join(' ') });
+    }
+  } else if (kind === 'rosette') {
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+      const cx = (i + .5) * s, cy = (j + .5) * s;
+      for (let k = 0; k < 10; k++) push('ellipse', { cx, cy: cy - s * .22, rx: s * .07, ry: s * .2, transform: `rotate(${k * 36} ${cx} ${cy})` });
+      push('circle', { cx, cy, r: s * .08 });
+    }
+  } else if (kind === 'leaf') {
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+      const cx = (i + .5) * s, cy = (j + .5) * s, a = (i + j) % 2 ? 35 : -35, w = s * .17, h = s * .38;
+      push('path', { d: `M${cx} ${cy - h}C${cx + w} ${cy - h * .3} ${cx + w} ${cy + h * .3} ${cx} ${cy + h}C${cx - w} ${cy + h * .3} ${cx - w} ${cy - h * .3} ${cx} ${cy - h}Z`, transform: `rotate(${a} ${cx} ${cy})` });
+      push('rect', { x: cx - s * .03, y: cy - s * .04, width: s * .06, height: s * .08 });
+    }
+  } else if (kind === 'waves') {
+    for (let j = 0; j <= n * 1.6; j++) {
+      const y = j * (B / (n * 1.6)), amp = B / (n * 3.2);
+      let d = `M0 ${y}`;
+      for (let x = 0; x <= B; x += B / n) d += `q${B / (n * 2)} ${-amp} ${B / n} 0`;
+      push('path', { d, fill: 'none', stroke: '#000', strokeWidth: B / (n * 3.4) });
+    }
+  } else if (kind === 'chevron') {
+    for (let j = 0; j <= n * 1.4; j++) {
+      const y = j * (B / (n * 1.4));
+      let d = `M0 ${y}`;
+      for (let x = 0; x < B; x += B / n) d += `l${B / (n * 2)} ${-B / (n * 2.4)} l${B / (n * 2)} ${B / (n * 2.4)}`;
+      push('path', { d, fill: 'none', stroke: '#000', strokeWidth: B / (n * 3.6) });
+    }
+  } else if (kind === 'star') {
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+      const cx = (i + .5) * s, cy = (j + .5) * s, R1 = s * .44, R2 = s * .19, pts = [];
+      for (let k = 0; k < 16; k++) { const a = Math.PI / 8 * k - Math.PI / 2, rr = k % 2 ? R2 : R1; pts.push(`${(cx + rr * Math.cos(a)).toFixed(2)},${(cy + rr * Math.sin(a)).toFixed(2)}`); }
+      push('polygon', { points: pts.join(' ') });
+    }
+  } else if (kind === 'arabesque') {
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+      const cx = (i + .5) * s, cy = (j + .5) * s, r = s * .4;
+      for (let k = 0; k < 4; k++) push('path', { d: `M${cx} ${cy}C${cx + r * .9} ${cy - r * .2} ${cx + r * .5} ${cy - r} ${cx} ${cy - r}C${cx - r * .28} ${cy - r * .62} ${cx - r * .12} ${cy - r * .2} ${cx} ${cy}Z`, transform: `rotate(${k * 90} ${cx} ${cy})` });
+    }
+  } else if (kind === 'optical') {
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+      const cx = (i + .5) * s, cy = (j + .5) * s;
+      for (let k = 1; k <= 3; k++) {
+        const r = s * .12 * k;
+        push('rect', { x: cx - r, y: cy - r, width: r * 2, height: r * 2, fill: 'none', stroke: '#000', strokeWidth: s * .055, transform: `rotate(${k * 15 + (i + j) * 8} ${cx} ${cy})` });
+      }
+    }
+  } else {
+    for (let i = 0; i < n * 1.4; i++) for (let j = 0; j < n * 1.4; j++) {
+      const st = B / (n * 1.4), cx = (i + .5) * st, cy = (j + .5) * st;
+      const dx = cx - B / 2, dy = cy - B / 2, dist = Math.sqrt(dx * dx + dy * dy) / (B * .72);
+      push('circle', { cx, cy, r: st * (.14 + .3 * (1 - dist)) });
+    }
+  }
+  return out;
+}
+
+const MATERIAL_FILL = { steel: '#4A4038', stainless: '#8B8F93', aluminium: '#A9AEB2', corten: '#8C4A2B', black: '#1E1613' };
+
+function plate(kind, n, id, fill) {
+  const mid = 'm' + id;
+  return R.createElement('svg', { viewBox: '0 0 120 120', width: '100%', height: '100%', preserveAspectRatio: 'xMidYMid slice', style: { display: 'block' } },
+    R.createElement('defs', null,
+      R.createElement('mask', { id: mid },
+        R.createElement('rect', { width: 120, height: 120, fill: '#fff' }),
+        holes(kind, n))),
+    R.createElement('rect', { width: 120, height: 120, fill, mask: `url(#${mid})` }));
+}
+
+function regionPath(outer, inner) {
+  let d = `M${outer} ${outer}H${120 - outer}V${120 - outer}H${outer}Z`;
+  if (inner != null) d += `M${inner} ${inner}H${120 - inner}V${120 - inner}H${inner}Z`;
+  return d;
+}
+
+function plateMulti(list, mode, id, fill) {
+  const mid = 'mx' + id, defs = [], groups = [];
+  list.forEach((d, i) => {
+    const h = holes(d.kind, d.n);
+    if (mode === 'blend') { groups.push(R.createElement('g', { key: i }, h)); return; }
+    const cid = mid + 'c' + i;
+    let clip;
+    if (mode === 'bands') {
+      const hh = 120 / list.length;
+      clip = R.createElement('rect', { x: 0, y: i * hh, width: 120, height: hh });
+    } else {
+      const stops = list.length === 2 ? [0, 24] : [0, 18, 42];
+      clip = R.createElement('path', { d: regionPath(stops[i], stops[i + 1]), clipRule: 'evenodd' });
+    }
+    defs.push(R.createElement('clipPath', { key: 'c' + i, id: cid, clipPathUnits: 'userSpaceOnUse' }, clip));
+    groups.push(R.createElement('g', { key: i, clipPath: `url(#${cid})` }, h));
+  });
+  const seams = mode === 'frame' && list.length > 1
+    ? (list.length === 2 ? [24] : [18, 42]).map((v, i) => R.createElement('rect', { key: 's' + i, x: v, y: v, width: 120 - v * 2, height: 120 - v * 2, fill: 'none', stroke: '#fff', strokeWidth: 3 }))
+    : mode === 'bands' ? list.slice(1).map((_, i) => R.createElement('rect', { key: 's' + i, x: 0, y: (i + 1) * (120 / list.length) - 1.5, width: 120, height: 3, fill: '#fff' })) : [];
+  return R.createElement('svg', { viewBox: '0 0 120 120', width: '100%', height: '100%', preserveAspectRatio: 'xMidYMid slice', style: { display: 'block' } },
+    R.createElement('defs', null, defs,
+      R.createElement('mask', { id: mid + 'm' },
+        R.createElement('rect', { width: 120, height: 120, fill: '#fff' }),
+        groups, seams)),
+    R.createElement('rect', { width: 120, height: 120, fill, mask: `url(#${mid}m)` }));
+}
+
+const CAT_SPEC = {
+  'Geometric Lattice': { mats: 'Mild steel · Stainless 304', thick: '2mm – 6mm', min: 2, note: 'Tie points at every node carry load, so it takes thicker stock than most.' },
+  'Hexagonal': { mats: 'Mild steel · Aluminium', thick: '1.5mm – 4mm', min: 1.5, note: 'Even cell walls; thin stock is fine because the geometry self-braces.' },
+  'Floral Rosette': { mats: 'Mild steel · Stainless 304', thick: '2mm – 5mm', min: 2, note: 'Petal bridges are the weak point — 2mm floor so they survive coating.' },
+  'Botanical Leaf': { mats: 'Mild steel · Corten', thick: '2mm – 5mm', min: 2, note: 'Stem details need body; Corten suits the organic reading.' },
+  'Waves & Curves': { mats: 'All four materials', thick: '1mm – 6mm', min: 1, note: 'Continuous cut lines, so it tolerates the full thickness range.' },
+  'Chevron': { mats: 'Mild steel · Aluminium · Corten', thick: '1.5mm – 5mm', min: 1.5, note: 'Directional — confirm which way is up before cutting.' },
+  'Islamic Star': { mats: 'All four materials', thick: '2mm – 6mm', min: 2, note: 'Tight inner radii; below 2mm the star points distort under handling.' },
+  'Arabesque': { mats: 'Mild steel · Stainless 304', thick: '2.5mm – 6mm', min: 2.5, note: 'Slender teardrop necks demand the highest thickness floor in the catalogue.' },
+  '3D Optical': { mats: 'Mild steel · Aluminium', thick: '1.5mm – 4mm', min: 1.5, note: 'Depth reading depends on edge crispness, not thickness.' },
+  'Organic Dots': { mats: 'All four materials', thick: '1mm – 6mm', min: 1, note: 'Isolated circular holes — the most forgiving pattern to cut.' },
+};
+
+const HOLD_REASONS = ['Awaiting customer response', 'Material out of stock', 'Machine downtime', 'Payment dispute', 'Specification query'];
+const CANCEL_REASONS = ['Customer withdrew', 'Duplicate job', 'Cannot be manufactured as specified', 'Payment failed', 'Replaced by a new job'];
+
+const BRANCHES = ['Idu', 'UOO', 'Dei-Dei', 'Bakasi', 'Maraba', 'Iyanakpaja', 'Owode'];
+const BRANCH_STOCK = { Idu: 34, UOO: 19, 'Dei-Dei': 22, Bakasi: 12, Maraba: 17, Iyanakpaja: 9, Owode: 15 };
+
+const QUOTE_REQUESTS = [
+  { id: 'QR-1188', customer: 'Chidi Nwosu', branch: 'Idu', spec: 'PGLC0219 · 2mm mild steel · 1800×2400', src: 'Catalogue · Request a quote', when: '14 min ago', kind: 'star', n: 4 },
+  { id: 'QR-1186', customer: 'Halcyon Interiors', branch: 'Dei-Dei', spec: 'PGMX-0219-0090 · blend, frame · 3mm corten · 1200×3000', src: 'Custom blend', when: '1 hr ago', kind: 'hex', n: 4 },
+  { id: 'QR-1181', customer: 'Fatima B.', branch: 'Owode', spec: 'PGLC0507 · 2mm stainless · 900×1800', src: 'Catalogue · Request a quote', when: '3 hrs ago', kind: 'rosette', n: 3 },
+];
+
+const BILLING = {
+  'PG-2466': { customer: 'Amara O.', branch: 'Idu', amount: '₦ 512,500', ref: 'PGD-2466-8545', kind: 'Balance · 40%' },
+  'PG-2489': { customer: 'Tunde M.', branch: 'Maraba', amount: '₦ 486,000', ref: 'PGD-2489-4471', kind: 'Deposit · 60%' },
+  'PG-2477': { customer: 'Bell Construction', branch: 'Dei-Dei', amount: '₦ 312,500', ref: 'PGD-2477-9930', kind: 'Deposit · 60%' },
+};
+
+const PAYMENTS = [
+  { id: 'PG-2489', matched: true },
+  { id: 'PG-2466', matched: true },
+  { id: 'PG-2477', matched: false },
+];
+
+const NOTIFICATIONS = [
+  { id: 'n1', kind: 'approval', title: 'Revision 2 is ready for PG-2481', body: 'Approve it and we release sheets to the cutting floor today.', when: '40 min ago', unread: true },
+  { id: 'n2', kind: 'payment', title: 'Deposit confirmed on PG-2489', body: 'Reference PGD-2489-4471 reconciled by accounts.', when: '2 hrs ago', unread: true },
+  { id: 'n3', kind: 'stage', title: 'PG-2466 is ready for dispatch', body: 'Packed and labelled at Idu. Driver assigned tomorrow.', when: 'Yesterday', unread: false },
+  { id: 'n4', kind: 'quote', title: 'Quote QR-1188 received', body: 'The centre manager is reviewing it — you will get a billed figure shortly.', when: 'Yesterday', unread: false },
+];
+
+const MERGE_STYLES = [
+  { key: 'blend', name: 'Blend', blurb: 'Both cut paths overlaid on one sheet — the openings merge into a single lace field. Lightest look, most cutting time.' },
+  { key: 'bands', name: 'Bands', blurb: 'Each pattern takes an equal horizontal band, separated by a solid rib that stiffens the panel.' },
+  { key: 'frame', name: 'Frame', blurb: 'The first pattern becomes the border, the next fills the field. Strongest edge, best for gate leaves.' },
+];
+
+const CATEGORY_DEFS = [
+  ['Geometric Lattice', 'lattice', 'Gates, balustrades', ['Kano Lattice', 'Fine Diamond', 'Argyle Grid', 'Trellis', 'Crosshatch', 'Basket Weave', 'Diamond Field', 'Lozenge', 'Quatrefoil Grid', 'Interlace']],
+  ['Hexagonal', 'hex', 'Facades, partitions', ['Comb Screen', 'Dense Comb', 'Honeycomb', 'Cell Block', 'Beehive', 'Hex Field', 'Tessellate', 'Six Point', 'Nectar', 'Apiary']],
+  ['Floral Rosette', 'rosette', 'Feature panels', ['Zaria Rosette', 'Petal Wheel', 'Bloom', 'Daisy Chain', 'Marigold', 'Sunburst Flower', 'Rose Window', 'Blossom', 'Camellia', 'Corolla']],
+  ['Botanical Leaf', 'leaf', 'Garden screens', ['Leaf Fall', 'Fern', 'Vine', 'Ivy Screen', 'Palm', 'Frond', 'Laurel', 'Acacia', 'Bamboo Leaf', 'Olive']],
+  ['Waves & Curves', 'waves', 'Ceilings, soffits', ['Tide Line', 'Slow Tide', 'Ripple', 'Current', 'Swell', 'Dune', 'Wavelength', 'Undertow', 'Meander', 'Surf']],
+  ['Chevron', 'chevron', 'Cladding', ['Herring Run', 'Zigzag', 'Arrow Field', 'Chevron Band', 'Peak', 'Dogtooth', 'Sawtooth', 'Pennant', 'Fletch', 'Ridge']],
+  ['Islamic Star', 'star', 'Gates, doors', ['Eight Point', 'Star Field', 'Girih', 'Najma', 'Kufic Star', 'Sixteen Point', 'Andalus', 'Alhambra', 'Zellige', 'Muqarnas']],
+  ['Arabesque', 'arabesque', 'Room dividers', ['Arabesque No.4', 'Tendril', 'Scroll', 'Vine Knot', 'Damask', 'Filigree', 'Rumi', 'Cartouche', 'Medallion', 'Baroque Leaf']],
+  ['3D Optical', 'optical', 'Signage, walls', ['Depth Field', 'Illusion', 'Cube Stack', 'Moiré', 'Vortex', 'Nested Square', 'Parallax', 'Rotor', 'Lens', 'Stepwell']],
+  ['Organic Dots', 'dots', 'Privacy panels', ['Rain Dots', 'Scatter', 'Drizzle', 'Spore', 'Bubble', 'Perforation', 'Grain', 'Speckle', 'Confetti', 'Shot Peen']],
+];
+
+const DESIGNS = [];
+CATEGORY_DEFS.forEach(([cat, kind, use, names], c) => {
+  for (let i = 0; i < 100; i++) {
+    const num = c * 100 + i + 1, v = Math.floor(i / 10);
+    DESIGNS.push({
+      id: 'PGLC' + String(num).padStart(4, '0'),
+      name: names[i % 10] + (v ? ' ' + String(v + 1).padStart(2, '0') : ''),
+      cat, kind, use, n: [3, 4, 5, 6][i % 4],
+    });
+  }
+});
+const indexOfId = id => DESIGNS.findIndex(d => d.id === id);
+
+const STAFF_USERS = [
+  { name: 'Nathaniel Oitomen', initials: 'NO', role: 'Super Admin', title: 'Super Admin 1', pin: '1428' },
+  { name: 'Prisca Oitomen', initials: 'PO', role: 'Super Admin', title: 'Super Admin 2', pin: '8051' },
+  { name: 'Freda Ilem', initials: 'FI', role: 'Accountant', title: 'Accountant', pin: '3072' },
+  { name: 'Chioma Obinwanne', initials: 'CO', role: 'Centre Manager', title: 'Centre Manager', branch: 'Idu', pin: '4915' },
+  { name: 'Mary Ubogu', initials: 'MU', role: 'Centre Manager', title: 'Centre Manager', branch: 'UOO', pin: '6208' },
+  { name: 'Ulor Priscilia', initials: 'UP', role: 'Centre Manager', title: 'Centre Manager', branch: 'Dei-Dei', pin: '5471' },
+  { name: 'Joy Musa', initials: 'JM', role: 'Centre Manager', title: 'Centre Manager', branch: 'Bakasi', pin: '8136' },
+  { name: 'Patient Dawal', initials: 'PD', role: 'Centre Manager', title: 'Centre Manager', branch: 'Maraba', pin: '2694' },
+  { name: 'PraiseGod Philemon', initials: 'PP', role: 'Centre Manager', title: 'Centre Manager', branch: 'Iyanakpaja', pin: '7583' },
+  { name: 'Kafayat Adisa', initials: 'KA', role: 'Centre Manager', title: 'Centre Manager', branch: 'Owode', pin: '1327' },
+  { name: 'Kurt Osadiaye', initials: 'KO', role: 'Designer', title: 'Design Team Leader', pin: '5289' },
+  { name: 'Ibrahim Musa', initials: 'IM', role: 'Production', title: 'Production Manager', pin: '4763' },
+  { name: 'Gabriel Olobo', initials: 'GO', role: 'Inventory', title: 'Inventory Manager', pin: '9640' },
+];
+const userLabel = u => u.title + (u.branch ? ' · ' + u.branch : '');
+
+const ROLE_TABS = {
+  'Super Admin': ['intake', 'pay', 'queue', 'desk', 'admin'],
+  'Centre Manager': ['intake', 'queue'],
+  'Accountant': ['pay'],
+  'Designer': ['desk', 'queue'],
+  'Production': ['queue'],
+  'Inventory': ['queue'],
+};
+
+const DXF_CODES = ['PGDL2021-01', 'PGDL2021-02', 'PGDL2021-03', 'PGDL2021-04', 'PGDL2021-05', 'PGDL2021-06', 'PGDL2021-07', 'PGDL2021-08', 'PGDL2021-09', 'PGDL2021-10', 'PGDL2021-11', 'PGDL2021-12'];
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const WHATSAPP_NUMBER = '+234 915 249 3122';
+
+const SCAN_STEPS = [
+  { label: 'Finding the sketch', note: 'Detecting the paper edges' },
+  { label: 'Flattening the page', note: 'Correcting perspective and rotation' },
+  { label: 'Cleaning the lines', note: 'Removing shadow, paper grain and ruling' },
+  { label: 'Tracing the outline', note: 'Building a closed path from the drawn lines' },
+];
+
+const SCAN_MATCHES = [
+  { id: 'PGLC0201', conf: '88%' },
+  { id: 'PGLC0104', conf: '71%' },
+  { id: 'PGLC0801', conf: '64%' },
+];
+
+const DEVICES = [
+  { name: 'Idu centre · counter tablet', user: 'Chioma Obinwanne', synced: 'Synced 2 min ago', ok: true },
+  { name: 'Design desk · workstation', user: 'Kurt Osadiaye', synced: 'Synced 6 min ago', ok: true },
+  { name: 'Cutting floor · handheld', user: 'Ibrahim Musa', synced: 'Synced 41 min ago', ok: true },
+  { name: 'Dei-Dei centre · counter tablet', user: 'Ulor Priscilia', synced: 'Synced 18 min ago', ok: true },
+  { name: 'Store · handheld', user: 'Gabriel Olobo', synced: 'Offline since 09:14 — 3 actions queued', ok: false },
+];
+
+const BLURBS = {
+  'Geometric Lattice': 'A repeating diamond lattice with tie points at every node — stiff enough for a full-height gate leaf without a backing frame.',
+  'Hexagonal': 'Even hex openings give roughly 40% free area, so it ventilates well while still reading as a solid surface from the street.',
+  'Floral Rosette': 'Ten-petal rosettes on a square grid. Best in 2mm and up so the petal bridges survive handling and powder coating.',
+  'Botanical Leaf': 'Alternating leaf forms with a stem detail. Reads softest of the catalogue — popular for garden screens and courtyard gates.',
+  'Waves & Curves': 'Continuous cut lines, so cutting time is low and the edge quality is excellent. Works well backlit.',
+  'Chevron': 'Directional zigzag banding. Runs long in one axis — say which way is up when you order.',
+  'Islamic Star': 'Classic eight-point star with a tight inner radius. The most requested pattern for gates and entrance doors.',
+  'Arabesque': 'Four interlocking teardrops per tile. Heavier cutting time than the geometric patterns, but the detail carries at close range.',
+  '3D Optical': 'Rotated concentric squares that read as depth from a distance and flatten as you approach.',
+  'Organic Dots': 'A graded dot field, denser at the edges. Gives privacy without blocking light.',
+};
+
+const MATERIALS = [
+  { key: 'steel', name: 'Mild steel', note: 'Workhorse · ₦ base', rate: 1 },
+  { key: 'stainless', name: 'Stainless 304', note: 'Coastal, no rust', rate: 2.4 },
+  { key: 'aluminium', name: 'Aluminium', note: 'Light, marine-safe', rate: 1.7 },
+  { key: 'corten', name: 'Corten', note: 'Weathered patina', rate: 1.9 },
+];
+const FINISHES = [
+  { key: 'raw', name: 'Mill finish', mult: 1 },
+  { key: 'powder', name: 'Powder coat', mult: 1.14 },
+  { key: 'galv', name: 'Hot-dip galvanised', mult: 1.22 },
+];
+
+const CUSTOMER_STAGES = [
+  { key: 'SUBMITTED', label: 'Job submitted', time: 'Mon 09:12' },
+  { key: 'PAYMENT_CONFIRMED', label: 'Deposit confirmed', time: 'Mon 11:40' },
+  { key: 'DESIGN_IN_PROGRESS', label: 'Design in progress', time: 'Tue 08:05' },
+  { key: 'DESIGN_SENT_FOR_APPROVAL', label: 'Waiting on your approval', time: 'Tue 15:22' },
+  { key: 'IN_PRODUCTION', label: 'Cutting', time: 'Wed 10:00' },
+  { key: 'READY_FOR_DISPATCH', label: 'Ready for dispatch', time: 'Thu 09:30' },
+  { key: 'DISPATCHED', label: 'On the way', time: 'Thu 13:15' },
+  { key: 'RELEASED', label: 'Collected', time: 'Fri 10:00' },
+];
+
+const JOBS = [
+  { id: 'PG-2481', short: 'Gate leaf', stage: 3, note: 'Revision 2 is ready. Approve it and we release the sheets to the cutting floor today.' },
+  { id: 'PG-2466', short: 'Balcony rail', stage: 5, note: 'Packed and labelled at Idu. Our driver picks it up tomorrow morning.' },
+  { id: 'PG-2402', short: 'Screen x4', stage: 7, note: 'Collected on Friday. Balance settled — thank you.' },
+];
+
+const QUEUE = [
+  { id: 'PG-2481', customer: 'Amara O.', branch: 'Idu', spec: '2mm mild steel · 1800×2400 · Eight Point', stage: 'DESIGN APPROVED', owner: 'inventory', action: 'Release material', mins: 42, kind: 'star', n: 4 },
+  { id: 'PG-2477', customer: 'Bell Construction', branch: 'Dei-Dei', spec: '3mm corten · 1200×3000 · Comb Screen', stage: 'IN PRODUCTION', owner: 'production', action: 'Mark complete', mins: 186, kind: 'hex', n: 4 },
+  { id: 'PG-2470', customer: 'Ndidi A.', branch: 'Owode', spec: '2mm stainless · 900×1800 · Rain Dots', stage: 'MATERIAL RELEASED', owner: 'production', action: 'Assign operator', mins: 21, kind: 'dots', n: 4 },
+  { id: 'PG-2466', customer: 'Amara O.', branch: 'Idu', spec: '4mm mild steel · 2400×2400 · Kano Lattice', stage: 'READY FOR DISPATCH', owner: 'inventory', action: 'Assign driver', mins: 305, kind: 'lattice', n: 4 },
+  { id: 'PG-2458', customer: 'Zainab K.', branch: 'Maraba', spec: '2mm aluminium · 1200×2100 · Fern', stage: 'IN PRODUCTION', owner: 'production', action: 'Mark complete', mins: 96, kind: 'leaf', n: 4 },
+];
+
+const DESK = [
+  { id: 'PG-2492', customer: 'Chidi Nwosu', branch: 'Idu', spec: '2mm mild steel · 1800×2400 · Eight Point', tag: 'AUTO-DRAFT', kind: 'star', n: 4, source: 'catalogue', primary: 'Review generated DXF', note: '' },
+  { id: 'PG-2490', customer: 'Halcyon Interiors', branch: 'Dei-Dei', spec: '3mm corten · 1200×3000 · PGMX blend, frame', tag: 'AUTO-DRAFT', kind: 'hex', n: 4, source: 'blend', primary: 'Review generated DXF', note: '' },
+  { id: 'PG-2489', customer: 'Tunde M.', branch: 'Maraba', spec: '2mm mild steel · 1500×2100 · scanned sketch', tag: 'HAND DRAW', kind: 'lattice', n: 4, source: 'sketch', primary: 'Upload DXF', note: 'Customer: “Match the pattern on my neighbour’s gate, but taller.”' },
+  { id: 'PG-2481', customer: 'Amara O.', branch: 'Idu', spec: '2mm mild steel · 1800×2400 · Eight Point', tag: 'REVISION', kind: 'star', n: 4, source: 'catalogue', primary: 'Upload revision 3', note: 'Customer: “Can the border be 40mm wider on the hinge side?”' },
+  { id: 'PG-2474', customer: 'Bell Construction', branch: 'Dei-Dei', spec: '3mm corten · 1200×3000 · Comb Screen', tag: 'SHEETS', kind: 'hex', n: 4, source: 'catalogue', primary: 'Verify sheet count', note: '' },
+];
+
+const DRAFTS = {
+  'PG-2492': {
+    pattern: 'Eight Point · PGLC0601', material: '2mm mild steel', panel: '1800 × 2400 mm',
+    sheets: 3, waste: '11%', cutLength: '186 m', cutTime: '42 min', drawn: '8 seconds ago',
+    checks: [
+      { state: 'pass', label: 'Minimum bridge width', detail: '3.4mm at the tightest point · floor is 2.0mm' },
+      { state: 'pass', label: 'Thickness against pattern', detail: 'Islamic Star needs 2mm or more · ordered 2mm' },
+      { state: 'pass', label: 'Closed cut paths', detail: '1,284 paths, all closed, no self-intersections' },
+      { state: 'warn', label: 'Fixing positions', detail: 'Hinge plate not specified. Confirm the hinge side before release.' },
+      { state: 'pass', label: 'Nest efficiency', detail: '89% of sheet area used across 3 sheets' },
+    ],
+  },
+  'PG-2490': {
+    pattern: 'PGMX-0601-0201 · frame blend', material: '3mm corten', panel: '1200 × 3000 mm',
+    sheets: 2, waste: '18%', cutLength: '241 m', cutTime: '1 hr 04 min', drawn: '3 minutes ago',
+    checks: [
+      { state: 'fail', label: 'Minimum bridge width', detail: '1.1mm where the border meets the field · floor is 2.0mm. Widen the seam or drop to a coarser field.' },
+      { state: 'pass', label: 'Thickness against pattern', detail: 'Hexagonal needs 1.5mm or more · ordered 3mm' },
+      { state: 'warn', label: 'Closed cut paths', detail: '6 open paths at the blend seam. Auto-closing changes the outline slightly.' },
+      { state: 'pass', label: 'Corten grain direction', detail: 'Panel runs with the sheet grain' },
+      { state: 'warn', label: 'Nest efficiency', detail: '82% used. A 1200mm width leaves an offcut too narrow to reuse.' },
+    ],
+  },
+};
+
+class Component extends DCLogic {
+  state = {
+    tab: 'home', detail: null, quoteFrom: null,
+    staff: false, staffTab: 'queue', role: 'Production',
+    signIn: false, pinUser: null, pinValue: '', pinError: '', user: null, branchView: 'All',
+    payGate: null, payGatePin: '', payGateError: '',
+    payMethod: 'transfer', cardNo: '', cardExp: '', cardCvv: '', page: 1,
+    query: '', cat: 'All', favOnly: true, favs: ['PGLC0601', 'PGLC0902'],
+    zoom: 2, swatch: 'steel',
+    pw: null, pwValue: '', pwError: '', unlocked: [],
+    merging: false, sel: [], mergeStyle: 'frame', merged: null,
+    scan: null, scanStep: 0, scanNote: '', scanCustomer: '', sketches: [], sketchSeq: 0,
+    notifOpen: false, readIds: [], payRef: '', paidRefs: [],
+    draft: null, draftDone: {}, regenerating: false, docs: [], doc: null,
+    hold: null, holdKind: 'hold', holdReason: '', holdNote: '',
+    jobStatus: {}, quoteActed: {},
+    material: 'steel', thickness: 2, panelW: 1800, panelH: 2400, finish: 'powder',
+    jobIdx: 0, approved: false, toast: '', tick: 0,
+  };
+
+  componentDidMount() { this.timer = setInterval(() => this.setState(s => ({ tick: s.tick + 1 })), 30000); }
+  componentWillUnmount() { clearInterval(this.timer); if (this.tt) clearTimeout(this.tt); if (this.st) clearInterval(this.st); }
+
+  runScan() {
+    if (this.st) clearInterval(this.st);
+    this.setState({ scan: 'processing', scanStep: 0 });
+    this.st = setInterval(() => this.setState(s => {
+      if (s.scanStep >= SCAN_STEPS.length - 1) {
+        clearInterval(this.st);
+        const n = s.sketchSeq + 1;
+        const kind = ['arabesque', 'rosette', 'leaf', 'star'][s.sketchSeq % 4];
+        return { scan: 'result', sketchSeq: n, sketches: s.sketches.concat({ key: 'sk' + n, label: 'Sketch ' + n, kind, desc: '' }) };
+      }
+      return { scanStep: s.scanStep + 1 };
+    }), 850);
+  }
+
+  say(msg) { this.setState({ toast: msg }); if (this.tt) clearTimeout(this.tt); this.tt = setTimeout(() => this.setState({ toast: '' }), 2600); }
+
+  issueDoc(kind, jobId) {
+    const num = (kind === 'order' ? 'PGJO-' : 'PGAO-') + jobId.slice(-4);
+    this.setState(st => st.docs.some(d => d.num === num) ? null : ({
+      docs: st.docs.concat({
+        kind, jobId, num,
+        title: kind === 'order' ? 'Job order' : 'Approved job order',
+        issued: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
+      }),
+    }));
+    return num;
+  }
+  go(tab) { this.setState({ tab, detail: null }); }
+  heart(on, size) {
+    return R.createElement('svg', { width: size, height: size, viewBox: '0 0 24 24', fill: on ? '#C33B22' : 'none' },
+      R.createElement('path', { d: 'M12 20s-7.2-4.5-7.2-9.4A4.3 4.3 0 0112 8.2a4.3 4.3 0 017.2 2.4C19.2 15.5 12 20 12 20z', stroke: on ? '#C33B22' : '#8A7566', strokeWidth: 1.7, strokeLinejoin: 'round' }));
+  }
+
+  renderVals() {
+    const s = this.state, dxfOpen = this.props.dxfDownloadEnabled ?? false;
+    const tabIcon = (d, on) => R.createElement('svg', { width: 19, height: 19, viewBox: '0 0 24 24', fill: 'none' },
+      R.createElement('path', { d, stroke: on ? '#FBF4EA' : 'rgba(251,244,234,.55)', strokeWidth: 1.7, strokeLinecap: 'round', strokeLinejoin: 'round' }));
+
+    const detail = s.detail != null ? DESIGNS[s.detail] : null;
+    const isDetail = !!detail && !s.staff;
+    const isQuote = s.tab === 'quote' && !s.staff;
+    const isMerged = !!s.merged && !detail && !s.staff && s.tab === 'patterns';
+    const isPatterns = s.tab === 'patterns' && !detail && !s.merged && !s.staff;
+    const mergeList = (s.merged || []).map(id => DESIGNS.find(d => d.id === id));
+    const mergeStyleDef = MERGE_STYLES.find(m => m.key === s.mergeStyle);
+
+    const customerTabs = [
+      { key: 'home', name: 'Home', d: 'M4 10.5L12 4l8 6.5V20a1 1 0 01-1 1h-4v-6H9v6H5a1 1 0 01-1-1z' },
+      { key: 'patterns', name: 'Patterns', d: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z' },
+      { key: 'jobs', name: 'Jobs', d: 'M4 7h16v13H4zM9 7V5h6v2M8 12h8M8 16h5' },
+      { key: 'about', name: 'About', d: 'M12 21a9 9 0 100-18 9 9 0 000 18zM12 11v5M12 7.6v.4' },
+    ];
+    const allStaffTabs = [
+      { key: 'intake', name: 'Intake', d: 'M4.5 13.5V19a1.5 1.5 0 001.5 1.5h12A1.5 1.5 0 0019.5 19v-5.5M12 3.5v10m0 0l-3.6-3.6M12 13.5l3.6-3.6' },
+      { key: 'pay', name: 'Payments', d: 'M3.5 8.5h17v9h-17zM3.5 11.5h17M7 15h3.5' },
+      { key: 'queue', name: 'Queue', d: 'M4 6h6v6H4zM14 6h6v6h-6zM4 15h6v5H4zM14 15h6v5h-6z' },
+      { key: 'desk', name: 'Desk', d: 'M4 19l3-.6L18 7.6a2.2 2.2 0 00-3.2-3.1L4 15.5z M14 6l3.2 3.2' },
+      { key: 'admin', name: 'Admin', d: 'M12 3.5l7 3v5c0 4-3 7-7 9-4-2-7-5-7-9v-5z M9.4 12.2l1.9 1.9 3.4-3.6' },
+    ];
+    const allowed = ROLE_TABS[s.role] || ['queue'];
+    const staffTabs = allStaffTabs.filter(t => allowed.includes(t.key));
+    const homeBranch = s.user && s.user.branch;
+    const scoped = !!homeBranch;
+    const branchOf = x => x.branch || 'Idu';
+    const inScope = x => !scoped || branchOf(x) === homeBranch;
+    const branchFilter = x => inScope(x) && (scoped || s.branchView === 'All' || branchOf(x) === s.branchView);
+    const viewBranch = scoped ? homeBranch : (s.branchView === 'All' ? null : s.branchView);
+    const activeTab = s.staff ? s.staffTab : (isQuote ? 'quote' : s.tab);
+    const tabs = (s.staff ? staffTabs : customerTabs).map(t => {
+      const on = activeTab === t.key || (t.key === 'patterns' && detail && !s.staff);
+      return { key: t.key, name: t.name, bg: on ? '#C33B22' : 'transparent', fg: on ? '#FBF4EA' : 'rgba(251,244,234,.55)', icon: tabIcon(t.d, on), tap: () => (s.staff ? this.setState({ staffTab: t.key }) : this.go(t.key)) };
+    });
+
+    const q = s.query.trim().toLowerCase();
+    const matches = DESIGNS
+      .filter(d => s.cat === 'All' || d.cat === s.cat)
+      .filter(d => !q || (d.id + ' ' + d.name + ' ' + d.cat).toLowerCase().includes(q));
+    const shown = matches.slice(0, s.page * 24);
+    const filtered = shown
+      .map(d => {
+        const i = DESIGNS.indexOf(d), on = s.favs.includes(d.id), pos = s.sel.indexOf(d.id);
+        return {
+          id: d.id, name: d.name, cat: d.cat, tile: plate(d.kind, d.n, d.id, MATERIAL_FILL.black), heart: this.heart(on, 15),
+          selected: s.merging && pos > -1, selIndex: pos + 1,
+          open: () => {
+            if (!s.merging) return this.setState({ detail: i, tab: 'patterns', zoom: 2 });
+            if (pos > -1) return this.setState(st => ({ sel: st.sel.filter(x => x !== d.id) }));
+            if (s.sel.length >= 3) return this.say('Three patterns is the limit for one blend.');
+            this.setState(st => ({ sel: st.sel.concat(d.id) }));
+          },
+          fav: e => { e.stopPropagation(); this.setState(st => ({ favs: on ? st.favs.filter(x => x !== d.id) : st.favs.concat(d.id) })); },
+        };
+      });
+
+    const mat = MATERIALS.find(m => m.key === s.material);
+    const fin = FINISHES.find(f => f.key === s.finish);
+    const area = (s.panelW / 1000) * (s.panelH / 1000);
+    const price = Math.round(area * 46000 * mat.rate * (0.72 + s.thickness * 0.16) * fin.mult / 500) * 500;
+    const sheets = Math.max(1, Math.ceil(area / 2.88));
+    const isMergeQuote = s.quoteFrom === 'merge' && mergeList.length > 0;
+    const cfgDesign = DESIGNS[typeof s.quoteFrom === 'number' ? s.quoteFrom : indexOfId('PGLC0601')];
+    const monthIdx = new Date().getMonth();
+    const activeCode = DXF_CODES[monthIdx];
+
+    const job = JOBS[s.jobIdx];
+    const jobStage = job.id === 'PG-2481' && s.approved ? 4 : job.stage;
+    const jst = s.jobStatus[job.id];
+    const bill = BILLING[job.id];
+    const payDone = s.paidRefs.includes(job.id);
+    const activeStage = CUSTOMER_STAGES[JOBS[0].stage];
+
+
+    return {
+      greeting: new Date().getHours() < 12 ? 'Good morning' : new Date().getHours() < 17 ? 'Good afternoon' : 'Good evening',
+      canBack: isDetail || isQuote || isMerged, showLogo: !isDetail && !isQuote && s.tab === 'home' && !s.staff,
+      goBack: () => isMerged
+        ? this.setState({ merged: null, merging: true, sel: s.merged.slice() })
+        : this.setState({ detail: null, tab: isQuote ? (s.quoteFrom != null ? 'patterns' : 'home') : 'patterns', quoteFrom: null }),
+      headerTitle: s.staff ? ({ queue: 'Job queue', intake: 'Intake', pay: 'Payments', desk: 'Design desk', admin: 'Admin' }[s.staffTab] || 'Staff') : isDetail ? 'Design' : isMerged ? 'Blend' : isQuote ? 'New job' : s.tab === 'patterns' ? 'Patterns' : s.tab === 'jobs' ? 'Your jobs' : s.tab === 'about' ? 'About us' : '',
+      modeLabel: s.staff ? (s.user ? s.user.initials : 'Staff') : 'You',
+      staffChipBg: s.staff ? '#1E1613' : '#fff', staffChipFg: s.staff ? '#FBF4EA' : '#1E1613', staffDotBg: s.staff ? '#F0A03C' : '#C33B22',
+      toggleStaff: () => s.staff
+        ? this.setState({ staff: false, user: null, role: 'Production', detail: null })
+        : this.setState({ signIn: true, pinUser: null, pinValue: '', pinError: '' }),
+
+      signInOpen: s.signIn,
+      signInUsers: STAFF_USERS.map(u => ({
+        name: u.name, role: userLabel(u), initials: u.initials,
+        bg: s.pinUser === u.name ? '#F6EDE1' : '#fff',
+        ring: s.pinUser === u.name ? '#C33B22' : 'rgba(30,22,19,.14)',
+        dot: s.pinUser === u.name ? '#C33B22' : 'transparent',
+        weight: s.pinUser === u.name ? '700' : '400',
+        tap: () => this.setState({ pinUser: u.name, pinValue: '', pinError: '' }),
+      })),
+      pinStep: !!s.pinUser, userStep: !s.pinUser, pinValue: s.pinValue, pinError: s.pinError,
+      userInitials: s.user ? s.user.initials : '',
+      payQueueCount: PAYMENTS.filter(pr => branchFilter(BILLING[pr.id])).filter(p => !s.paidRefs.includes(p.id)).length,
+      pinBorder: s.pinError ? '#C33B22' : 'rgba(30,22,19,.14)',
+      pinUserName: s.pinUser || '',
+      pinUserRole: s.pinUser ? userLabel(STAFF_USERS.find(u => u.name === s.pinUser)) : '',
+      setPin: e => this.setState({ pinValue: e.target.value, pinError: '' }),
+      backToUsers: () => this.setState({ pinUser: null, pinValue: '', pinError: '' }),
+      cancelSignIn: () => this.setState({ signIn: false, pinUser: null, pinValue: '', pinError: '' }),
+      submitPin: () => {
+        const u = STAFF_USERS.find(x => x.name === s.pinUser);
+        if (!u || s.pinValue.trim() !== u.pin) return this.setState({ pinError: 'Wrong PIN for that account.' });
+        const tabs2 = ROLE_TABS[u.role] || ['queue'];
+        this.setState({ signIn: false, staff: true, user: u, role: u.role, staffTab: tabs2[0], pinUser: null, pinValue: '', pinError: '', detail: null, branchView: 'All' });
+        this.say('Signed in as ' + u.name + ' · ' + userLabel(u) + '. Every action is logged to this account.');
+      },
+      signedInLabel: s.user ? s.user.name + ' · ' + userLabel(s.user) : '',
+
+      isHome: !s.staff && s.tab === 'home', isPatterns, isDetail, isQuote,
+      isJobs: !s.staff && s.tab === 'jobs', isAbout: !s.staff && s.tab === 'about',
+      isStaffQueue: s.staff && s.staffTab === 'queue', isStaffDesk: s.staff && s.staffTab === 'desk',
+      isStaffIntake: s.staff && s.staffTab === 'intake',
+      isStaffPay: s.staff && s.staffTab === 'pay', isStaffAdmin: s.staff && s.staffTab === 'admin',
+      centreCount: STAFF_USERS.filter(u => u.branch).length,
+
+      showBell: !s.staff && !isDetail && !isQuote && !isMerged,
+      unreadCount: NOTIFICATIONS.filter(n => n.unread && !s.readIds.includes(n.id)).length || '',
+      notifOpen: s.notifOpen,
+      openNotifs: () => this.setState({ notifOpen: true }),
+      closeNotifs: () => this.setState({ notifOpen: false }),
+      markAllRead: () => this.setState({ readIds: NOTIFICATIONS.map(n => n.id) }),
+      notifs: NOTIFICATIONS.map(n => {
+        const unread = n.unread && !s.readIds.includes(n.id);
+        const ic = { approval: 'M4.5 12.6l4.4 4.3L19.5 6.6', payment: 'M3.5 8.5h17M3.5 8.5v9h17v-9M7 13.5h4', stage: 'M12 21a9 9 0 100-18 9 9 0 000 18zM12 7.5V12l3 2', quote: 'M6 4.5h9l4 4V19a.5.5 0 01-.5.5h-12A.5.5 0 016 19z' }[n.kind];
+        return {
+          title: n.title, body: n.body, when: n.when, unread, weight: unread ? '700' : '500',
+          bg: unread ? '#fff' : 'transparent', border: unread ? 'rgba(30,22,19,.1)' : 'rgba(30,22,19,.06)',
+          iconBg: unread ? '#F6E3DE' : '#EDE2D4',
+          icon: R.createElement('svg', { width: 15, height: 15, viewBox: '0 0 24 24', fill: 'none' },
+            R.createElement('path', { d: ic, stroke: unread ? '#C33B22' : '#8A7566', strokeWidth: 1.8, strokeLinecap: 'round', strokeLinejoin: 'round' })),
+          tap: () => this.setState(st => ({ readIds: st.readIds.includes(n.id) ? st.readIds : st.readIds.concat(n.id), notifOpen: n.kind === 'approval' ? false : true, tab: n.kind === 'approval' ? 'jobs' : st.tab, jobIdx: n.kind === 'approval' ? 0 : st.jobIdx })),
+        };
+      }),
+      tabs, toast: s.toast,
+
+      heroPlate: plate('lattice', 5, 'hero', '#FBF4EA'),
+      aboutPlate: plate('star', 5, 'about', '#F0A03C'),
+      activeJobId: JOBS[0].id, activeStageLabel: activeStage.label,
+      activeProgress: Math.round((JOBS[0].stage + 1) / CUSTOMER_STAGES.length * 100) + '%',
+      activeStageStep: `Stage ${JOBS[0].stage + 1} of ${CUSTOMER_STAGES.length}`,
+      openActiveJob: () => this.setState({ tab: 'jobs', jobIdx: 0 }),
+      goQuote: () => this.setState({ tab: 'quote', detail: null, quoteFrom: null }),
+      goPatterns: () => this.go('patterns'),
+      toastWhatsApp: () => this.say('Opening WhatsApp chat with ' + WHATSAPP_NUMBER + '.'),
+      whatsappNumber: WHATSAPP_NUMBER,
+      railDesigns: ['PGLC0601', 'PGLC0101', 'PGLC0401', 'PGLC0902', 'PGLC0201'].map(indexOfId).map(i => ({ id: DESIGNS[i].id, name: DESIGNS[i].name, tile: plate(DESIGNS[i].kind, DESIGNS[i].n, 'r' + DESIGNS[i].id, MATERIAL_FILL.black), open: () => this.setState({ detail: i, tab: 'patterns', zoom: 2 }) })),
+      services: [
+        ['01', 'Metal laser cutting', 'Intricate designs, clean edges, minimal waste'],
+        ['02', 'Press brake bending', 'Computer-controlled angles and complex shapes'],
+        ['03', 'Welding', 'MIG, TIG and spot — strong and clean'],
+        ['04', 'CNC milling', 'Complex geometry and custom components'],
+        ['05', 'Drilling & tapping', 'Accurate holes, threading, counter-sinking'],
+        ['06', 'Custom fabrication', 'End-to-end, gates to façades'],
+      ].map(([n, name, blurb]) => ({ n, name, blurb, tap: () => this.say(name + ' — ask for it in your next quote.') })),
+
+      query: s.query, setQuery: e => this.setState({ query: e.target.value, page: 1 }),
+      categories: CATS.map(c => ({ name: c, bg: s.cat === c ? '#1E1613' : '#fff', fg: s.cat === c ? '#FBF4EA' : '#5C4B3F', border: s.cat === c ? '#1E1613' : 'rgba(30,22,19,.12)', tap: () => this.setState({ cat: c, page: 1 }) })),
+      filtered, noResults: matches.length === 0,
+      resultCount: matches.length === DESIGNS.length ? '1,000 designs · PGLC0001–PGLC1000' : matches.length + ' of 1,000 designs',
+      hasMore: matches.length > shown.length,
+      moreLabel: 'Load 24 more · ' + (matches.length - shown.length) + ' left',
+      loadMore: () => this.setState(st => ({ page: st.page + 1 })),
+      favFilterLabel: `${s.favs.length} saved`, favFilterColor: '#C33B22',
+      scanOpen: s.scan != null,
+      scanCapture: s.scan === 'capture', scanProcessing: s.scan === 'processing', scanResult: s.scan === 'result',
+      openScan: () => this.setState({ scan: 'capture', scanStep: 0, scanNote: '', scanCustomer: '', sketches: [], sketchSeq: 0 }),
+      addAnother: () => this.setState({ scan: 'capture', scanStep: 0 }),
+      sketches: s.sketches.map((sk, i) => ({
+        label: sk.label, desc: sk.desc,
+        tile: plate(sk.kind, 3, 'sk' + sk.key, MATERIAL_FILL.black),
+        placeholder: i === 0 ? 'What is this panel for? Size, material, where it goes' : 'What is different about this one?',
+        counter: sk.desc.length + '/240',
+        counterColor: sk.desc.length > 220 ? '#C33B22' : '#A08F80',
+        setDesc: e => { const v = e.target.value.slice(0, 240); this.setState(st => ({ sketches: st.sketches.map((x, j) => j === i ? Object.assign({}, x, { desc: v }) : x) })); },
+        remove: () => this.setState(st => ({ sketches: st.sketches.filter((_, j) => j !== i) })),
+      })),
+      sketchCount: s.sketches.length,
+      sketchCountLabel: s.sketches.length === 1 ? '1 sketch' : s.sketches.length + ' sketches',
+      missingDesc: s.sketches.some(sk => !sk.desc.trim()),
+      closeScan: () => { if (this.st) clearInterval(this.st); this.setState({ scan: null, scanStep: 0 }); },
+      shutter: () => this.runScan(),
+      retake: () => this.setState({ scan: 'capture', scanStep: 0 }),
+      scanTitle: s.staff ? 'Scan a customer sketch' : 'Scan your sketch',
+      scanHint: s.staff
+        ? 'Lay the sketch flat on the counter. Fill the frame — we straighten it and clean the lines.'
+        : 'Lay the sketch flat in good light. Fill the frame with the paper.',
+      scanIsStaff: s.staff,
+      scanSteps: SCAN_STEPS.map((st2, i) => ({
+        label: st2.label, note: st2.note,
+        dot: i < s.scanStep ? '#C33B22' : i === s.scanStep ? '#E8452B' : '#E1D5C6',
+        ring: i < s.scanStep ? '#C33B22' : i === s.scanStep ? 'rgba(232,69,43,.28)' : '#E1D5C6',
+        anim: i === s.scanStep ? 'pgPulse 1.2s ease-in-out infinite' : 'none',
+        fg: i <= s.scanStep ? '#1E1613' : '#A08F80',
+        weight: i === s.scanStep ? '700' : '400',
+      })),
+      scanTracedTile: plate('arabesque', 3, 'scantrace', MATERIAL_FILL.black),
+      scanMatches: SCAN_MATCHES.map(m => {
+        const d = DESIGNS[indexOfId(m.id)];
+        return {
+          id: d.id, name: d.name, cat: d.cat, conf: m.conf,
+          tile: plate(d.kind, d.n, 'sm' + d.id, MATERIAL_FILL.black),
+          tap: () => { if (this.st) clearInterval(this.st); this.setState({ scan: null, detail: indexOfId(m.id), tab: 'patterns', staff: s.staff, zoom: 2 }); },
+        };
+      }),
+      scanNote: s.scanNote, setScanNote: e => this.setState({ scanNote: e.target.value }),
+      scanCustomer: s.scanCustomer, setScanCustomer: e => this.setState({ scanCustomer: e.target.value }),
+      submitScan: () => {
+        if (this.st) clearInterval(this.st);
+        if (s.staff && !s.scanCustomer.trim()) return this.say('Add the customer name before sending it to the design desk.');
+        if (s.sketches.some(sk => !sk.desc.trim())) return this.say('Describe every sketch — the design desk draws from your words, not the paper alone.');
+        const n = s.sketches.length;
+        this.setState({ scan: null, scanStep: 0 });
+        this.say(s.staff
+          ? n + (n === 1 ? ' sketch' : ' sketches') + ' attached to a new request for ' + s.scanCustomer.trim() + '. On the design desk as NEW.'
+          : (n === 1 ? 'Sketch sent' : n + ' sketches sent') + ' with your notes. The design desk will come back with a quote.');
+      },
+
+      isMerged,
+      toggleMerge: () => this.setState(st => ({ merging: !st.merging, sel: [], merged: null })),
+      mergeBtnLabel: s.merging ? 'Done' : 'Merge',
+      mergeBtnBg: s.merging ? '#1E1613' : '#fff', mergeBtnFg: s.merging ? '#FBF4EA' : '#5C4B3F',
+      mergeBtnBorder: s.merging ? '#1E1613' : 'rgba(30,22,19,.12)',
+      showMergeBar: s.merging && isPatterns,
+      mergeCountLabel: s.sel.length === 0 ? 'Pick 2 or 3 patterns to blend' : s.sel.length === 1 ? '1 picked · one more to blend' : s.sel.length + ' picked · ready',
+      mergeGoBg: s.sel.length >= 2 ? '#E8452B' : 'rgba(251,244,234,.14)',
+      mergeGoFg: s.sel.length >= 2 ? '#fff' : 'rgba(251,244,234,.4)',
+      clearMerge: () => this.setState({ sel: [] }),
+      doMerge: () => s.sel.length >= 2
+        ? this.setState({ merged: s.sel.slice(), merging: false })
+        : this.say('Pick at least two patterns.'),
+
+      mergedTile: mergeList.length ? plateMulti(mergeList, s.mergeStyle, s.merged.join('') + s.mergeStyle, MATERIAL_FILL[s.swatch === 'black' ? 'steel' : s.swatch]) : null,
+      mergedBg: { steel: '#EDE2D4', stainless: '#E6E7E4', aluminium: '#E9EBEC', corten: '#F0DCCB', black: '#EDE2D4' }[s.swatch],
+      mergedName: mergeList.length ? mergeList.map(d => d.name.split(' ')[0]).join(' × ') : '',
+      mergedRef: mergeList.length ? 'PGMX-' + mergeList.map(d => d.id.slice(-4)).join('-') : '',
+      mergedBlurb: mergeStyleDef.blurb,
+      mergeStyles: MERGE_STYLES.map(m => ({ name: m.name, bg: s.mergeStyle === m.key ? '#1E1613' : 'rgba(255,255,255,.6)', fg: s.mergeStyle === m.key ? '#FBF4EA' : '#5C4B3F', border: s.mergeStyle === m.key ? '#1E1613' : 'rgba(30,22,19,.14)', tap: () => this.setState({ mergeStyle: m.key }) })),
+      mergedParts: mergeList.map((d, i) => ({
+        n: i + 1, id: d.id, name: d.name, tile: plate(d.kind, d.n, 'mp' + d.id, MATERIAL_FILL.black),
+        role: s.mergeStyle === 'frame' ? ['border', 'field', 'centre'][i] : s.mergeStyle === 'bands' ? 'band ' + (i + 1) : 'layer ' + (i + 1),
+        drop: () => this.setState(st => {
+          const next = st.merged.filter(x => x !== d.id);
+          return next.length < 2 ? { merged: null, merging: true, sel: next } : { merged: next };
+        }),
+      })),
+      mergedHeart: this.heart(false, 19),
+      mergedSave: () => this.say('Blend saved to your favourites as a custom design.'),
+      mergedQuote: () => this.setState({ tab: 'quote', quoteFrom: 'merge' }),
+      toggleFavFilter: () => this.say(s.favs.length ? 'Saved: ' + s.favs.join(', ') : 'Nothing saved yet — tap a heart.'),
+
+      detailTile: detail ? plate(detail.kind, Math.max(2, Math.round(detail.n / [1, 1.5, 2.2, 3][s.zoom - 1])), 'dt' + detail.id + s.zoom + s.swatch, MATERIAL_FILL[s.swatch]) : null,
+      detailName: detail && detail.name, detailId: detail && detail.id, detailCat: detail && detail.cat,
+      detailUse: detail && detail.use, detailBlurb: detail && BLURBS[detail.cat],
+      detailMaterials: detail ? CAT_SPEC[detail.cat].mats : '',
+      detailThickness: detail ? CAT_SPEC[detail.cat].thick : '',
+      detailSpecNote: detail ? CAT_SPEC[detail.cat].note : '',
+      detailHeart: detail ? this.heart(s.favs.includes(detail.id), 19) : null,
+      favDetail: () => detail && this.setState(st => ({ favs: st.favs.includes(detail.id) ? st.favs.filter(x => x !== detail.id) : st.favs.concat(detail.id) })),
+      zoom: s.zoom, zoomPct: ['64%', '100%', '148%', '210%'][s.zoom - 1],
+      setZoom: e => this.setState({ zoom: +e.target.value }),
+      dragStart: () => this.setState(st => ({ zoom: st.zoom >= 4 ? 1 : st.zoom + 1 })),
+      prevDesign: () => this.setState(st => ({ detail: (st.detail - 1 + DESIGNS.length) % DESIGNS.length })),
+      nextDesign: () => this.setState(st => ({ detail: (st.detail + 1) % DESIGNS.length })),
+      previewBg: { steel: '#EDE2D4', stainless: '#E6E7E4', aluminium: '#E9EBEC', corten: '#F0DCCB', black: '#EDE2D4' }[s.swatch],
+      swatches: [['steel', 'Steel'], ['stainless', 'Inox'], ['aluminium', 'Alu'], ['corten', 'Corten']].map(([k, n]) => ({
+        name: n, color: s.swatch === k ? MATERIAL_FILL[k] : 'rgba(255,255,255,.55)', fg: s.swatch === k ? '#fff' : '#5C4B3F',
+        border: s.swatch === k ? MATERIAL_FILL[k] : 'rgba(30,22,19,.14)', tap: () => this.setState({ swatch: k }),
+      })),
+      dxfLabel: !dxfOpen ? 'DXF on request' : detail && s.unlocked.includes(detail.id) ? 'DXF unlocked' : 'DXF code required',
+      dxfBg: dxfOpen && detail && s.unlocked.includes(detail.id) ? '#E4EFE7' : '#F6E3DE',
+      dxfFg: dxfOpen && detail && s.unlocked.includes(detail.id) ? '#2F6B57' : '#A33B22',
+      dxfTap: () => {
+        if (!dxfOpen) return this.say('DXF is release-controlled. Request a quote and we send the cut file to production.');
+        if (detail && s.unlocked.includes(detail.id)) return this.say(detail.id + '.dxf downloaded — production file, keep it safe.');
+        this.setState({ pw: s.detail, pwValue: '', pwError: '' });
+      },
+      askPassword: s.pw != null, pwValue: s.pwValue, pwError: s.pwError,
+      pwBorder: s.pwError ? '#C33B22' : 'rgba(30,22,19,.14)',
+      pwDesignId: s.pw != null ? DESIGNS[s.pw].id : '',
+      setPw: e => this.setState({ pwValue: e.target.value, pwError: '' }),
+      cancelPw: () => this.setState({ pw: null, pwValue: '', pwError: '' }),
+      requestCode: () => { this.setState({ pw: null, pwValue: '', pwError: '' }); this.say('Code request sent to the Idu centre manager on WhatsApp.'); },
+      submitPw: () => {
+        const code = (this.props.dxfReleaseCode || activeCode).trim().toLowerCase();
+        const id = DESIGNS[s.pw].id;
+        if (s.pwValue.trim().toLowerCase() !== code) return this.setState({ pwError: 'That code is not valid for this design. Three tries left.' });
+        this.setState(st => ({ pw: null, pwValue: '', pwError: '', unlocked: st.unlocked.concat(id) }));
+        this.say(id + '.dxf unlocked and downloaded. Access logged against your account.');
+      },
+      goQuoteFromDetail: () => this.setState({ tab: 'quote', quoteFrom: s.detail, detail: null }),
+
+      materials: MATERIALS.map(m => ({ name: m.name, note: m.note, bg: s.material === m.key ? '#1E1613' : '#fff', fg: s.material === m.key ? '#FBF4EA' : '#1E1613', sub: s.material === m.key ? 'rgba(251,244,234,.6)' : '#8A7566', border: s.material === m.key ? '#1E1613' : 'rgba(30,22,19,.12)', tap: () => this.setState({ material: m.key }) })),
+      finishes: FINISHES.map(f => ({ name: f.name, bg: s.finish === f.key ? '#C33B22' : '#fff', fg: s.finish === f.key ? '#FBF4EA' : '#5C4B3F', border: s.finish === f.key ? '#C33B22' : 'rgba(30,22,19,.12)', tap: () => this.setState({ finish: f.key }) })),
+      thickness: s.thickness,
+      thicknessLabel: s.thickness + 'mm' + (s.thickness < CAT_SPEC[cfgDesign.cat].min ? ' · below minimum' : ''),
+      thicknessColor: s.thickness < CAT_SPEC[cfgDesign.cat].min ? '#C33B22' : '#1E1613',
+      thinWarning: s.thickness < CAT_SPEC[cfgDesign.cat].min
+        ? cfgDesign.cat + ' needs ' + CAT_SPEC[cfgDesign.cat].min + 'mm or thicker. ' + CAT_SPEC[cfgDesign.cat].note
+        : '',
+      setThickness: e => this.setState({ thickness: +e.target.value }),
+      panelW: s.panelW, panelH: s.panelH, widthLabel: s.panelW + 'mm', heightLabel: s.panelH + 'mm',
+      setPanelW: e => this.setState({ panelW: +e.target.value }), setPanelH: e => this.setState({ panelH: +e.target.value }),
+      configTile: isMergeQuote
+        ? plateMulti(mergeList, s.mergeStyle, 'cfgmx' + s.merged.join('') + s.mergeStyle + s.material, MATERIAL_FILL[s.material])
+        : plate(cfgDesign.kind, cfgDesign.n, 'cfg' + cfgDesign.id + s.material, MATERIAL_FILL[s.material]),
+      configBg: { steel: '#EDE2D4', stainless: '#E6E7E4', aluminium: '#E9EBEC', corten: '#F0DCCB' }[s.material],
+      configRatio: (s.panelW / s.panelH).toFixed(2),
+      configPatternName: isMergeQuote
+        ? mergeList.map(d => d.name.split(' ')[0]).join(' × ') + ' · PGMX-' + mergeList.map(d => d.id.slice(-4)).join('-')
+        : cfgDesign.name + ' · ' + cfgDesign.id,
+      configDims: s.panelW + ' × ' + s.panelH + ' mm',
+      priceLabel: (this.props.priceEstimateVisible ?? true) ? '₦ ' + price.toLocaleString('en-NG') : 'Quote on review',
+      sheetLabel: sheets + (sheets > 1 ? ' sheets' : ' sheet'),
+      leadLabel: (5 + sheets) + ' working days',
+      submitJob: () => this.say('Job sent. PG-2492 is with the Idu centre manager for billing.'),
+
+      jobTabs: JOBS.map((j, i) => ({ id: j.id, short: j.short, bg: s.jobIdx === i ? '#1E1613' : '#fff', fg: s.jobIdx === i ? '#FBF4EA' : '#5C4B3F', border: s.jobIdx === i ? '#1E1613' : 'rgba(30,22,19,.12)', tap: () => this.setState({ jobIdx: i }) })),
+      jobTitle: job.id + ' · ' + job.short,
+      jobStageLabel: CUSTOMER_STAGES[jobStage].label,
+      jobStageNote: s.jobIdx === 0 && s.approved ? 'Approved. Sheets released — cutting starts this afternoon.' : job.note,
+      jobDocs: s.docs.filter(d => d.jobId === job.id).map(d => ({
+        num: d.num, title: d.title, issued: 'Issued ' + d.issued,
+        bg: d.kind === 'approved' ? '#E4EFE7' : '#F6EDE1',
+        fg: d.kind === 'approved' ? '#2F6B57' : '#6E5A4C',
+        open: () => this.setState({ doc: d }),
+      })),
+      hasDocs: s.docs.some(d => d.jobId === job.id),
+
+      docOpen: s.doc != null,
+      docNum: s.doc ? s.doc.num : '',
+      docTitle: s.doc ? s.doc.title : '',
+      docIssued: s.doc ? s.doc.issued : '',
+      docJob: s.doc ? s.doc.jobId : '',
+      docIsApproved: s.doc ? s.doc.kind === 'approved' : false,
+      docCustomer: s.doc && BILLING[s.doc.jobId] ? BILLING[s.doc.jobId].customer : (s.doc ? 'Amara O.' : ''),
+      docBranch: s.doc && BILLING[s.doc.jobId] ? BILLING[s.doc.jobId].branch : 'Idu',
+      docAmount: s.doc && BILLING[s.doc.jobId] ? BILLING[s.doc.jobId].amount : '₦ 512,500',
+      docRef: s.doc && BILLING[s.doc.jobId] ? BILLING[s.doc.jobId].ref : '—',
+      docSpec: s.doc ? (QUEUE.find(j => j.id === s.doc.jobId) || { spec: '2mm mild steel · 1800×2400 · Eight Point' }).spec : '',
+      docStatusLine: s.doc && s.doc.kind === 'approved'
+        ? 'Design approved by the customer. This order releases material and authorises cutting.'
+        : 'Payment confirmed by the accountant. This order opens the job and books it into the schedule.',
+      docSignatory: s.doc && s.doc.kind === 'approved' ? 'Customer approval · recorded in-app' : 'Freda Ilem · Accountant',
+      closeDoc: () => this.setState({ doc: null }),
+      downloadDoc: () => this.say((s.doc ? s.doc.num : '') + '.pdf downloaded. A copy is filed against the job.'),
+      shareDoc: () => this.say('Sent on WhatsApp to the number on the account.'),
+
+      jobHeld: !!jst,
+      heldLabel: jst ? (jst.kind === 'cancel' ? 'Cancelled' : 'On hold') : '',
+      heldReason: jst ? jst.reason : '',
+      heldNote: jst ? (jst.note || (jst.kind === 'cancel' ? 'This job has been closed. Nothing further is owed on it.' : 'The clock is paused. We will restart as soon as this clears.')) : '',
+      heldBg: jst && jst.kind === 'cancel' ? '#F6E3DE' : '#FAEFD8',
+      heldBorder: jst && jst.kind === 'cancel' ? 'rgba(163,59,34,.25)' : 'rgba(196,140,36,.3)',
+      heldDot: jst && jst.kind === 'cancel' ? '#A33B22' : '#B07A1C',
+
+      needsPayment: !!bill && !payDone && !jst,
+      balanceAmount: bill ? bill.amount : '', payExpected: bill ? bill.ref : '', payRef: s.payRef,
+      payKindLabel: bill ? bill.kind : '',
+      payBorder: s.payErrorShown ? '#C33B22' : 'rgba(30,22,19,.14)',
+      payError: s.payErrorShown ? 'That reference does not match our bank record. Check the digits or ask us to look it up.' : '',
+      setPayRef: e => this.setState({ payRef: e.target.value, payErrorShown: false }),
+      submitPayRef: () => {
+        if (!bill || s.payRef.trim().toUpperCase() !== bill.ref) return this.setState({ payErrorShown: true });
+        this.setState(st => ({ paidRefs: st.paidRefs.concat(job.id), payRef: '', payErrorShown: false }));
+        const n = this.issueDoc('order', job.id);
+        this.say('Reference matched. Job order ' + n + ' issued and ready to download.');
+      },
+
+      needsApproval: s.jobIdx === 0 && !s.approved && !jst,
+      approvalTile: plate('star', 4, 'appr', MATERIAL_FILL.black),
+      approve: () => {
+        this.setState({ approved: true });
+        const n = this.issueDoc('approved', JOBS[0].id);
+        this.say('Design approved. Approved job order ' + n + ' issued to production.');
+      },
+      requestRevision: () => this.say('Revision request sent to the design desk.'),
+      timeline: CUSTOMER_STAGES.map((st, i) => {
+        const last = i === CUSTOMER_STAGES.length - 1;
+        const done = i < jobStage || (last && i === jobStage), now = i === jobStage && !last;
+        return {
+          label: st.label, time: done ? st.time : now ? 'In progress' : 'Pending',
+          dot: done ? '#C33B22' : now ? '#E8452B' : '#E1D5C6', ring: done ? '#C33B22' : now ? 'rgba(232,69,43,.28)' : '#E1D5C6',
+          line: done ? '#E3B7AB' : '#EBE0D3', anim: now ? 'pgPulse 1.8s ease-in-out infinite' : 'none',
+          fg: done || now ? '#1E1613' : '#A08F80', weight: now ? '700' : '400',
+        };
+      }),
+
+      queueOwnerLabel: (scoped
+        ? 'Scoped to ' + homeBranch + '. Jobs from other centres are not visible to you.'
+        : (s.role === 'Super Admin' ? 'Every stage, every centre.' : 'Central ' + s.role.toLowerCase() + ' — you action ' + s.role.toLowerCase() + ' stages for all seven centres.')
+          + (viewBranch ? ' Viewing ' + viewBranch + '.' : '')),
+
+      scopeBadge: scoped ? homeBranch : s.branchView === 'All' ? 'All centres' : s.branchView,
+      showBranchFilter: !scoped,
+      branchTabs: ['All'].concat(BRANCHES).map(b => ({
+        name: b, bg: s.branchView === b ? '#1E1613' : '#fff', fg: s.branchView === b ? '#FBF4EA' : '#5C4B3F',
+        border: s.branchView === b ? '#1E1613' : 'rgba(30,22,19,.12)',
+        tap: () => this.setState({ branchView: b }),
+      })),
+      statQueue: QUEUE.filter(branchFilter).filter(j => !s.jobStatus[j.id]).length,
+      statStalled: QUEUE.filter(branchFilter).filter(j => j.mins > 120 && !s.jobStatus[j.id]).length,
+      statStock: viewBranch ? BRANCH_STOCK[viewBranch] : 128,
+      statStockLabel: viewBranch ? 'Sheets at ' + viewBranch : 'Sheets in stock',
+      holdOpen: s.hold != null,
+      holdKinds: [['hold', 'Put on hold'], ['cancel', 'Cancel job']].map(([k, n]) => ({
+        name: n, bg: s.holdKind === k ? '#1E1613' : 'transparent', fg: s.holdKind === k ? '#FBF4EA' : '#5C4B3F',
+        tap: () => this.setState({ holdKind: k, holdReason: '', holdError: '' }),
+      })),
+      holdTitle: s.holdKind === 'cancel' ? 'Cancel ' + (s.hold || '') : 'Hold ' + (s.hold || ''),
+      holdSubtitle: s.holdKind === 'cancel'
+        ? 'A reason is required. Cancelling closes the job and notifies the customer — it cannot be undone from this screen.'
+        : 'A reason is required. The SLA clock pauses and the customer sees the reason on their timeline.',
+      holdReasons: (s.holdKind === 'cancel' ? CANCEL_REASONS : HOLD_REASONS).map(r => ({
+        name: r, bg: s.holdReason === r ? '#F6EDE1' : '#fff', weight: s.holdReason === r ? '700' : '400',
+        ring: s.holdReason === r ? '#C33B22' : 'rgba(30,22,19,.22)',
+        dot: s.holdReason === r ? '#C33B22' : 'transparent',
+        tap: () => this.setState({ holdReason: r, holdError: '' }),
+      })),
+      holdNote: s.holdNote, setHoldNote: e => this.setState({ holdNote: e.target.value }),
+      holdError: s.holdError || '',
+      holdBtnLabel: s.holdKind === 'cancel' ? 'Cancel job' : 'Put on hold',
+      holdBtnBg: s.holdReason ? (s.holdKind === 'cancel' ? '#A33B22' : '#C33B22') : 'rgba(30,22,19,.1)',
+      holdBtnFg: s.holdReason ? '#FBF4EA' : '#A08F80',
+      closeHold: () => this.setState({ hold: null, holdReason: '', holdNote: '', holdError: '' }),
+      submitHold: () => {
+        if (!s.holdReason) return this.setState({ holdError: 'Pick a reason — it is recorded on the audit trail.' });
+        const id = s.hold, kind = s.holdKind, reason = s.holdReason, note = s.holdNote;
+        this.setState(st => ({ jobStatus: Object.assign({}, st.jobStatus, { [id]: { kind, reason, note } }), hold: null, holdReason: '', holdNote: '', holdError: '' }));
+        this.say(id + (kind === 'cancel' ? ' cancelled' : ' on hold') + ' · ' + reason.toLowerCase() + '. Logged with your user ID.');
+      },
+
+      intakeCount: QUOTE_REQUESTS.filter(branchFilter).filter(r => !s.quoteActed[r.id]).length,
+      payPendingLabel: scoped ? 'at ' + homeBranch : s.branchView === 'All' ? 'across all centres' : 'at ' + s.branchView,
+      quoteQueue: QUOTE_REQUESTS.filter(branchFilter).map(r => {
+        const acted = s.quoteActed[r.id];
+        return {
+          id: r.id, customer: r.customer, spec: r.spec, src: r.src, when: r.when, branch: r.branch,
+          tile: plate(r.kind, r.n, 'qr' + r.id, MATERIAL_FILL.black),
+          opacity: acted ? '.62' : '1', decided: !!acted, decision: acted || '', open: !acted,
+          bill: () => { this.setState(st => ({ quoteActed: Object.assign({}, st.quoteActed, { [r.id]: 'Billed and opened as a job. Deposit invoice sent on WhatsApp.' }) })); this.say(r.id + ' → job opened. Customer invoiced for the deposit.'); },
+          decline: () => { this.setState(st => ({ quoteActed: Object.assign({}, st.quoteActed, { [r.id]: 'Declined. The customer was told why and invited to revise the request.' }) })); this.say(r.id + ' declined. Reason recorded on the request.'); },
+        };
+      }),
+      payGateOpen: s.payGate != null,
+      payGateJob: s.payGate || '',
+      payGatePin: s.payGatePin, payGateError: s.payGateError,
+      payGateBorder: s.payGateError ? '#C33B22' : 'rgba(30,22,19,.14)',
+      setPayGatePin: e => this.setState({ payGatePin: e.target.value, payGateError: '' }),
+      closePayGate: () => this.setState({ payGate: null, payGatePin: '', payGateError: '' }),
+      submitPayGate: () => {
+        const acct = STAFF_USERS.find(u => u.role === 'Accountant');
+        if (s.payGatePin.trim() !== acct.pin) return this.setState({ payGateError: 'Wrong accountant PIN. Confirmation refused.' });
+        const id = s.payGate;
+        this.setState(st => ({ paidRefs: st.paidRefs.concat(id), payGate: null, payGatePin: '', payGateError: '' }));
+        const n = this.issueDoc('order', id);
+        this.say(id + ' confirmed by ' + acct.name + '. Job order ' + n + ' generated automatically.');
+      },
+
+      adminWhatsApp: WHATSAPP_NUMBER,
+      adminCode: activeCode, adminCodeMonth: MONTHS[monthIdx],
+      adminNextCode: DXF_CODES[(monthIdx + 1) % 12], adminNextMonth: MONTHS[(monthIdx + 1) % 12],
+      adminCodeSchedule: DXF_CODES.map((c, i) => ({
+        code: c, month: MONTHS[i].slice(0, 3),
+        bg: i === monthIdx ? '#C33B22' : i < monthIdx ? 'rgba(30,22,19,.06)' : '#fff',
+        fg: i === monthIdx ? '#FBF4EA' : i < monthIdx ? '#A08F80' : '#5C4B3F',
+        border: i === monthIdx ? '#C33B22' : 'rgba(30,22,19,.12)',
+      })),
+      rotateNow: () => this.say('Rotation is automatic on the 1st. Manual rotation invalidates every code issued this month.'),
+      devices: DEVICES.map(d => ({
+        name: d.name, user: d.user, synced: d.synced,
+        dot: d.ok ? '#2F6B57' : '#C33B22',
+        fg: d.ok ? '#8A7566' : '#C33B22',
+        tap: () => this.say(d.ok ? d.name + ' is up to date.' : d.name + ' — queued actions will replay when it reconnects.'),
+      })),
+      backupLabel: 'Last backup 04:00 today · retained 30 days',
+      runBackup: () => this.say('Manual backup started. Jobs, payments and the design manifest are included.'),
+      staffCount: STAFF_USERS.length,
+      staffList: STAFF_USERS.map(u => ({
+        name: u.name, role: userLabel(u), initials: u.initials,
+        tap: () => this.say(u.name + ' · ' + userLabel(u) + '. Reset PIN, change role or revoke access from here.'),
+      })),
+      addStaff: () => this.say('Invite sent. The new user sets their own PIN on first sign-in.'),
+
+      paymentQueue: PAYMENTS.filter(pr => branchFilter(BILLING[pr.id])).map(pr => {
+        const b = BILLING[pr.id], p = { id: pr.id, matched: pr.matched, customer: b.customer, amount: b.amount, ref: b.ref, kind: b.kind };
+        const done = s.paidRefs.includes(p.id);
+        return {
+          id: p.id, customer: p.customer, amount: p.amount, ref: p.ref, kind: p.kind, branch: b.branch,
+          tag: done ? 'CONFIRMED' : p.matched ? 'MATCHED' : 'NO MATCH',
+          tagBg: done || p.matched ? '#E4EFE7' : '#F6E3DE', tagFg: done || p.matched ? '#2F6B57' : '#A33B22',
+          action: done ? 'Confirmed' : p.matched ? 'Confirm payment' : 'Escalate to accounts',
+          btnBg: done ? 'rgba(30,22,19,.07)' : p.matched ? '#C33B22' : '#1E1613',
+          btnFg: done ? '#8A7566' : '#FBF4EA',
+          act: () => p.matched && !done
+            ? this.setState({ payGate: p.id, payGatePin: '', payGateError: '' })
+            : this.say(done ? p.id + ' is already confirmed.' : p.id + ' escalated. Accounts will reconcile ' + p.ref + ' manually.'),
+        };
+      }),
+
+      queue: QUEUE.filter(branchFilter).map(j => {
+        const mine = s.role === 'Super Admin' || s.role.toLowerCase() === j.owner;
+        const late = j.mins > 120;
+        const st2 = s.jobStatus[j.id];
+        return {
+          held: !!st2,
+          heldLabel: st2 ? (st2.kind === 'cancel' ? 'Cancelled' : 'On hold · SLA paused') : '',
+          heldReason: st2 ? st2.reason + (st2.note ? ' — ' + st2.note : '') : '',
+          heldBg: st2 && st2.kind === 'cancel' ? '#F6E3DE' : '#FAEFD8',
+          heldFg: st2 && st2.kind === 'cancel' ? '#A33B22' : '#B07A1C',
+          openHold: () => this.setState({ hold: j.id, holdKind: 'hold', holdReason: '', holdNote: '', holdError: '' }),
+          id: j.id, customer: j.customer, spec: j.spec, stage: j.stage, branch: j.branch,
+          tile: plate(j.kind, j.n, 'q' + j.id, MATERIAL_FILL.black),
+          elapsed: j.mins < 60 ? j.mins + 'm' : Math.floor(j.mins / 60) + 'h ' + (j.mins % 60) + 'm',
+          timerColor: late ? '#C33B22' : '#8A7566',
+          cardBg: st2 ? '#FBF6EE' : mine ? '#fff' : '#F6EDE1', cardBorder: mine ? 'rgba(30,22,19,.09)' : 'rgba(30,22,19,.06)', opacity: st2 ? '.72' : mine ? '1' : '.62',
+          stageBg: st2 ? '#EDE2D4' : late ? '#F6E3DE' : '#EDE2D4', stageFg: st2 ? '#8A7566' : late ? '#A33B22' : '#6E5A4C',
+          action: st2 ? (st2.kind === 'cancel' ? 'Reopen' : 'Resume') : mine ? j.action : 'Waiting on ' + j.owner,
+          btnBg: st2 ? '#1E1613' : mine ? '#C33B22' : 'rgba(30,22,19,.07)', btnFg: st2 || mine ? '#FBF4EA' : '#8A7566', cursor: st2 || mine ? 'pointer' : 'not-allowed',
+          act: () => {
+            if (st2) { this.setState(stt => { const nx = Object.assign({}, stt.jobStatus); delete nx[j.id]; return { jobStatus: nx }; }); return this.say(j.id + (st2.kind === 'cancel' ? ' reopened' : ' resumed') + '. SLA clock restarted.'); }
+            this.say(mine ? j.id + ' → ' + j.action.toLowerCase() + '. Logged against your user ID.' : 'That stage belongs to ' + j.owner + '. Role checks run server-side.');
+          },
+        };
+      }),
+
+      deskCount: (n => n + (n === 1 ? ' job' : ' jobs'))(DESK.filter(branchFilter).length),
+      deskRevisions: (n => n + (n === 1 ? ' revision request' : ' revision requests'))(DESK.filter(branchFilter).filter(d => d.tag === 'REVISION').length),
+      deskJobs: DESK.filter(branchFilter).map(d => {
+        const released = s.draftDone[d.id];
+        const auto = d.tag === 'AUTO-DRAFT' && !released;
+        return {
+          id: d.id, customer: d.customer, spec: d.spec, branch: d.branch,
+          tag: released ? 'RELEASED' : d.tag,
+          primary: released ? 'View released file' : d.primary,
+          tile: plate(d.kind, d.n, 'dk' + d.id, MATERIAL_FILL.black),
+          tagBg: released ? '#E4EFE7' : d.tag === 'AUTO-DRAFT' ? '#EDE6F3' : d.tag === 'REVISION' ? '#F6E3DE' : d.tag === 'SHEETS' ? '#E4EFE7' : '#EDE2D4',
+          tagFg: released ? '#2F6B57' : d.tag === 'AUTO-DRAFT' ? '#5B4A7A' : d.tag === 'REVISION' ? '#A33B22' : d.tag === 'SHEETS' ? '#2F6B57' : '#6E5A4C',
+          hasNote: !!d.note, note: d.note,
+          isAuto: auto,
+          autoLine: auto ? 'Drafted automatically · ' + DRAFTS[d.id].sheets + ' sheets · ' + DRAFTS[d.id].drawn : '',
+          upload: () => auto
+            ? this.setState({ draft: d.id, regenerating: false })
+            : this.say(d.id + ' · ' + (released ? 'released file opened.' : d.primary.toLowerCase() + ' — version logged, customer notified.')),
+          sheets: () => this.say(d.id + ' · sheet count 3 → verified against inventory.'),
+        };
+      }),
+
+      draftOpen: s.draft != null,
+      draftId: s.draft || '',
+      draftRegenerating: s.regenerating,
+      draftOpacity: s.regenerating ? '.35' : '1',
+      draftPattern: s.draft ? DRAFTS[s.draft].pattern : '',
+      draftMaterial: s.draft ? DRAFTS[s.draft].material : '',
+      draftPanel: s.draft ? DRAFTS[s.draft].panel : '',
+      draftSheets: s.draft ? DRAFTS[s.draft].sheets + (DRAFTS[s.draft].sheets === 1 ? ' sheet' : ' sheets') : '',
+      draftWaste: s.draft ? DRAFTS[s.draft].waste : '',
+      draftCutLength: s.draft ? DRAFTS[s.draft].cutLength : '',
+      draftCutTime: s.draft ? DRAFTS[s.draft].cutTime : '',
+      draftDrawn: s.draft ? 'Generated ' + DRAFTS[s.draft].drawn : '',
+      draftTile: s.draft ? plate(DESK.find(d => d.id === s.draft).kind, DESK.find(d => d.id === s.draft).n, 'draft' + s.draft, MATERIAL_FILL.black) : null,
+      draftNest: s.draft ? Array.from({ length: DRAFTS[s.draft].sheets }, (_, i) => ({
+        label: 'Sheet ' + (i + 1),
+        tile: plate(DESK.find(d => d.id === s.draft).kind, 3, 'nest' + s.draft + i, MATERIAL_FILL.steel),
+      })) : [],
+      draftChecks: s.draft ? DRAFTS[s.draft].checks.map(c => ({
+        label: c.label, detail: c.detail,
+        bg: c.state === 'fail' ? '#F6E3DE' : c.state === 'warn' ? '#FAEFD8' : '#E4EFE7',
+        fg: c.state === 'fail' ? '#A33B22' : c.state === 'warn' ? '#8A6314' : '#2F6B57',
+        mark: c.state === 'fail' ? '✕' : c.state === 'warn' ? '!' : '✓',
+      })) : [],
+      draftBlocked: s.draft ? DRAFTS[s.draft].checks.some(c => c.state === 'fail') : false,
+      draftVerdict: s.draft
+        ? DRAFTS[s.draft].checks.some(c => c.state === 'fail')
+          ? 'A check failed. This file cannot be released until it is redrawn or overridden.'
+          : DRAFTS[s.draft].checks.some(c => c.state === 'warn')
+            ? 'Passed with warnings. Read them before you release — your name goes on the file.'
+            : 'All checks passed. Release when you are satisfied with the nest.'
+        : '',
+      draftVerdictBg: s.draft
+        ? DRAFTS[s.draft].checks.some(c => c.state === 'fail') ? '#F6E3DE'
+          : DRAFTS[s.draft].checks.some(c => c.state === 'warn') ? '#FAEFD8' : '#E4EFE7'
+        : '',
+      draftPrimaryLabel: s.draft && DRAFTS[s.draft].checks.some(c => c.state === 'fail') ? 'Redraw by hand' : 'Approve and release',
+      closeDraft: () => this.setState({ draft: null, regenerating: false }),
+      regenDraft: () => {
+        this.setState({ regenerating: true });
+        setTimeout(() => { this.setState({ regenerating: false }); this.say('Redrawn from the catalogue geometry. Checks re-run.'); }, 1400);
+      },
+      approveDraft: () => {
+        const id = s.draft, blocked = DRAFTS[id].checks.some(c => c.state === 'fail');
+        if (blocked) { this.setState({ draft: null }); return this.say(id + ' sent to manual drawing. The generated file was discarded.'); }
+        this.setState(st => ({ draft: null, draftDone: Object.assign({}, st.draftDone, { [id]: true }) }));
+        this.say(id + ' released to production, signed by ' + (s.user ? s.user.name : 'the design desk') + '.');
+      },
+      overrideDraft: () => this.say('Manual upload replaces the generated file. The override and your reason are recorded.'),
+
+      process: [
+        ['01', 'Design & engineering', 'CAD modelling and analysis for the right solution'],
+        ['02', 'Material preparation', 'Precision cutting and prep of quality stock'],
+        ['03', 'Fabrication', 'Machining, bending and welding'],
+        ['04', 'Quality assurance', 'Inspection and testing before it leaves us'],
+      ].map(([n, name, blurb]) => ({ n, name, blurb })),
+      mission: [
+        'Exceptional craftsmanship through modern technology and expert design',
+        'Reliable, durable structures that exceed expectations',
+        'Innovation, professionalism and integrity on every project',
+        'Empowering African creativity through engineering excellence',
+      ].map(text => ({ text })),
+      payMethods: [['transfer', 'Bank transfer'], ['card', 'Card'], ['ussd', 'USSD']].map(([k, n]) => ({
+        name: n, bg: s.payMethod === k ? '#1E1613' : '#fff', fg: s.payMethod === k ? '#FBF4EA' : '#5C4B3F',
+        border: s.payMethod === k ? '#1E1613' : 'rgba(30,22,19,.12)',
+        tap: () => this.setState({ payMethod: k, payErrorShown: false }),
+      })),
+      isTransfer: s.payMethod === 'transfer', isCard: s.payMethod === 'card', isUssd: s.payMethod === 'ussd',
+      cardNo: s.cardNo, cardExp: s.cardExp, cardCvv: s.cardCvv,
+      setCardNo: e => this.setState({ cardNo: e.target.value }),
+      setCardExp: e => this.setState({ cardExp: e.target.value }),
+      setCardCvv: e => this.setState({ cardCvv: e.target.value }),
+      payNowLabel: bill ? 'Pay ' + bill.amount + ' now' : 'Pay now',
+      payCard: () => {
+        if (s.cardNo.replace(/\D/g, '').length < 12) return this.say('Enter the full card number to continue.');
+        this.setState(st => ({ paidRefs: st.paidRefs.concat(job.id), cardNo: '', cardExp: '', cardCvv: '' }));
+        this.say('Payment received. Accounts still countersign before the job advances.');
+      },
+      ussdCode: bill ? '*737*000*' + bill.ref.slice(-4) + '#' : '',
+      copyUssd: () => this.say('USSD string copied. Dial it from the phone number on your account.'),
+    };
+  }
+}
+
+</script>
+</body>
+</html>

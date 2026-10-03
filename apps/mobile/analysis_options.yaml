@@ -13,6 +13,8 @@ analyzer:
     - build/**
     - '**/*.g.dart'
     - '**/*.drift.dart'
+    - android/**
+    - web/**
   errors:
     missing_required_param: error
     missing_return: error
