@@ -242,3 +242,5 @@ access is available, and treat every piece of static verification in
 `docs/` as exactly that — static, not executed — until
 [`docs/pg-019-supabase-staging-setup.md`](./docs/pg-019-supabase-staging-setup.md)'s
 procedure has actually been run somewhere with internet access.
+#   p r o - g r a f i z - m o b i l e  
+ 
