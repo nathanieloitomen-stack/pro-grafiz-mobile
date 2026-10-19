@@ -13,11 +13,13 @@ void showPGToast(BuildContext context, String message) {
   messenger.hideCurrentSnackBar();
   messenger.showSnackBar(
     SnackBar(
-      content: Text(message, style: PGTextStyles.body.copyWith(color: PGColors.paper)),
+      content: Text(message,
+          style: PGTextStyles.body.copyWith(color: PGColors.paper)),
       backgroundColor: PGColors.ink,
       duration: PGMotion.toast,
       behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(PGRadius.insetNote)),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(PGRadius.insetNote)),
       margin: const EdgeInsets.only(left: 24, right: 24, bottom: 110),
     ),
   );

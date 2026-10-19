@@ -11,18 +11,25 @@ class PGColors {
   PGColors._();
 
   // Ground
-  static const ink = Color(0xFF1E1613); // Primary text, dark cards, active nav, staff headers
+  static const ink =
+      Color(0xFF1E1613); // Primary text, dark cards, active nav, staff headers
   static const inkDeep = Color(0xFF141010); // Full-bleed dark panels
   static const paper = Color(0xFFFBF4EA); // App background, text on dark
-  static const paperWarm = Color(0xFFF6EDE1); // Selected rows, inset notes, secondary cards
-  static const clay = Color(0xFFF2E4D2); // Accent cards, testimonial, CTA blocks
-  static const clayDeep = Color(0xFFEDE2D4); // Pattern tile backgrounds, avatar fills, chips
+  static const paperWarm =
+      Color(0xFFF6EDE1); // Selected rows, inset notes, secondary cards
+  static const clay =
+      Color(0xFFF2E4D2); // Accent cards, testimonial, CTA blocks
+  static const clayDeep =
+      Color(0xFFEDE2D4); // Pattern tile backgrounds, avatar fills, chips
 
   // Action
-  static const ember = Color(0xFFC33B22); // Primary action, links, active state, counts
-  static const emberBright = Color(0xFFE8452B); // Live pulse dot, submit on dark
+  static const ember =
+      Color(0xFFC33B22); // Primary action, links, active state, counts
+  static const emberBright =
+      Color(0xFFE8452B); // Live pulse dot, submit on dark
   static const emberDark = Color(0xFF9E2C16); // Link hover / pressed
-  static const amber = Color(0xFFF0A03C); // Staff dot, camera guides, gradient end, About accent
+  static const amber =
+      Color(0xFFF0A03C); // Staff dot, camera guides, gradient end, About accent
 
   // Text
   static const textMid = Color(0xFF5C4B3F); // Body copy on paper

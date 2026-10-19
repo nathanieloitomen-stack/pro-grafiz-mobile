@@ -58,7 +58,8 @@ class AuthGate extends StatelessWidget {
           future: _isCustomer(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
-              return const Scaffold(body: Center(child: CircularProgressIndicator()));
+              return const Scaffold(
+                  body: Center(child: CircularProgressIndicator()));
             }
             if (snapshot.data == true) {
               return _BrowsingShell(
@@ -76,7 +77,10 @@ class AuthGate extends StatelessWidget {
 
   Future<bool> _isCustomer() async {
     try {
-      final row = await Supabase.instance.client.from('customers').select('id').maybeSingle();
+      final row = await Supabase.instance.client
+          .from('customers')
+          .select('id')
+          .maybeSingle();
       return row != null;
     } catch (_) {
       return false;
@@ -102,7 +106,9 @@ class _BrowsingShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        HomeScreen(catalogueRepository: catalogueRepository, authRepository: authRepository),
+        HomeScreen(
+            catalogueRepository: catalogueRepository,
+            authRepository: authRepository),
         Positioned(
           top: 8,
           right: 8,
@@ -114,25 +120,40 @@ class _BrowsingShell extends StatelessWidget {
                   TextButton(
                     onPressed: () => Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (_) => JobsScreen(jobRepository: JobRepository(Supabase.instance.client)),
+                        builder: (_) => JobsScreen(
+                            jobRepository:
+                                JobRepository(Supabase.instance.client)),
                       ),
                     ),
-                    child: Text('My jobs', style: PGTextStyles.button.copyWith(color: PGColors.ink)),
+                    child: Text('My jobs',
+                        style:
+                            PGTextStyles.button.copyWith(color: PGColors.ink)),
                   ),
                 if (signedIn)
                   TextButton(
                     onPressed: () => Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (_) => NotificationsScreen(repository: NotificationRepository(Supabase.instance.client)),
+                        builder: (_) => NotificationsScreen(
+                            repository: NotificationRepository(
+                                Supabase.instance.client)),
                       ),
                     ),
-                    child: Text('Notifications', style: PGTextStyles.button.copyWith(color: PGColors.ink)),
+                    child: Text('Notifications',
+                        style:
+                            PGTextStyles.button.copyWith(color: PGColors.ink)),
                   ),
-                TextButton(
-                  onPressed: signedIn ? authRepository.signOut : () => _showSignInChoice(context),
-                  child: Text(
-                    signedIn ? 'Sign out' : 'Sign in',
-                    style: PGTextStyles.button.copyWith(color: PGColors.ember),
+                Semantics(
+                  identifier:
+                      signedIn ? 'pg_signout_button' : 'pg_signin_button',
+                  child: TextButton(
+                    onPressed: signedIn
+                        ? authRepository.signOut
+                        : () => _showSignInChoice(context),
+                    child: Text(
+                      signedIn ? 'Sign out' : 'Sign in',
+                      style:
+                          PGTextStyles.button.copyWith(color: PGColors.ember),
+                    ),
                   ),
                 ),
               ],
@@ -147,24 +168,30 @@ class _BrowsingShell extends StatelessWidget {
     showPGBottomSheet<void>(
       context: context,
       builder: (context) => Padding(
-        padding: const EdgeInsets.fromLTRB(PGSpacing.screenHorizontal, 24, PGSpacing.screenHorizontal, 24),
+        padding: const EdgeInsets.fromLTRB(
+            PGSpacing.screenHorizontal, 24, PGSpacing.screenHorizontal, 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Sign in', style: PGTextStyles.cardTitle.copyWith(color: PGColors.ink)),
+            Text('Sign in',
+                style: PGTextStyles.cardTitle.copyWith(color: PGColors.ink)),
             const SizedBox(height: PGSpacing.sectionGap),
             PGPrimaryButton(
+              testId: 'pg_signin_customer',
               label: 'I\'m a customer',
               onPressed: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => CustomerPhoneSignInScreen(authRepository: authRepository)),
+                  MaterialPageRoute(
+                      builder: (_) => CustomerPhoneSignInScreen(
+                          authRepository: authRepository)),
                 );
               },
             ),
             const SizedBox(height: PGSpacing.groupGap),
             PGSecondaryButton(
+              testId: 'pg_signin_staff',
               label: 'I\'m on staff',
               onPressed: () {
                 Navigator.of(context).pop();
@@ -193,7 +220,9 @@ class _StaffSignedInPlaceholder extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Signed in — staff', style: PGTextStyles.screenTitle.copyWith(color: PGColors.ink)),
+              Text('Signed in — staff',
+                  style:
+                      PGTextStyles.screenTitle.copyWith(color: PGColors.ink)),
               const SizedBox(height: PGSpacing.groupGap),
               Text(
                 'Admin (staff account management) starts in a later PG task.',
@@ -204,7 +233,9 @@ class _StaffSignedInPlaceholder extends StatelessWidget {
                 label: 'Payments',
                 onPressed: () => Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) => StaffPaymentsScreen(paymentRepository: PaymentRepository(Supabase.instance.client)),
+                    builder: (_) => StaffPaymentsScreen(
+                        paymentRepository:
+                            PaymentRepository(Supabase.instance.client)),
                   ),
                 ),
               ),
@@ -213,7 +244,9 @@ class _StaffSignedInPlaceholder extends StatelessWidget {
                 label: 'Design Desk',
                 onPressed: () => Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) => DesignDeskScreen(repository: DesignDeskRepository(Supabase.instance.client)),
+                    builder: (_) => DesignDeskScreen(
+                        repository:
+                            DesignDeskRepository(Supabase.instance.client)),
                   ),
                 ),
               ),
@@ -222,7 +255,9 @@ class _StaffSignedInPlaceholder extends StatelessWidget {
                 label: 'Intake',
                 onPressed: () => Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) => IntakeScreen(repository: OperationsRepository(Supabase.instance.client)),
+                    builder: (_) => IntakeScreen(
+                        repository:
+                            OperationsRepository(Supabase.instance.client)),
                   ),
                 ),
               ),
@@ -231,7 +266,9 @@ class _StaffSignedInPlaceholder extends StatelessWidget {
                 label: 'Job Queue',
                 onPressed: () => Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) => JobQueueScreen(repository: OperationsRepository(Supabase.instance.client)),
+                    builder: (_) => JobQueueScreen(
+                        repository:
+                            OperationsRepository(Supabase.instance.client)),
                   ),
                 ),
               ),
@@ -240,7 +277,9 @@ class _StaffSignedInPlaceholder extends StatelessWidget {
                 label: 'Dashboard',
                 onPressed: () => Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) => OperationsDashboardScreen(repository: OperationsRepository(Supabase.instance.client)),
+                    builder: (_) => OperationsDashboardScreen(
+                        repository:
+                            OperationsRepository(Supabase.instance.client)),
                   ),
                 ),
               ),
@@ -249,12 +288,15 @@ class _StaffSignedInPlaceholder extends StatelessWidget {
                 label: 'Notifications',
                 onPressed: () => Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) => NotificationsScreen(repository: NotificationRepository(Supabase.instance.client)),
+                    builder: (_) => NotificationsScreen(
+                        repository:
+                            NotificationRepository(Supabase.instance.client)),
                   ),
                 ),
               ),
               const Spacer(),
-              PGSecondaryButton(label: 'Sign out', onPressed: authRepository.signOut),
+              PGSecondaryButton(
+                  label: 'Sign out', onPressed: authRepository.signOut),
             ],
           ),
         ),

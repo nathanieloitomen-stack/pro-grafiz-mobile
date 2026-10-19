@@ -6,13 +6,15 @@ import '../data/auth_repository.dart';
 /// OTP entry following [CustomerPhoneSignInScreen]. Same "no approved
 /// design" caveat applies — see that file's header comment.
 class CustomerOtpVerifyScreen extends StatefulWidget {
-  const CustomerOtpVerifyScreen({super.key, required this.authRepository, required this.phone});
+  const CustomerOtpVerifyScreen(
+      {super.key, required this.authRepository, required this.phone});
 
   final AuthRepository authRepository;
   final String phone;
 
   @override
-  State<CustomerOtpVerifyScreen> createState() => _CustomerOtpVerifyScreenState();
+  State<CustomerOtpVerifyScreen> createState() =>
+      _CustomerOtpVerifyScreenState();
 }
 
 class _CustomerOtpVerifyScreenState extends State<CustomerOtpVerifyScreen> {
@@ -31,7 +33,8 @@ class _CustomerOtpVerifyScreenState extends State<CustomerOtpVerifyScreen> {
       _error = null;
     });
     try {
-      await widget.authRepository.verifyCustomerOtp(phone: widget.phone, token: code);
+      await widget.authRepository
+          .verifyCustomerOtp(phone: widget.phone, token: code);
       if (!mounted) return;
       Navigator.of(context).popUntil((route) => route.isFirst);
     } catch (_) {
@@ -62,15 +65,19 @@ class _CustomerOtpVerifyScreenState extends State<CustomerOtpVerifyScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Enter the code', style: PGTextStyles.screenTitle.copyWith(color: PGColors.ink)),
+              Text('Enter the code',
+                  style:
+                      PGTextStyles.screenTitle.copyWith(color: PGColors.ink)),
               const SizedBox(height: PGSpacing.groupGap),
-              Text('We sent a code to ${widget.phone}.', style: PGTextStyles.body.copyWith(color: PGColors.textMid)),
+              Text('We sent a code to ${widget.phone}.',
+                  style: PGTextStyles.body.copyWith(color: PGColors.textMid)),
               const SizedBox(height: PGSpacing.sectionGap),
               TextField(
                 controller: _codeController,
                 keyboardType: TextInputType.number,
                 style: PGTextStyles.input.copyWith(letterSpacing: 4),
-                decoration: InputDecoration(hintText: '••••••', errorText: _error),
+                decoration:
+                    InputDecoration(hintText: '••••••', errorText: _error),
               ),
               const SizedBox(height: PGSpacing.groupGap),
               PGPrimaryButton(

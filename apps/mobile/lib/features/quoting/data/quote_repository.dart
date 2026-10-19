@@ -6,7 +6,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 /// should show [reason] as an honest explanation, never fall back to a
 /// placeholder number.
 class QuoteEstimate {
-  const QuoteEstimate({required this.available, this.reason, this.totalKobo, this.depositKobo, this.balanceKobo});
+  const QuoteEstimate(
+      {required this.available,
+      this.reason,
+      this.totalKobo,
+      this.depositKobo,
+      this.balanceKobo});
 
   final bool available;
   final String? reason;

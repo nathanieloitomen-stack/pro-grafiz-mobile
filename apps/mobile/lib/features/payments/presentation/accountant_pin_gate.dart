@@ -13,7 +13,8 @@ import '../data/payment_repository.dart';
 ///
 /// UNTESTED against a live backend.
 class AccountantPinGate extends StatefulWidget {
-  const AccountantPinGate({super.key, required this.jobRef, required this.paymentId});
+  const AccountantPinGate(
+      {super.key, required this.jobRef, required this.paymentId});
 
   final String jobRef;
   final String paymentId;
@@ -38,7 +39,8 @@ class _AccountantPinGateState extends State<AccountantPinGate> {
     });
     try {
       final repository = PaymentRepository(Supabase.instance.client);
-      await repository.confirm(paymentId: widget.paymentId, pin: _pinController.text);
+      await repository.confirm(
+          paymentId: widget.paymentId, pin: _pinController.text);
       if (!mounted) return;
       Navigator.of(context).pop(true);
     } catch (e) {
@@ -59,12 +61,14 @@ class _AccountantPinGateState extends State<AccountantPinGate> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(PGSpacing.screenHorizontal, 24, PGSpacing.screenHorizontal, 24),
+      padding: const EdgeInsets.fromLTRB(
+          PGSpacing.screenHorizontal, 24, PGSpacing.screenHorizontal, 24),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(widget.jobRef, style: PGTextStyles.cardTitle.copyWith(color: PGColors.ink)),
+          Text(widget.jobRef,
+              style: PGTextStyles.cardTitle.copyWith(color: PGColors.ink)),
           const SizedBox(height: 5),
           Text(
             'Only the Accountant may confirm this payment. Enter your PIN to continue.',
@@ -77,8 +81,10 @@ class _AccountantPinGateState extends State<AccountantPinGate> {
             obscureText: true,
             keyboardType: TextInputType.number,
             maxLength: 4,
-            style: PGTextStyles.input.copyWith(fontSize: 20, letterSpacing: 8, color: PGColors.ink),
-            decoration: InputDecoration(counterText: '', hintText: '••••', errorText: _error),
+            style: PGTextStyles.input
+                .copyWith(fontSize: 20, letterSpacing: 8, color: PGColors.ink),
+            decoration: InputDecoration(
+                counterText: '', hintText: '••••', errorText: _error),
           ),
           const SizedBox(height: 10),
           PGPrimaryButton(
@@ -91,9 +97,11 @@ class _AccountantPinGateState extends State<AccountantPinGate> {
   }
 }
 
-Future<bool?> showAccountantPinGate(BuildContext context, {required String jobRef, String? paymentId}) {
+Future<bool?> showAccountantPinGate(BuildContext context,
+    {required String jobRef, String? paymentId}) {
   return showPGBottomSheet<bool>(
     context: context,
-    builder: (context) => AccountantPinGate(jobRef: jobRef, paymentId: paymentId ?? ''),
+    builder: (context) =>
+        AccountantPinGate(jobRef: jobRef, paymentId: paymentId ?? ''),
   );
 }

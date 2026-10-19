@@ -21,7 +21,8 @@ class CustomerPhoneSignInScreen extends StatefulWidget {
   final AuthRepository authRepository;
 
   @override
-  State<CustomerPhoneSignInScreen> createState() => _CustomerPhoneSignInScreenState();
+  State<CustomerPhoneSignInScreen> createState() =>
+      _CustomerPhoneSignInScreenState();
 }
 
 class _CustomerPhoneSignInScreenState extends State<CustomerPhoneSignInScreen> {
@@ -44,12 +45,14 @@ class _CustomerPhoneSignInScreenState extends State<CustomerPhoneSignInScreen> {
       if (!mounted) return;
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (_) => CustomerOtpVerifyScreen(authRepository: widget.authRepository, phone: phone),
+          builder: (_) => CustomerOtpVerifyScreen(
+              authRepository: widget.authRepository, phone: phone),
         ),
       );
     } catch (_) {
       if (!mounted) return;
-      setState(() => _error = 'Could not send a code. Check the number and try again.');
+      setState(() =>
+          _error = 'Could not send a code. Check the number and try again.');
     } finally {
       if (mounted) setState(() => _sending = false);
     }
@@ -75,21 +78,29 @@ class _CustomerPhoneSignInScreenState extends State<CustomerPhoneSignInScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Pro_Grafiz', style: PGTextStyles.hero.copyWith(color: PGColors.ink)),
+              Text('Pro_Grafiz',
+                  style: PGTextStyles.hero.copyWith(color: PGColors.ink)),
               const SizedBox(height: PGSpacing.groupGap),
               Text(
                 'Enter your phone number to sign in or create an account.',
                 style: PGTextStyles.body.copyWith(color: PGColors.textMid),
               ),
               const SizedBox(height: PGSpacing.sectionGap),
-              TextField(
-                controller: _phoneController,
-                keyboardType: TextInputType.phone,
-                style: PGTextStyles.input,
-                decoration: InputDecoration(hintText: '+234 8xx xxx xxxx', errorText: _error),
+              Semantics(
+                identifier: 'pg_phone_field',
+                child: TextField(
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
+                  style: PGTextStyles.input,
+                  decoration: InputDecoration(
+                      hintText: '+234 8xx xxx xxxx', errorText: _error),
+                ),
               ),
               const SizedBox(height: PGSpacing.groupGap),
-              PGPrimaryButton(label: _sending ? 'Sending…' : 'Send code', onPressed: _sending ? null : _submit),
+              PGPrimaryButton(
+                  testId: 'pg_send_code_button',
+                  label: _sending ? 'Sending…' : 'Send code',
+                  onPressed: _sending ? null : _submit),
             ],
           ),
         ),

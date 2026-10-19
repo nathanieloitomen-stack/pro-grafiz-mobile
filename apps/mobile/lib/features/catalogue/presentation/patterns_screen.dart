@@ -20,7 +20,10 @@ import 'pattern_detail_screen.dart';
 ///
 /// UNTESTED against a live backend.
 class PatternsScreen extends StatefulWidget {
-  const PatternsScreen({super.key, required this.catalogueRepository, required this.authRepository});
+  const PatternsScreen(
+      {super.key,
+      required this.catalogueRepository,
+      required this.authRepository});
 
   final CatalogueRepository catalogueRepository;
   final AuthRepository authRepository;
@@ -127,7 +130,8 @@ class _PatternsScreenState extends State<PatternsScreen> {
       );
     });
     try {
-      await widget.catalogueRepository.setFavourite(pattern.id, customerId, favourited: next);
+      await widget.catalogueRepository
+          .setFavourite(pattern.id, customerId, favourited: next);
     } catch (_) {
       if (!mounted) return;
       setState(() => _patterns[index] = pattern); // revert on failure
@@ -142,7 +146,10 @@ class _PatternsScreenState extends State<PatternsScreen> {
   Future<String?> _resolveCustomerId() async {
     if (widget.authRepository.currentSession == null) return null;
     try {
-      final row = await Supabase.instance.client.from('customers').select('id').maybeSingle();
+      final row = await Supabase.instance.client
+          .from('customers')
+          .select('id')
+          .maybeSingle();
       return row?['id'] as String?;
     } catch (_) {
       return null;
@@ -172,12 +179,15 @@ class _PatternsScreenState extends State<PatternsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Patterns', style: PGTextStyles.screenTitle.copyWith(color: PGColors.ink)),
+                  Text('Patterns',
+                      style: PGTextStyles.screenTitle
+                          .copyWith(color: PGColors.ink)),
                   const SizedBox(height: PGSpacing.groupGap),
                   TextField(
                     controller: _searchController,
                     style: PGTextStyles.input,
-                    decoration: const InputDecoration(hintText: 'Search by name, PGLC code, or category'),
+                    decoration: const InputDecoration(
+                        hintText: 'Search by name, PGLC code, or category'),
                     onSubmitted: (value) {
                       _query = value;
                       _reload();
@@ -203,7 +213,8 @@ class _PatternsScreenState extends State<PatternsScreen> {
                             label: category.name,
                             selected: _selectedCategoryCode == category.code,
                             onTap: () {
-                              setState(() => _selectedCategoryCode = category.code);
+                              setState(
+                                  () => _selectedCategoryCode = category.code);
                               _reload();
                             },
                           ),
@@ -213,7 +224,9 @@ class _PatternsScreenState extends State<PatternsScreen> {
                   ),
                   const SizedBox(height: PGSpacing.groupGap),
                   if (!_loading && _error == null)
-                    Text('${_patterns.length} results', style: PGTextStyles.caption.copyWith(color: PGColors.textSoft)),
+                    Text('${_patterns.length} results',
+                        style: PGTextStyles.caption
+                            .copyWith(color: PGColors.textSoft)),
                 ],
               ),
             ),
@@ -229,11 +242,14 @@ class _PatternsScreenState extends State<PatternsScreen> {
       return const Center(child: CircularProgressIndicator());
     }
     if (_error != null) {
-      return Center(child: Text(_error!, style: PGTextStyles.body.copyWith(color: PGColors.dangerFg)));
+      return Center(
+          child: Text(_error!,
+              style: PGTextStyles.body.copyWith(color: PGColors.dangerFg)));
     }
     if (_patterns.isEmpty) {
       return Center(
-        child: Text('No patterns match your search.', style: PGTextStyles.body.copyWith(color: PGColors.textSoft)),
+        child: Text('No patterns match your search.',
+            style: PGTextStyles.body.copyWith(color: PGColors.textSoft)),
       );
     }
     return GridView.builder(
@@ -277,7 +293,10 @@ class _PatternsScreenState extends State<PatternsScreen> {
 }
 
 class _PatternTile extends StatelessWidget {
-  const _PatternTile({required this.pattern, required this.onTap, required this.onFavouriteTap});
+  const _PatternTile(
+      {required this.pattern,
+      required this.onTap,
+      required this.onFavouriteTap});
 
   final PatternSummary pattern;
   final VoidCallback onTap;
@@ -304,9 +323,12 @@ class _PatternTile extends StatelessWidget {
                       pattern.name,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: PGTextStyles.body.copyWith(fontWeight: FontWeight.w700, color: PGColors.ink),
+                      style: PGTextStyles.body.copyWith(
+                          fontWeight: FontWeight.w700, color: PGColors.ink),
                     ),
-                    Text(pattern.categoryName, style: PGTextStyles.caption.copyWith(color: PGColors.textSoft)),
+                    Text(pattern.categoryName,
+                        style: PGTextStyles.caption
+                            .copyWith(color: PGColors.textSoft)),
                   ],
                 ),
               ),
@@ -319,11 +341,16 @@ class _PatternTile extends StatelessWidget {
                 pressedScale: 0.9,
                 child: Container(
                   padding: const EdgeInsets.all(6),
-                  decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                  decoration: const BoxDecoration(
+                      color: Colors.white, shape: BoxShape.circle),
                   child: Icon(
-                    pattern.isFavourited ? Icons.favorite : Icons.favorite_border,
+                    pattern.isFavourited
+                        ? Icons.favorite
+                        : Icons.favorite_border,
                     size: 16,
-                    color: pattern.isFavourited ? PGColors.ember : PGColors.textFaint,
+                    color: pattern.isFavourited
+                        ? PGColors.ember
+                        : PGColors.textFaint,
                   ),
                 ),
               ),

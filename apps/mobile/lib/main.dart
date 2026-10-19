@@ -19,7 +19,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   if (Env.isConfigured) {
-    await Supabase.initialize(url: Env.supabaseUrl, anonKey: Env.supabaseAnonKey);
+    await Supabase.initialize(
+        url: Env.supabaseUrl, anonKey: Env.supabaseAnonKey);
   }
   // If not configured, the app still runs — see _MissingEnvPlaceholder
   // below — rather than crashing on a bare `flutter run` with no
@@ -61,7 +62,8 @@ class _MissingEnvPlaceholder extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Pro_Grafiz', style: PGTextStyles.hero.copyWith(color: PGColors.ink)),
+              Text('Pro_Grafiz',
+                  style: PGTextStyles.hero.copyWith(color: PGColors.ink)),
               const SizedBox(height: PGSpacing.groupGap),
               const PGLabel('Missing configuration'),
               const SizedBox(height: PGSpacing.sectionGap),

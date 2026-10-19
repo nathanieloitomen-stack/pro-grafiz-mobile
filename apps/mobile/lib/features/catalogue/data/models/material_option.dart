@@ -14,7 +14,8 @@ class MaterialOption {
   final List<double> thicknesses;
 
   factory MaterialOption.fromJson(Map<String, dynamic> json) {
-    final thicknessRows = (json['material_thicknesses'] as List<dynamic>? ?? []);
+    final thicknessRows =
+        (json['material_thicknesses'] as List<dynamic>? ?? []);
     return MaterialOption(
       id: json['id'] as String,
       code: json['code'] as String,
@@ -30,7 +31,8 @@ class MaterialOption {
 
 /// A finish option (e.g. "Powder Coat"). Mirrors `finishes`.
 class FinishOption {
-  const FinishOption({required this.id, required this.code, required this.name});
+  const FinishOption(
+      {required this.id, required this.code, required this.name});
 
   final String id;
   final String code;

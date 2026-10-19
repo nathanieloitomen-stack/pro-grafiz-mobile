@@ -17,7 +17,8 @@ class OperationsDashboardScreen extends StatefulWidget {
   final OperationsRepository repository;
 
   @override
-  State<OperationsDashboardScreen> createState() => _OperationsDashboardScreenState();
+  State<OperationsDashboardScreen> createState() =>
+      _OperationsDashboardScreenState();
 }
 
 class _OperationsDashboardScreenState extends State<OperationsDashboardScreen> {
@@ -48,11 +49,16 @@ class _OperationsDashboardScreenState extends State<OperationsDashboardScreen> {
       appBar: AppBar(
         backgroundColor: PGColors.paper,
         elevation: 0,
-        title: Text('Dashboard', style: PGTextStyles.cardTitle.copyWith(color: PGColors.ink, fontSize: 20)),
+        title: Text('Dashboard',
+            style: PGTextStyles.cardTitle
+                .copyWith(color: PGColors.ink, fontSize: 20)),
       ),
       body: SafeArea(
         child: _error != null
-            ? Center(child: Text(_error!, style: PGTextStyles.body.copyWith(color: PGColors.dangerFg)))
+            ? Center(
+                child: Text(_error!,
+                    style:
+                        PGTextStyles.body.copyWith(color: PGColors.dangerFg)))
             : _counts == null
                 ? const Center(child: CircularProgressIndicator())
                 : ListView(
@@ -63,10 +69,15 @@ class _OperationsDashboardScreenState extends State<OperationsDashboardScreen> {
                             padding: const EdgeInsets.symmetric(vertical: 6),
                             child: PGCard(
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(entry.key.replaceAll('_', ' '), style: PGTextStyles.body.copyWith(color: PGColors.ink)),
-                                  Text('${entry.value}', style: PGTextStyles.numeric.copyWith(color: PGColors.ember)),
+                                  Text(entry.key.replaceAll('_', ' '),
+                                      style: PGTextStyles.body
+                                          .copyWith(color: PGColors.ink)),
+                                  Text('${entry.value}',
+                                      style: PGTextStyles.numeric
+                                          .copyWith(color: PGColors.ember)),
                                 ],
                               ),
                             ),

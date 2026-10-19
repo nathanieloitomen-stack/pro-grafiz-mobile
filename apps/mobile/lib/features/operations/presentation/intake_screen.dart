@@ -61,16 +61,25 @@ class _IntakeScreenState extends State<IntakeScreen> {
     final reason = await showPGBottomSheet<String>(
       context: context,
       builder: (context) => Padding(
-        padding: const EdgeInsets.fromLTRB(PGSpacing.screenHorizontal, 24, PGSpacing.screenHorizontal, 24),
+        padding: const EdgeInsets.fromLTRB(
+            PGSpacing.screenHorizontal, 24, PGSpacing.screenHorizontal, 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Decline request', style: PGTextStyles.cardTitle.copyWith(color: PGColors.ink)),
+            Text('Decline request',
+                style: PGTextStyles.cardTitle.copyWith(color: PGColors.ink)),
             const SizedBox(height: PGSpacing.groupGap),
-            TextField(controller: controller, maxLines: 2, decoration: const InputDecoration(hintText: 'Reason (required)')),
+            TextField(
+                controller: controller,
+                maxLines: 2,
+                decoration:
+                    const InputDecoration(hintText: 'Reason (required)')),
             const SizedBox(height: PGSpacing.groupGap),
-            PGPrimaryButton(label: 'Decline', onPressed: () => Navigator.of(context).pop(controller.text.trim())),
+            PGPrimaryButton(
+                label: 'Decline',
+                onPressed: () =>
+                    Navigator.of(context).pop(controller.text.trim())),
           ],
         ),
       ),
@@ -79,7 +88,8 @@ class _IntakeScreenState extends State<IntakeScreen> {
 
     setState(() => _busy = true);
     try {
-      await widget.repository.decideQuoteRequest(request.id, accept: false, reason: reason);
+      await widget.repository
+          .decideQuoteRequest(request.id, accept: false, reason: reason);
       if (!mounted) return;
       showPGToast(context, 'Declined.');
       _load();
@@ -98,34 +108,60 @@ class _IntakeScreenState extends State<IntakeScreen> {
       appBar: AppBar(
         backgroundColor: PGColors.paper,
         elevation: 0,
-        title: Text('Intake', style: PGTextStyles.cardTitle.copyWith(color: PGColors.ink, fontSize: 20)),
+        title: Text('Intake',
+            style: PGTextStyles.cardTitle
+                .copyWith(color: PGColors.ink, fontSize: 20)),
       ),
       body: SafeArea(
         child: _error != null
-            ? Center(child: Text(_error!, style: PGTextStyles.body.copyWith(color: PGColors.dangerFg)))
+            ? Center(
+                child: Text(_error!,
+                    style:
+                        PGTextStyles.body.copyWith(color: PGColors.dangerFg)))
             : _requests == null
                 ? const Center(child: CircularProgressIndicator())
                 : _requests!.isEmpty
-                    ? Center(child: Text('No pending requests.', style: PGTextStyles.body.copyWith(color: PGColors.textSoft)))
+                    ? Center(
+                        child: Text('No pending requests.',
+                            style: PGTextStyles.body
+                                .copyWith(color: PGColors.textSoft)))
                     : ListView.separated(
-                        padding: const EdgeInsets.all(PGSpacing.screenHorizontal),
+                        padding:
+                            const EdgeInsets.all(PGSpacing.screenHorizontal),
                         itemCount: _requests!.length,
                         separatorBuilder: (_, __) => const SizedBox(height: 10),
                         itemBuilder: (context, index) {
                           final request = _requests![index];
-                          final age = DateTime.now().difference(request.createdAt);
+                          final age =
+                              DateTime.now().difference(request.createdAt);
                           return PGCard(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Request ${request.id.substring(0, 8)}', style: PGTextStyles.body.copyWith(fontWeight: FontWeight.w700, color: PGColors.ink)),
-                                Text('${age.inHours}h ${age.inMinutes % 60}m ago', style: PGTextStyles.caption.copyWith(color: PGColors.textSoft)),
+                                Text('Request ${request.id.substring(0, 8)}',
+                                    style: PGTextStyles.body.copyWith(
+                                        fontWeight: FontWeight.w700,
+                                        color: PGColors.ink)),
+                                Text(
+                                    '${age.inHours}h ${age.inMinutes % 60}m ago',
+                                    style: PGTextStyles.caption
+                                        .copyWith(color: PGColors.textSoft)),
                                 const SizedBox(height: PGSpacing.groupGap),
                                 Row(
                                   children: [
-                                    Expanded(child: PGSecondaryButton(label: 'Decline', onPressed: _busy ? null : () => _decline(request))),
+                                    Expanded(
+                                        child: PGSecondaryButton(
+                                            label: 'Decline',
+                                            onPressed: _busy
+                                                ? null
+                                                : () => _decline(request))),
                                     const SizedBox(width: 8),
-                                    Expanded(child: PGPrimaryButton(label: 'Accept', onPressed: _busy ? null : () => _accept(request))),
+                                    Expanded(
+                                        child: PGPrimaryButton(
+                                            label: 'Accept',
+                                            onPressed: _busy
+                                                ? null
+                                                : () => _accept(request))),
                                   ],
                                 ),
                               ],

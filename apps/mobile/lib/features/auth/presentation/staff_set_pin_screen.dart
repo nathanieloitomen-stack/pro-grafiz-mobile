@@ -32,8 +32,10 @@ class StaffSetPinScreen extends StatefulWidget {
 }
 
 class _StaffSetPinScreenState extends State<StaffSetPinScreen> {
-  late final _profileIdController = TextEditingController(text: widget.initialProfileId ?? '');
-  late final _tokenController = TextEditingController(text: widget.initialInviteToken ?? '');
+  late final _profileIdController =
+      TextEditingController(text: widget.initialProfileId ?? '');
+  late final _tokenController =
+      TextEditingController(text: widget.initialInviteToken ?? '');
   final _pinController = TextEditingController();
   final _confirmController = TextEditingController();
   String? _error;
@@ -81,7 +83,10 @@ class _StaffSetPinScreenState extends State<StaffSetPinScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: PGColors.paper,
-      appBar: AppBar(title: const Text('Set your PIN'), backgroundColor: PGColors.paper, elevation: 0),
+      appBar: AppBar(
+          title: const Text('Set your PIN'),
+          backgroundColor: PGColors.paper,
+          elevation: 0),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(PGSpacing.screenHorizontal),
@@ -96,14 +101,16 @@ class _StaffSetPinScreenState extends State<StaffSetPinScreen> {
               if (widget.initialProfileId == null) ...[
                 TextField(
                   controller: _profileIdController,
-                  decoration: const InputDecoration(hintText: 'Profile ID (from your admin)'),
+                  decoration: const InputDecoration(
+                      hintText: 'Profile ID (from your admin)'),
                 ),
                 const SizedBox(height: PGSpacing.groupGap),
               ],
               if (widget.initialInviteToken == null) ...[
                 TextField(
                   controller: _tokenController,
-                  decoration: const InputDecoration(hintText: 'Invite code (from your admin)'),
+                  decoration: const InputDecoration(
+                      hintText: 'Invite code (from your admin)'),
                 ),
                 const SizedBox(height: PGSpacing.groupGap),
               ],
@@ -112,8 +119,10 @@ class _StaffSetPinScreenState extends State<StaffSetPinScreen> {
                 obscureText: true,
                 keyboardType: TextInputType.number,
                 maxLength: 4,
-                style: PGTextStyles.input.copyWith(fontSize: 20, letterSpacing: 8),
-                decoration: const InputDecoration(hintText: '••••', counterText: ''),
+                style:
+                    PGTextStyles.input.copyWith(fontSize: 20, letterSpacing: 8),
+                decoration:
+                    const InputDecoration(hintText: '••••', counterText: ''),
               ),
               const SizedBox(height: PGSpacing.groupGap),
               TextField(
@@ -121,8 +130,10 @@ class _StaffSetPinScreenState extends State<StaffSetPinScreen> {
                 obscureText: true,
                 keyboardType: TextInputType.number,
                 maxLength: 4,
-                style: PGTextStyles.input.copyWith(fontSize: 20, letterSpacing: 8),
-                decoration: InputDecoration(hintText: '••••', counterText: '', errorText: _error),
+                style:
+                    PGTextStyles.input.copyWith(fontSize: 20, letterSpacing: 8),
+                decoration: InputDecoration(
+                    hintText: '••••', counterText: '', errorText: _error),
               ),
               const SizedBox(height: PGSpacing.sectionGap),
               PGPrimaryButton(

@@ -18,13 +18,16 @@ class JobRepository {
         .from('jobs')
         .select('id, job_ref, current_stage, status')
         .order('created_at', ascending: false);
-    return (rows as List<dynamic>).map((e) => JobSummary.fromJson(e as Map<String, dynamic>)).toList();
+    return (rows as List<dynamic>)
+        .map((e) => JobSummary.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   Future<JobDetail> fetchJobDetail(String jobId) async {
     final job = await _client
         .from('jobs')
-        .select('id, job_ref, current_stage, status, hold_reason, hold_note, cancel_reason, cancel_note, quote_id')
+        .select(
+            'id, job_ref, current_stage, status, hold_reason, hold_note, cancel_reason, cancel_note, quote_id')
         .eq('id', jobId)
         .single();
 
@@ -53,14 +56,21 @@ class JobRepository {
     final quoteId = job['quote_id'] as String?;
     if (quoteId != null) {
       try {
-        final quoteRow = await _client.from('quotes').select('total_kobo').eq('id', quoteId).maybeSingle();
+        final quoteRow = await _client
+            .from('quotes')
+            .select('total_kobo')
+            .eq('id', quoteId)
+            .maybeSingle();
         totalKobo = (quoteRow?['total_kobo'] as num?)?.toInt();
       } catch (_) {
         // No access or not found — fine.
       }
     }
 
-    return JobDetail.fromJson(job, hasReleasedDraft: hasReleasedDraft, previewPath: previewPath, totalKobo: totalKobo);
+    return JobDetail.fromJson(job,
+        hasReleasedDraft: hasReleasedDraft,
+        previewPath: previewPath,
+        totalKobo: totalKobo);
   }
 
   Future<List<Map<String, dynamic>>> fetchStageHistory(String jobId) async {

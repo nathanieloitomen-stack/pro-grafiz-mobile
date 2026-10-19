@@ -66,16 +66,25 @@ class _JobQueueScreenState extends State<JobQueueScreen> {
     final reason = await showPGBottomSheet<String>(
       context: context,
       builder: (context) => Padding(
-        padding: const EdgeInsets.fromLTRB(PGSpacing.screenHorizontal, 24, PGSpacing.screenHorizontal, 24),
+        padding: const EdgeInsets.fromLTRB(
+            PGSpacing.screenHorizontal, 24, PGSpacing.screenHorizontal, 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Hold ${job.jobRef}', style: PGTextStyles.cardTitle.copyWith(color: PGColors.ink)),
+            Text('Hold ${job.jobRef}',
+                style: PGTextStyles.cardTitle.copyWith(color: PGColors.ink)),
             const SizedBox(height: PGSpacing.groupGap),
-            TextField(controller: controller, maxLines: 2, decoration: const InputDecoration(hintText: 'Reason (required)')),
+            TextField(
+                controller: controller,
+                maxLines: 2,
+                decoration:
+                    const InputDecoration(hintText: 'Reason (required)')),
             const SizedBox(height: PGSpacing.groupGap),
-            PGPrimaryButton(label: 'Hold', onPressed: () => Navigator.of(context).pop(controller.text.trim())),
+            PGPrimaryButton(
+                label: 'Hold',
+                onPressed: () =>
+                    Navigator.of(context).pop(controller.text.trim())),
           ],
         ),
       ),
@@ -89,16 +98,25 @@ class _JobQueueScreenState extends State<JobQueueScreen> {
     final reason = await showPGBottomSheet<String>(
       context: context,
       builder: (context) => Padding(
-        padding: const EdgeInsets.fromLTRB(PGSpacing.screenHorizontal, 24, PGSpacing.screenHorizontal, 24),
+        padding: const EdgeInsets.fromLTRB(
+            PGSpacing.screenHorizontal, 24, PGSpacing.screenHorizontal, 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Cancel ${job.jobRef}', style: PGTextStyles.cardTitle.copyWith(color: PGColors.ink)),
+            Text('Cancel ${job.jobRef}',
+                style: PGTextStyles.cardTitle.copyWith(color: PGColors.ink)),
             const SizedBox(height: PGSpacing.groupGap),
-            TextField(controller: controller, maxLines: 2, decoration: const InputDecoration(hintText: 'Reason (required)')),
+            TextField(
+                controller: controller,
+                maxLines: 2,
+                decoration:
+                    const InputDecoration(hintText: 'Reason (required)')),
             const SizedBox(height: PGSpacing.groupGap),
-            PGPrimaryButton(label: 'Cancel job', onPressed: () => Navigator.of(context).pop(controller.text.trim())),
+            PGPrimaryButton(
+                label: 'Cancel job',
+                onPressed: () =>
+                    Navigator.of(context).pop(controller.text.trim())),
           ],
         ),
       ),
@@ -107,20 +125,24 @@ class _JobQueueScreenState extends State<JobQueueScreen> {
     await _run(() => widget.repository.cancel(job.id, reason), 'Cancelled.');
   }
 
-  Future<void> _resume(OperationalJob job) => _run(() => widget.repository.resume(job.id), 'Resumed.');
-  Future<void> _reopen(OperationalJob job) => _run(() => widget.repository.reopen(job.id), 'Reopened.');
+  Future<void> _resume(OperationalJob job) =>
+      _run(() => widget.repository.resume(job.id), 'Resumed.');
+  Future<void> _reopen(OperationalJob job) =>
+      _run(() => widget.repository.reopen(job.id), 'Reopened.');
 
   // PG-015: the three final lifecycle actions. Each just calls its own
   // Edge Function via _run — no client-side stage or role logic beyond
   // deciding whether to SHOW the button (see build() below).
-  Future<void> _markReady(OperationalJob job) =>
-      _run(() => widget.repository.markReadyForDispatch(job.id), 'Marked ready for dispatch.');
+  Future<void> _markReady(OperationalJob job) => _run(
+      () => widget.repository.markReadyForDispatch(job.id),
+      'Marked ready for dispatch.');
   Future<void> _dispatch(OperationalJob job) =>
       _run(() => widget.repository.dispatch(job.id), 'Dispatched.');
   Future<void> _release(OperationalJob job) =>
       _run(() => widget.repository.release(job.id), 'Released.');
 
-  Future<void> _run(Future<void> Function() action, String successMessage) async {
+  Future<void> _run(
+      Future<void> Function() action, String successMessage) async {
     setState(() => _busy = true);
     try {
       await action();
@@ -142,30 +164,44 @@ class _JobQueueScreenState extends State<JobQueueScreen> {
       appBar: AppBar(
         backgroundColor: PGColors.paper,
         elevation: 0,
-        title: Text('Job Queue', style: PGTextStyles.cardTitle.copyWith(color: PGColors.ink, fontSize: 20)),
+        title: Text('Job Queue',
+            style: PGTextStyles.cardTitle
+                .copyWith(color: PGColors.ink, fontSize: 20)),
       ),
       body: SafeArea(
         child: _error != null
-            ? Center(child: Text(_error!, style: PGTextStyles.body.copyWith(color: PGColors.dangerFg)))
+            ? Center(
+                child: Text(_error!,
+                    style:
+                        PGTextStyles.body.copyWith(color: PGColors.dangerFg)))
             : _jobs == null
                 ? const Center(child: CircularProgressIndicator())
                 : _jobs!.isEmpty
-                    ? Center(child: Text('No active jobs.', style: PGTextStyles.body.copyWith(color: PGColors.textSoft)))
+                    ? Center(
+                        child: Text('No active jobs.',
+                            style: PGTextStyles.body
+                                .copyWith(color: PGColors.textSoft)))
                     : ListView.separated(
-                        padding: const EdgeInsets.all(PGSpacing.screenHorizontal),
+                        padding:
+                            const EdgeInsets.all(PGSpacing.screenHorizontal),
                         itemCount: _jobs!.length,
                         separatorBuilder: (_, __) => const SizedBox(height: 10),
                         itemBuilder: (context, index) {
                           final job = _jobs![index];
-                          final elapsed = DateTime.now().difference(job.stageStartedAt);
+                          final elapsed =
+                              DateTime.now().difference(job.stageStartedAt);
                           return PGCard(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(job.jobRef, style: PGTextStyles.body.copyWith(fontWeight: FontWeight.w700, color: PGColors.ink)),
+                                    Text(job.jobRef,
+                                        style: PGTextStyles.body.copyWith(
+                                            fontWeight: FontWeight.w700,
+                                            color: PGColors.ink)),
                                     PGTag(
                                       label: job.status.replaceAll('_', ' '),
                                       tone: switch (job.status) {
@@ -178,7 +214,8 @@ class _JobQueueScreenState extends State<JobQueueScreen> {
                                 ),
                                 Text(
                                   '${job.currentStage.replaceAll('_', ' ')} · ${elapsed.inHours}h ${elapsed.inMinutes % 60}m in this stage',
-                                  style: PGTextStyles.caption.copyWith(color: PGColors.textSoft),
+                                  style: PGTextStyles.caption
+                                      .copyWith(color: PGColors.textSoft),
                                 ),
                                 const SizedBox(height: PGSpacing.groupGap),
                                 Wrap(
@@ -186,42 +223,74 @@ class _JobQueueScreenState extends State<JobQueueScreen> {
                                   runSpacing: 8,
                                   children: [
                                     if (job.status == 'active') ...[
-                                      PGSecondaryButton(label: 'Hold', expand: false, onPressed: _busy ? null : () => _hold(job)),
-                                      PGSecondaryButton(label: 'Cancel', expand: false, onPressed: _busy ? null : () => _cancel(job)),
+                                      PGSecondaryButton(
+                                          label: 'Hold',
+                                          expand: false,
+                                          onPressed:
+                                              _busy ? null : () => _hold(job)),
+                                      PGSecondaryButton(
+                                          label: 'Cancel',
+                                          expand: false,
+                                          onPressed: _busy
+                                              ? null
+                                              : () => _cancel(job)),
                                     ],
                                     if (job.status == 'on_hold') ...[
-                                      PGPrimaryButton(label: 'Resume', expand: false, onPressed: _busy ? null : () => _resume(job)),
-                                      PGSecondaryButton(label: 'Cancel', expand: false, onPressed: _busy ? null : () => _cancel(job)),
+                                      PGPrimaryButton(
+                                          label: 'Resume',
+                                          expand: false,
+                                          onPressed: _busy
+                                              ? null
+                                              : () => _resume(job)),
+                                      PGSecondaryButton(
+                                          label: 'Cancel',
+                                          expand: false,
+                                          onPressed: _busy
+                                              ? null
+                                              : () => _cancel(job)),
                                     ],
                                     if (job.status == 'cancelled')
-                                      PGPrimaryButton(label: 'Reopen', expand: false, onPressed: _busy ? null : () => _reopen(job)),
+                                      PGPrimaryButton(
+                                          label: 'Reopen',
+                                          expand: false,
+                                          onPressed: _busy
+                                              ? null
+                                              : () => _reopen(job)),
                                     // PG-015: shown only when the caller's own role
                                     // plausibly matches AND the job is at the exact
                                     // matching stage — UI convenience only, see
                                     // this file's class-level comment.
                                     if (job.status == 'active' &&
                                         job.currentStage == 'IN_PRODUCTION' &&
-                                        (_ownRole == 'production' || _ownRole == 'super_admin'))
+                                        (_ownRole == 'production' ||
+                                            _ownRole == 'super_admin'))
                                       PGPrimaryButton(
                                         label: 'Mark Ready for Dispatch',
                                         expand: false,
-                                        onPressed: _busy ? null : () => _markReady(job),
+                                        onPressed: _busy
+                                            ? null
+                                            : () => _markReady(job),
                                       ),
                                     if (job.status == 'active' &&
-                                        job.currentStage == 'READY_FOR_DISPATCH' &&
-                                        (_ownRole == 'inventory' || _ownRole == 'super_admin'))
+                                        job.currentStage ==
+                                            'READY_FOR_DISPATCH' &&
+                                        (_ownRole == 'inventory' ||
+                                            _ownRole == 'super_admin'))
                                       PGPrimaryButton(
                                         label: 'Mark Dispatched',
                                         expand: false,
-                                        onPressed: _busy ? null : () => _dispatch(job),
+                                        onPressed:
+                                            _busy ? null : () => _dispatch(job),
                                       ),
                                     if (job.status == 'active' &&
                                         job.currentStage == 'DISPATCHED' &&
-                                        (_ownRole == 'centre_manager' || _ownRole == 'super_admin'))
+                                        (_ownRole == 'centre_manager' ||
+                                            _ownRole == 'super_admin'))
                                       PGPrimaryButton(
                                         label: 'Release Job',
                                         expand: false,
-                                        onPressed: _busy ? null : () => _release(job),
+                                        onPressed:
+                                            _busy ? null : () => _release(job),
                                       ),
                                   ],
                                 ),

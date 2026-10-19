@@ -48,7 +48,8 @@ class PaymentRepository {
   Future<PaymentRecord?> fetchLatestForJob(String jobId, String kind) async {
     final row = await _client
         .from('payments')
-        .select('id, job_id, kind, amount_kobo, status, bank_reference, jobs(job_ref)')
+        .select(
+            'id, job_id, kind, amount_kobo, status, bank_reference, jobs(job_ref)')
         .eq('job_id', jobId)
         .eq('kind', kind)
         .order('created_at', ascending: false)
@@ -57,7 +58,8 @@ class PaymentRepository {
     return row == null ? null : PaymentRecord.fromJson(row);
   }
 
-  Future<PaymentRecord> requestPayment({required String jobId, required String kind}) async {
+  Future<PaymentRecord> requestPayment(
+      {required String jobId, required String kind}) async {
     final response = await _client.functions.invoke(
       'create-payment-request',
       body: {'job_id': jobId, 'kind': kind},
@@ -73,15 +75,25 @@ class PaymentRepository {
   Future<List<PaymentRecord>> fetchStaffPayments() async {
     final rows = await _client
         .from('payments')
-        .select('id, job_id, kind, amount_kobo, status, bank_reference, jobs(job_ref)')
+        .select(
+            'id, job_id, kind, amount_kobo, status, bank_reference, jobs(job_ref)')
         .order('created_at', ascending: false);
-    return (rows as List<dynamic>).map((e) => PaymentRecord.fromJson(e as Map<String, dynamic>)).toList();
+    return (rows as List<dynamic>)
+        .map((e) => PaymentRecord.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
-  Future<void> triage({required String paymentId, required String result, String? bankReference}) async {
+  Future<void> triage(
+      {required String paymentId,
+      required String result,
+      String? bankReference}) async {
     final response = await _client.functions.invoke(
       'triage-payment',
-      body: {'payment_id': paymentId, 'result': result, if (bankReference != null) 'bank_reference': bankReference},
+      body: {
+        'payment_id': paymentId,
+        'result': result,
+        if (bankReference != null) 'bank_reference': bankReference
+      },
     );
     final data = response.data as Map<String, dynamic>;
     if (data['error'] != null) throw Exception(data['error'] as String);

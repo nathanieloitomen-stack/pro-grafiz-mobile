@@ -46,7 +46,9 @@ class PGPill extends StatelessWidget {
       ),
     );
 
-    return onTap == null ? pill : PGPressable(onTap: onTap, pressedScale: 0.96, child: pill);
+    return onTap == null
+        ? pill
+        : PGPressable(onTap: onTap, pressedScale: 0.96, child: pill);
   }
 }
 
@@ -74,7 +76,8 @@ class PGTag extends StatelessWidget {
     final (bg, fg) = _colors;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(PGRadius.pill)),
+      decoration: BoxDecoration(
+          color: bg, borderRadius: BorderRadius.circular(PGRadius.pill)),
       child: Text(
         label.toUpperCase(),
         style: PGTextStyles.tag.copyWith(color: fg),

@@ -11,7 +11,8 @@ const mandatoryCheckKeys = [
 ];
 
 class DesignJob {
-  const DesignJob({required this.id, required this.jobRef, required this.currentStage});
+  const DesignJob(
+      {required this.id, required this.jobRef, required this.currentStage});
 
   final String id;
   final String jobRef;
@@ -56,7 +57,8 @@ class DraftRecord {
 }
 
 class DraftCheckResult {
-  const DraftCheckResult({required this.checkKey, required this.result, this.message});
+  const DraftCheckResult(
+      {required this.checkKey, required this.result, this.message});
 
   final String checkKey;
   final String result;
@@ -93,49 +95,71 @@ class DesignDeskRepository {
         .inFilter('current_stage', ['PAYMENT_CONFIRMED', 'DESIGN_IN_PROGRESS'])
         .eq('status', 'active')
         .order('created_at');
-    return (rows as List<dynamic>).map((e) => DesignJob.fromJson(e as Map<String, dynamic>)).toList();
+    return (rows as List<dynamic>)
+        .map((e) => DesignJob.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   Future<void> startDesign(String jobId) async {
-    final response = await _client.functions.invoke('start-design', body: {'job_id': jobId});
+    final response =
+        await _client.functions.invoke('start-design', body: {'job_id': jobId});
     _throwIfError(response.data);
   }
 
   Future<List<DraftRecord>> fetchDrafts(String jobId) async {
     final rows = await _client
         .from('drafts')
-        .select('id, job_id, version, release_status, preview_path, override_reason')
+        .select(
+            'id, job_id, version, release_status, preview_path, override_reason')
         .eq('job_id', jobId)
         .order('version', ascending: false);
-    return (rows as List<dynamic>).map((e) => DraftRecord.fromJson(e as Map<String, dynamic>)).toList();
+    return (rows as List<dynamic>)
+        .map((e) => DraftRecord.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   Future<DraftRecord> createDraft(String jobId) async {
-    final job = await _client.from('jobs').select('material_id').eq('id', jobId).single();
+    final job = await _client
+        .from('jobs')
+        .select('material_id')
+        .eq('id', jobId)
+        .single();
     final existing = await _client
         .from('drafts')
         .select('version')
         .eq('job_id', jobId)
         .order('version', ascending: false)
         .limit(1);
-    final nextVersion = (existing as List<dynamic>).isNotEmpty ? (existing.first['version'] as int) + 1 : 1;
+    final nextVersion = (existing as List<dynamic>).isNotEmpty
+        ? (existing.first['version'] as int) + 1
+        : 1;
     final row = await _client
         .from('drafts')
-        .insert({'job_id': jobId, 'version': nextVersion, 'material_id': job['material_id']})
+        .insert({
+          'job_id': jobId,
+          'version': nextVersion,
+          'material_id': job['material_id']
+        })
         .select()
         .single();
     return DraftRecord.fromJson(row);
   }
 
   Future<List<DraftCheckResult>> fetchChecks(String draftId) async {
-    final rows = await _client.from('draft_checks').select('check_key, result, message').eq('draft_id', draftId);
-    return (rows as List<dynamic>).map((e) => DraftCheckResult.fromJson(e as Map<String, dynamic>)).toList();
+    final rows = await _client
+        .from('draft_checks')
+        .select('check_key, result, message')
+        .eq('draft_id', draftId);
+    return (rows as List<dynamic>)
+        .map((e) => DraftCheckResult.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   /// Manual entry only — the designer records what THEY found reviewing
   /// the file. Nothing here computes or infers a result automatically
   /// (automated manufacturing checks are Master Spec §6 V2 scope).
-  Future<void> recordCheck(String draftId, String checkKey, String result, {String? message}) async {
+  Future<void> recordCheck(String draftId, String checkKey, String result,
+      {String? message}) async {
     await _client.from('draft_checks').upsert({
       'draft_id': draftId,
       'check_key': checkKey,
@@ -144,14 +168,23 @@ class DesignDeskRepository {
     }, onConflict: 'draft_id,check_key');
   }
 
-  Future<Map<String, String>> requestUploadUrl(String draftId, String assetType, {String extension = 'png'}) async {
+  Future<Map<String, String>> requestUploadUrl(String draftId, String assetType,
+      {String extension = 'png'}) async {
     final response = await _client.functions.invoke(
       'request-draft-upload-url',
-      body: {'draft_id': draftId, 'asset_type': assetType, 'extension': extension},
+      body: {
+        'draft_id': draftId,
+        'asset_type': assetType,
+        'extension': extension
+      },
     );
     final data = response.data as Map<String, dynamic>;
     if (data['error'] != null) throw Exception(data['error'] as String);
-    return {'signed_url': data['signed_url'] as String, 'token': data['token'] as String, 'path': data['path'] as String};
+    return {
+      'signed_url': data['signed_url'] as String,
+      'token': data['token'] as String,
+      'path': data['path'] as String
+    };
   }
 
   Future<String> requestFileUrl(String draftId, String assetType) async {
@@ -167,7 +200,10 @@ class DesignDeskRepository {
   Future<void> release(String draftId, {String? overrideReason}) async {
     final response = await _client.functions.invoke(
       'release-draft',
-      body: {'draft_id': draftId, if (overrideReason != null) 'override_reason': overrideReason},
+      body: {
+        'draft_id': draftId,
+        if (overrideReason != null) 'override_reason': overrideReason
+      },
     );
     _throwIfError(response.data);
   }

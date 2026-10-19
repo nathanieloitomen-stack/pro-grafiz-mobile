@@ -12,6 +12,7 @@ class PGPrimaryButton extends StatelessWidget {
     required this.onPressed,
     this.height = 50,
     this.expand = true,
+    this.testId,
   });
 
   final String label;
@@ -20,6 +21,9 @@ class PGPrimaryButton extends StatelessWidget {
   /// Approved range is 50–54px.
   final double height;
   final bool expand;
+
+  /// Stable automation identifier for E2E tests (Appetize). Optional.
+  final String? testId;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +40,10 @@ class PGPrimaryButton extends StatelessWidget {
         ),
       ),
     );
-    return expand ? button : IntrinsicWidth(child: button);
+    final sized = expand ? button : IntrinsicWidth(child: button);
+    // Non-visual: exposes a stable automation id (Android resource-id)
+    // for E2E tests. No effect on layout or appearance.
+    return testId == null ? sized : Semantics(identifier: testId, child: sized);
   }
 }
 
@@ -48,12 +55,16 @@ class PGSecondaryButton extends StatelessWidget {
     required this.onPressed,
     this.height = 50,
     this.expand = true,
+    this.testId,
   });
 
   final String label;
   final VoidCallback? onPressed;
   final double height;
   final bool expand;
+
+  /// Stable automation identifier for E2E tests (Appetize). Optional.
+  final String? testId;
 
   @override
   Widget build(BuildContext context) {
@@ -72,6 +83,9 @@ class PGSecondaryButton extends StatelessWidget {
         child: Text(label),
       ),
     );
-    return expand ? button : IntrinsicWidth(child: button);
+    final sized = expand ? button : IntrinsicWidth(child: button);
+    // Non-visual: exposes a stable automation id (Android resource-id)
+    // for E2E tests. No effect on layout or appearance.
+    return testId == null ? sized : Semantics(identifier: testId, child: sized);
   }
 }

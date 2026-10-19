@@ -62,19 +62,26 @@ class _ConfigureScreenState extends State<ConfigureScreen> {
   bool _submitting = false;
 
   Future<void> _submit() async {
-    if (_selectedMaterial == null || _selectedFinish == null || _selectedThickness == null) return;
+    if (_selectedMaterial == null ||
+        _selectedFinish == null ||
+        _selectedThickness == null) return;
     setState(() => _submitting = true);
     try {
       final client = Supabase.instance.client;
       if (client.auth.currentSession == null) {
         throw Exception('Sign in as a customer to send a request.');
       }
-      final customerRow = await client.from('customers').select('id, default_branch_id').maybeSingle();
+      final customerRow = await client
+          .from('customers')
+          .select('id, default_branch_id')
+          .maybeSingle();
       if (customerRow == null) {
-        throw Exception('Only a customer account can send a request — staff use the Intake flow.');
+        throw Exception(
+            'Only a customer account can send a request — staff use the Intake flow.');
       }
       if (customerRow['default_branch_id'] == null) {
-        throw Exception('Your account has no default centre set — contact Pro_Grafiz to set one.');
+        throw Exception(
+            'Your account has no default centre set — contact Pro_Grafiz to set one.');
       }
       await client.from('quote_requests').insert({
         'customer_id': customerRow['id'],
@@ -87,7 +94,8 @@ class _ConfigureScreenState extends State<ConfigureScreen> {
         'height_mm': _height,
       });
       if (!mounted) return;
-      showPGToast(context, 'Request sent — we\'ll notify you once it\'s reviewed.');
+      showPGToast(
+          context, 'Request sent — we\'ll notify you once it\'s reviewed.');
       Navigator.of(context).pop();
     } catch (e) {
       if (!mounted) return;
@@ -120,12 +128,15 @@ class _ConfigureScreenState extends State<ConfigureScreen> {
       _fetchEstimate();
     } catch (_) {
       if (!mounted) return;
-      setState(() => _error = 'Could not load material and finish options. Check your connection.');
+      setState(() => _error =
+          'Could not load material and finish options. Check your connection.');
     }
   }
 
   Future<void> _fetchEstimate() async {
-    if (_selectedMaterial == null || _selectedFinish == null || _selectedThickness == null) return;
+    if (_selectedMaterial == null ||
+        _selectedFinish == null ||
+        _selectedThickness == null) return;
     setState(() => _estimating = true);
     try {
       final estimate = await _quoteRepository.estimate(
@@ -143,7 +154,8 @@ class _ConfigureScreenState extends State<ConfigureScreen> {
     } catch (_) {
       if (!mounted) return;
       setState(() {
-        _estimate = const QuoteEstimate(available: false, reason: 'Could not reach the pricing service.');
+        _estimate = const QuoteEstimate(
+            available: false, reason: 'Could not reach the pricing service.');
         _estimating = false;
       });
     }
@@ -156,11 +168,16 @@ class _ConfigureScreenState extends State<ConfigureScreen> {
       appBar: AppBar(
         backgroundColor: PGColors.paper,
         elevation: 0,
-        title: Text('Configure', style: PGTextStyles.cardTitle.copyWith(color: PGColors.ink, fontSize: 20)),
+        title: Text('Configure',
+            style: PGTextStyles.cardTitle
+                .copyWith(color: PGColors.ink, fontSize: 20)),
       ),
       body: SafeArea(
         child: _error != null
-            ? Center(child: Text(_error!, style: PGTextStyles.body.copyWith(color: PGColors.dangerFg)))
+            ? Center(
+                child: Text(_error!,
+                    style:
+                        PGTextStyles.body.copyWith(color: PGColors.dangerFg)))
             : _materials.isEmpty
                 ? const Center(child: CircularProgressIndicator())
                 : _buildForm(),
@@ -174,9 +191,9 @@ class _ConfigureScreenState extends State<ConfigureScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(widget.patternName, style: PGTextStyles.sectionHead.copyWith(color: PGColors.ink)),
+          Text(widget.patternName,
+              style: PGTextStyles.sectionHead.copyWith(color: PGColors.ink)),
           const SizedBox(height: PGSpacing.sectionGap),
-
           const PGLabel('Material'),
           const SizedBox(height: PGSpacing.labelToValue),
           GridView.count(
@@ -194,18 +211,20 @@ class _ConfigureScreenState extends State<ConfigureScreen> {
                   onTap: () {
                     setState(() {
                       _selectedMaterial = material;
-                      _selectedThickness = material.thicknesses.isNotEmpty ? material.thicknesses.first : null;
+                      _selectedThickness = material.thicknesses.isNotEmpty
+                          ? material.thicknesses.first
+                          : null;
                     });
                     _fetchEstimate();
                   },
                 ),
             ],
           ),
-
           const SizedBox(height: PGSpacing.sectionGap),
           const PGLabel('Thickness'),
           const SizedBox(height: PGSpacing.labelToValue),
-          if (_selectedMaterial != null && _selectedMaterial!.thicknesses.isNotEmpty)
+          if (_selectedMaterial != null &&
+              _selectedMaterial!.thicknesses.isNotEmpty)
             Slider(
               value: _selectedThickness ?? _selectedMaterial!.thicknesses.first,
               min: _selectedMaterial!.thicknesses.first,
@@ -219,8 +238,9 @@ class _ConfigureScreenState extends State<ConfigureScreen> {
               onChangeEnd: (_) => _fetchEstimate(),
             )
           else
-            Text('No thickness options for this material yet.', style: PGTextStyles.caption.copyWith(color: PGColors.textFaint)),
-
+            Text('No thickness options for this material yet.',
+                style:
+                    PGTextStyles.caption.copyWith(color: PGColors.textFaint)),
           const SizedBox(height: PGSpacing.sectionGap),
           const PGLabel('Width'),
           const SizedBox(height: PGSpacing.labelToValue),
@@ -246,7 +266,6 @@ class _ConfigureScreenState extends State<ConfigureScreen> {
             onChanged: (v) => setState(() => _height = v),
             onChangeEnd: (_) => _fetchEstimate(),
           ),
-
           const SizedBox(height: PGSpacing.sectionGap),
           const PGLabel('Finish'),
           const SizedBox(height: PGSpacing.labelToValue),
@@ -264,13 +283,14 @@ class _ConfigureScreenState extends State<ConfigureScreen> {
                 ),
             ],
           ),
-
           const SizedBox(height: PGSpacing.sectionGap),
           PGHeroCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Your specification', style: PGTextStyles.cardTitle.copyWith(color: PGColors.paper, fontSize: 19)),
+                Text('Your specification',
+                    style: PGTextStyles.cardTitle
+                        .copyWith(color: PGColors.paper, fontSize: 19)),
                 const SizedBox(height: 8),
                 Text(
                   '${_selectedMaterial?.name ?? '—'} · ${_selectedThickness?.toStringAsFixed(1) ?? '—'} mm\n'
@@ -281,18 +301,24 @@ class _ConfigureScreenState extends State<ConfigureScreen> {
                 Container(height: 1, color: PGColors.paper.withOpacity(0.15)),
                 const SizedBox(height: 12),
                 if (_estimating)
-                  Text('Getting a price…', style: PGTextStyles.meta.copyWith(color: PGColors.paper.withOpacity(0.8)))
+                  Text('Getting a price…',
+                      style: PGTextStyles.meta
+                          .copyWith(color: PGColors.paper.withOpacity(0.8)))
                 else if (_estimate == null)
-                  Text('—', style: PGTextStyles.numeric.copyWith(color: PGColors.paper))
+                  Text('—',
+                      style:
+                          PGTextStyles.numeric.copyWith(color: PGColors.paper))
                 else if (_estimate!.available)
                   Text(
                     '₦${_formatKobo(_estimate!.totalKobo!)}',
-                    style: PGTextStyles.numeric.copyWith(color: PGColors.paper, fontSize: 24),
+                    style: PGTextStyles.numeric
+                        .copyWith(color: PGColors.paper, fontSize: 24),
                   )
                 else
                   Text(
                     _estimate!.reason ?? 'Pricing not available yet.',
-                    style: PGTextStyles.meta.copyWith(color: PGColors.paper.withOpacity(0.8)),
+                    style: PGTextStyles.meta
+                        .copyWith(color: PGColors.paper.withOpacity(0.8)),
                   ),
               ],
             ),

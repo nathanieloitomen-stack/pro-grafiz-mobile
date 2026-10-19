@@ -1,7 +1,8 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class PendingQuoteRequest {
-  const PendingQuoteRequest({required this.id, required this.status, required this.createdAt});
+  const PendingQuoteRequest(
+      {required this.id, required this.status, required this.createdAt});
 
   final String id;
   final String status;
@@ -65,13 +66,20 @@ class OperationsRepository {
         .select('id, status, created_at')
         .eq('status', 'pending')
         .order('created_at');
-    return (rows as List<dynamic>).map((e) => PendingQuoteRequest.fromJson(e as Map<String, dynamic>)).toList();
+    return (rows as List<dynamic>)
+        .map((e) => PendingQuoteRequest.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
-  Future<void> decideQuoteRequest(String id, {required bool accept, String? reason}) async {
+  Future<void> decideQuoteRequest(String id,
+      {required bool accept, String? reason}) async {
     final response = await _client.functions.invoke(
       'decide-quote-request',
-      body: {'quote_request_id': id, 'decision': accept ? 'accept' : 'decline', if (reason != null) 'decision_reason': reason},
+      body: {
+        'quote_request_id': id,
+        'decision': accept ? 'accept' : 'decline',
+        if (reason != null) 'decision_reason': reason
+      },
     );
     _throwIfError(response.data);
   }
@@ -82,32 +90,44 @@ class OperationsRepository {
         .select('id, job_ref, current_stage, status, stage_started_at')
         .neq('current_stage', 'RELEASED')
         .order('stage_started_at');
-    return (rows as List<dynamic>).map((e) => OperationalJob.fromJson(e as Map<String, dynamic>)).toList();
+    return (rows as List<dynamic>)
+        .map((e) => OperationalJob.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   Future<void> hold(String jobId, String reason, {String? note}) async {
     final response = await _client.functions.invoke(
       'hold-job',
-      body: {'job_id': jobId, 'hold_reason': reason, if (note != null) 'hold_note': note},
+      body: {
+        'job_id': jobId,
+        'hold_reason': reason,
+        if (note != null) 'hold_note': note
+      },
     );
     _throwIfError(response.data);
   }
 
   Future<void> resume(String jobId) async {
-    final response = await _client.functions.invoke('resume-job', body: {'job_id': jobId});
+    final response =
+        await _client.functions.invoke('resume-job', body: {'job_id': jobId});
     _throwIfError(response.data);
   }
 
   Future<void> cancel(String jobId, String reason, {String? note}) async {
     final response = await _client.functions.invoke(
       'cancel-job',
-      body: {'job_id': jobId, 'cancel_reason': reason, if (note != null) 'cancel_note': note},
+      body: {
+        'job_id': jobId,
+        'cancel_reason': reason,
+        if (note != null) 'cancel_note': note
+      },
     );
     _throwIfError(response.data);
   }
 
   Future<void> reopen(String jobId) async {
-    final response = await _client.functions.invoke('reopen-job', body: {'job_id': jobId});
+    final response =
+        await _client.functions.invoke('reopen-job', body: {'job_id': jobId});
     _throwIfError(response.data);
   }
 
@@ -117,17 +137,20 @@ class OperationsRepository {
   // decisions of its own, matching every other method here.
 
   Future<void> markReadyForDispatch(String jobId) async {
-    final response = await _client.functions.invoke('mark-ready-for-dispatch', body: {'job_id': jobId});
+    final response = await _client.functions
+        .invoke('mark-ready-for-dispatch', body: {'job_id': jobId});
     _throwIfError(response.data);
   }
 
   Future<void> dispatch(String jobId) async {
-    final response = await _client.functions.invoke('dispatch-job', body: {'job_id': jobId});
+    final response =
+        await _client.functions.invoke('dispatch-job', body: {'job_id': jobId});
     _throwIfError(response.data);
   }
 
   Future<void> release(String jobId) async {
-    final response = await _client.functions.invoke('release-job', body: {'job_id': jobId});
+    final response =
+        await _client.functions.invoke('release-job', body: {'job_id': jobId});
     _throwIfError(response.data);
   }
 

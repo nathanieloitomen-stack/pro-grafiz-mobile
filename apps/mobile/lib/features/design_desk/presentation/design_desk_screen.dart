@@ -47,17 +47,26 @@ class _DesignDeskScreenState extends State<DesignDeskScreen> {
       appBar: AppBar(
         backgroundColor: PGColors.paper,
         elevation: 0,
-        title: Text('Design Desk', style: PGTextStyles.cardTitle.copyWith(color: PGColors.ink, fontSize: 20)),
+        title: Text('Design Desk',
+            style: PGTextStyles.cardTitle
+                .copyWith(color: PGColors.ink, fontSize: 20)),
       ),
       body: SafeArea(
         child: _error != null
-            ? Center(child: Text(_error!, style: PGTextStyles.body.copyWith(color: PGColors.dangerFg)))
+            ? Center(
+                child: Text(_error!,
+                    style:
+                        PGTextStyles.body.copyWith(color: PGColors.dangerFg)))
             : _jobs == null
                 ? const Center(child: CircularProgressIndicator())
                 : _jobs!.isEmpty
-                    ? Center(child: Text('No jobs need design work right now.', style: PGTextStyles.body.copyWith(color: PGColors.textSoft)))
+                    ? Center(
+                        child: Text('No jobs need design work right now.',
+                            style: PGTextStyles.body
+                                .copyWith(color: PGColors.textSoft)))
                     : ListView.separated(
-                        padding: const EdgeInsets.all(PGSpacing.screenHorizontal),
+                        padding:
+                            const EdgeInsets.all(PGSpacing.screenHorizontal),
                         itemCount: _jobs!.length,
                         separatorBuilder: (_, __) => const SizedBox(height: 10),
                         itemBuilder: (context, index) {
@@ -66,19 +75,28 @@ class _DesignDeskScreenState extends State<DesignDeskScreen> {
                             onTap: () async {
                               await Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (_) => DraftReviewScreen(job: job, repository: widget.repository),
+                                  builder: (_) => DraftReviewScreen(
+                                      job: job, repository: widget.repository),
                                 ),
                               );
                               _load();
                             },
                             child: PGCard(
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(job.jobRef, style: PGTextStyles.body.copyWith(fontWeight: FontWeight.w700, color: PGColors.ink)),
+                                  Text(job.jobRef,
+                                      style: PGTextStyles.body.copyWith(
+                                          fontWeight: FontWeight.w700,
+                                          color: PGColors.ink)),
                                   PGTag(
-                                    label: job.currentStage.replaceAll('_', ' '),
-                                    tone: job.currentStage == 'PAYMENT_CONFIRMED' ? PGTagTone.warning : PGTagTone.auto,
+                                    label:
+                                        job.currentStage.replaceAll('_', ' '),
+                                    tone:
+                                        job.currentStage == 'PAYMENT_CONFIRMED'
+                                            ? PGTagTone.warning
+                                            : PGTagTone.auto,
                                   ),
                                 ],
                               ),

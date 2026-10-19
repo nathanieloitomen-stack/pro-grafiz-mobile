@@ -14,12 +14,16 @@ class DocumentRepository {
   /// to show a "View" button at all, without needing a signed URL just
   /// to check existence.
   Future<Set<String>> fetchAvailableTypes(String jobId) async {
-    final rows = await _client.from('documents').select('type').eq('job_id', jobId);
-    return (rows as List<dynamic>).map((e) => (e as Map<String, dynamic>)['type'] as String).toSet();
+    final rows =
+        await _client.from('documents').select('type').eq('job_id', jobId);
+    return (rows as List<dynamic>)
+        .map((e) => (e as Map<String, dynamic>)['type'] as String)
+        .toSet();
   }
 
   Future<String> requestUrl(String jobId, String type) async {
-    final response = await _client.functions.invoke('get-document-url', body: {'job_id': jobId, 'type': type});
+    final response = await _client.functions
+        .invoke('get-document-url', body: {'job_id': jobId, 'type': type});
     final data = response.data as Map<String, dynamic>;
     if (data['error'] != null) throw Exception(data['error'] as String);
     return data['signed_url'] as String;

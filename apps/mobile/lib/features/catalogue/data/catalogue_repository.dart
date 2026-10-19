@@ -41,9 +41,8 @@ class CatalogueRepository {
     int limit = 24,
     int offset = 0,
   }) async {
-    var builder = _client
-        .from('patterns')
-        .select('id, pglc_code, name, pattern_categories(name), pattern_assets(asset_type, storage_path)');
+    var builder = _client.from('patterns').select(
+        'id, pglc_code, name, pattern_categories(name), pattern_assets(asset_type, storage_path)');
 
     if (categoryCode != null && categoryCode != 'All') {
       builder = builder.eq('pattern_categories.code', categoryCode);
@@ -54,7 +53,9 @@ class CatalogueRepository {
     }
 
     final rows = await builder.order('name').range(offset, offset + limit - 1);
-    final patternIds = (rows as List<dynamic>).map((e) => (e as Map<String, dynamic>)['id'] as String).toList();
+    final patternIds = (rows as List<dynamic>)
+        .map((e) => (e as Map<String, dynamic>)['id'] as String)
+        .toList();
 
     final counts = await _fetchFavouriteCounts(patternIds);
     final favourited = await _fetchFavouritedSet(patternIds);
@@ -62,7 +63,8 @@ class CatalogueRepository {
     return rows.map((e) {
       final json = e as Map<String, dynamic>;
       final id = json['id'] as String;
-      return PatternSummary.fromJson(json, savedCount: counts[id] ?? 0, isFavourited: favourited.contains(id));
+      return PatternSummary.fromJson(json,
+          savedCount: counts[id] ?? 0, isFavourited: favourited.contains(id));
     }).toList();
   }
 
@@ -89,9 +91,12 @@ class CatalogueRepository {
 
   /// Requires a signed-in customer — `pattern_favourites`' RLS
   /// (`customer_id = current_customer_id()`) rejects this otherwise.
-  Future<void> setFavourite(String patternId, String customerId, {required bool favourited}) async {
+  Future<void> setFavourite(String patternId, String customerId,
+      {required bool favourited}) async {
     if (favourited) {
-      await _client.from('pattern_favourites').insert({'pattern_id': patternId, 'customer_id': customerId});
+      await _client
+          .from('pattern_favourites')
+          .insert({'pattern_id': patternId, 'customer_id': customerId});
     } else {
       await _client
           .from('pattern_favourites')
@@ -110,13 +115,15 @@ class CatalogueRepository {
         .eq('customer_id', customerId);
 
     final patterns = (rows as List<dynamic>)
-        .map((e) => (e as Map<String, dynamic>)['patterns'] as Map<String, dynamic>)
+        .map((e) =>
+            (e as Map<String, dynamic>)['patterns'] as Map<String, dynamic>)
         .toList();
     final ids = patterns.map((p) => p['id'] as String).toList();
     final counts = await _fetchFavouriteCounts(ids);
 
     return patterns
-        .map((p) => PatternSummary.fromJson(p, savedCount: counts[p['id']] ?? 0, isFavourited: true))
+        .map((p) => PatternSummary.fromJson(p,
+            savedCount: counts[p['id']] ?? 0, isFavourited: true))
         .toList();
   }
 
@@ -126,15 +133,24 @@ class CatalogueRepository {
         .select('id, code, name, material_thicknesses(thickness_mm)')
         .eq('active', true)
         .order('name');
-    return (rows as List<dynamic>).map((e) => MaterialOption.fromJson(e as Map<String, dynamic>)).toList();
+    return (rows as List<dynamic>)
+        .map((e) => MaterialOption.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   Future<List<FinishOption>> fetchFinishes() async {
-    final rows = await _client.from('finishes').select('id, code, name').eq('active', true).order('name');
-    return (rows as List<dynamic>).map((e) => FinishOption.fromJson(e as Map<String, dynamic>)).toList();
+    final rows = await _client
+        .from('finishes')
+        .select('id, code, name')
+        .eq('active', true)
+        .order('name');
+    return (rows as List<dynamic>)
+        .map((e) => FinishOption.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
-  Future<Map<String, int>> _fetchFavouriteCounts(List<String> patternIds) async {
+  Future<Map<String, int>> _fetchFavouriteCounts(
+      List<String> patternIds) async {
     if (patternIds.isEmpty) return {};
     final rows = await _client
         .from('pattern_favourite_counts')
@@ -142,7 +158,8 @@ class CatalogueRepository {
         .inFilter('pattern_id', patternIds);
     return {
       for (final row in rows as List<dynamic>)
-        (row as Map<String, dynamic>)['pattern_id'] as String: (row['favourite_count'] as num).toInt(),
+        (row as Map<String, dynamic>)['pattern_id'] as String:
+            (row['favourite_count'] as num).toInt(),
     };
   }
 
@@ -155,7 +172,9 @@ class CatalogueRepository {
           .from('pattern_favourites')
           .select('pattern_id')
           .inFilter('pattern_id', patternIds);
-      return (rows as List<dynamic>).map((e) => (e as Map<String, dynamic>)['pattern_id'] as String).toSet();
+      return (rows as List<dynamic>)
+          .map((e) => (e as Map<String, dynamic>)['pattern_id'] as String)
+          .toSet();
     } catch (_) {
       // Signed-out / no matching customer row — current_customer_id()
       // returns null and the query legitimately yields nothing.

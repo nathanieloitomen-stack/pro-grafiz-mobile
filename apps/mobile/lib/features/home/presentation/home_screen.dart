@@ -21,7 +21,10 @@ import '../../catalogue/presentation/patterns_screen.dart';
 ///
 /// UNTESTED against a live backend.
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key, required this.catalogueRepository, required this.authRepository});
+  const HomeScreen(
+      {super.key,
+      required this.catalogueRepository,
+      required this.authRepository});
 
   final CatalogueRepository catalogueRepository;
   final AuthRepository authRepository;
@@ -62,9 +65,9 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(_greeting, style: PGTextStyles.hero.copyWith(color: PGColors.ink)),
+              Text(_greeting,
+                  style: PGTextStyles.hero.copyWith(color: PGColors.ink)),
               const SizedBox(height: PGSpacing.sectionGap),
-
               Row(
                 children: [
                   Expanded(
@@ -82,14 +85,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-
               if (_featured.isNotEmpty) ...[
                 const SizedBox(height: PGSpacing.sectionGap),
                 PGSectionHeader(
                   title: 'Suggested designs',
                   trailing: TextButton(
                     onPressed: () => _openPatterns(context),
-                    child: Text('See all', style: PGTextStyles.button.copyWith(color: PGColors.ember)),
+                    child: Text('See all',
+                        style: PGTextStyles.button
+                            .copyWith(color: PGColors.ember)),
                   ),
                 ),
                 const SizedBox(height: PGSpacing.groupGap),
@@ -115,7 +119,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           width: 120,
                           decoration: BoxDecoration(
                             color: PGColors.clayDeep,
-                            borderRadius: BorderRadius.circular(PGRadius.thumbnail),
+                            borderRadius:
+                                BorderRadius.circular(PGRadius.thumbnail),
                           ),
                           padding: const EdgeInsets.all(10),
                           alignment: Alignment.bottomLeft,
@@ -123,7 +128,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             pattern.name,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: PGTextStyles.body.copyWith(fontWeight: FontWeight.w700, color: PGColors.ink),
+                            style: PGTextStyles.body.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: PGColors.ink),
                           ),
                         ),
                       );
@@ -131,7 +138,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ],
-
               const SizedBox(height: PGSpacing.sectionGap),
               const PGSectionHeader(title: 'What we do'),
               const SizedBox(height: PGSpacing.groupGap),
@@ -141,13 +147,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(line, style: PGTextStyles.body.copyWith(color: PGColors.ink)),
+                      Text(line,
+                          style:
+                              PGTextStyles.body.copyWith(color: PGColors.ink)),
                       const Divider(color: PGColors.clayDeep, height: 1),
                     ],
                   ),
                 ),
               ),
-
               const SizedBox(height: PGSpacing.sectionGap),
               PGClayCard(
                 child: Text(
@@ -156,9 +163,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: PGTextStyles.quote.copyWith(color: PGColors.textWarm),
                 ),
               ),
-
               const SizedBox(height: PGSpacing.sectionGap),
-              Text('Abuja & Lagos · WhatsApp +234 915 249 3122', style: PGTextStyles.caption.copyWith(color: PGColors.textFaint)),
+              Text('Abuja & Lagos · WhatsApp +234 915 249 3122',
+                  style:
+                      PGTextStyles.caption.copyWith(color: PGColors.textFaint)),
               const SizedBox(height: PGSpacing.screenBottomForNav),
             ],
           ),
@@ -205,7 +213,9 @@ class _ShortcutTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(PGRadius.jobCard),
           border: Border.all(color: PGColors.hairline()),
         ),
-        child: Text(label, style: PGTextStyles.body.copyWith(fontWeight: FontWeight.w700, color: PGColors.ink)),
+        child: Text(label,
+            style: PGTextStyles.body
+                .copyWith(fontWeight: FontWeight.w700, color: PGColors.ink)),
       ),
     );
   }

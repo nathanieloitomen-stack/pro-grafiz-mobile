@@ -16,7 +16,8 @@ class PGSectionHeader extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title, style: PGTextStyles.sectionHead.copyWith(color: PGColors.ink)),
+        Text(title,
+            style: PGTextStyles.sectionHead.copyWith(color: PGColors.ink)),
         if (trailing != null) trailing!,
       ],
     );
@@ -32,6 +33,7 @@ class PGLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(text.toUpperCase(), style: PGTextStyles.label.copyWith(color: color));
+    return Text(text.toUpperCase(),
+        style: PGTextStyles.label.copyWith(color: color));
   }
 }

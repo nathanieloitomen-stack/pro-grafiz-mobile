@@ -1,0 +1,121 @@
+name: Appetize E2E (Android)
+
+# Builds the Flutter APK against STAGING, uploads it to the existing
+# Appetize app (same buildId every time), then runs the Playwright suite.
+#
+# Manual trigger only for now, to control Appetize session minutes.
+# Switch on the push trigger once the smoke suite is reliably green.
+#
+# Required repository secrets (Settings → Secrets and variables → Actions):
+#   APPETIZE_API_TOKEN      Appetize API token
+#   APPETIZE_BUILD_ID       buildId (publicKey) of the Pro_Grafiz app on Appetize
+#   STAGING_SUPABASE_URL    staging project URL — never production
+#   STAGING_SUPABASE_ANON_KEY
+# Optional (RBAC suite): E2E_<ROLE>_NAME / E2E_<ROLE>_PIN for seed staff.
+
+on:
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: 'Which tests to run'
+        type: choice
+        options: [smoke, all]
+        default: smoke
+  # push:
+  #   branches: [main]
+  #   paths: ['apps/mobile/**', 'e2e/appetize/**']
+
+concurrency:
+  group: appetize-e2e
+  cancel-in-progress: true
+
+jobs:
+  build-upload-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      BUILD_ID: ${{ secrets.APPETIZE_BUILD_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check required secrets
+        env:
+          T: ${{ secrets.APPETIZE_API_TOKEN }}
+          B: ${{ secrets.APPETIZE_BUILD_ID }}
+          U: ${{ secrets.STAGING_SUPABASE_URL }}
+          K: ${{ secrets.STAGING_SUPABASE_ANON_KEY }}
+        run: |
+          missing=0
+          for v in T B U K; do [ -z "${!v}" ] && missing=1; done
+          if [ "$missing" = 1 ]; then
+            echo "::error::Missing one or more secrets: APPETIZE_API_TOKEN, APPETIZE_BUILD_ID, STAGING_SUPABASE_URL, STAGING_SUPABASE_ANON_KEY"
+            exit 1
+          fi
+
+      # ---------- Build the APK ----------
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Build APK (staging)
+        working-directory: apps/mobile
+        run: |
+          flutter pub get
+          # Release mode for realistic performance; still signed with the
+          # debug key per android/app/build.gradle.kts (not store-ready).
+          flutter build apk --release \
+            --dart-define=SUPABASE_URL=${{ secrets.STAGING_SUPABASE_URL }} \
+            --dart-define=SUPABASE_ANON_KEY=${{ secrets.STAGING_SUPABASE_ANON_KEY }}
+
+      # ---------- Upload to Appetize (update existing app, same buildId) ----------
+      - name: Upload APK to Appetize
+        run: |
+          curl -fsS -X POST "https://api.appetize.io/v1/apps/${{ secrets.APPETIZE_BUILD_ID }}" \
+            -H "X-API-KEY: ${{ secrets.APPETIZE_API_TOKEN }}" \
+            -F "file=@apps/mobile/build/app/outputs/flutter-apk/app-release.apk" \
+            -F "platform=android" \
+            -F "note=CI ${GITHUB_REF_NAME}@${GITHUB_SHA::7} run ${GITHUB_RUN_NUMBER}" \
+            -o /tmp/appetize-upload.json
+          # Print only non-sensitive fields.
+          jq '{publicKey, platform, versionCode, updated}' /tmp/appetize-upload.json
+
+      # ---------- Run Playwright tests on Appetize ----------
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: e2e/appetize/package-lock.json
+      - name: Install test deps
+        working-directory: e2e/appetize
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: Run tests
+        working-directory: e2e/appetize
+        env:
+          E2E_ACCOUNTANT_NAME: ${{ secrets.E2E_ACCOUNTANT_NAME }}
+          E2E_ACCOUNTANT_PIN: ${{ secrets.E2E_ACCOUNTANT_PIN }}
+          E2E_DESIGNER_NAME: ${{ secrets.E2E_DESIGNER_NAME }}
+          E2E_DESIGNER_PIN: ${{ secrets.E2E_DESIGNER_PIN }}
+          E2E_CENTRE_MANAGER_NAME: ${{ secrets.E2E_CENTRE_MANAGER_NAME }}
+          E2E_CENTRE_MANAGER_PIN: ${{ secrets.E2E_CENTRE_MANAGER_PIN }}
+          E2E_PRODUCTION_NAME: ${{ secrets.E2E_PRODUCTION_NAME }}
+          E2E_PRODUCTION_PIN: ${{ secrets.E2E_PRODUCTION_PIN }}
+        run: |
+          if [ "${{ inputs.suite }}" = "all" ]; then npx playwright test; else npm run test:smoke; fi
+
+      # The report contains an Appetize session token: keep it a private
+      # workflow artifact, never publish it.
+      - name: Upload test report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: appetize-playwright-report
+          path: |
+            e2e/appetize/playwright-report/
+            e2e/appetize/test-results/
+          retention-days: 14

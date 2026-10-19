@@ -20,12 +20,16 @@ class PatternSummary {
   final String? previewPath;
   final bool isFavourited;
 
-  factory PatternSummary.fromJson(Map<String, dynamic> json, {required int savedCount, required bool isFavourited}) {
+  factory PatternSummary.fromJson(Map<String, dynamic> json,
+      {required int savedCount, required bool isFavourited}) {
     final category = json['pattern_categories'] as Map<String, dynamic>?;
     final assets = (json['pattern_assets'] as List<dynamic>? ?? [])
         .map((e) => e as Map<String, dynamic>)
         .toList();
-    final preview = assets.where((a) => a['asset_type'] == 'preview').cast<Map<String, dynamic>?>().firstWhere(
+    final preview = assets
+        .where((a) => a['asset_type'] == 'preview')
+        .cast<Map<String, dynamic>?>()
+        .firstWhere(
           (_) => true,
           orElse: () => null,
         );

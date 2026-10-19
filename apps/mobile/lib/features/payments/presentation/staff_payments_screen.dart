@@ -46,7 +46,8 @@ class _StaffPaymentsScreenState extends State<StaffPaymentsScreen> {
       setState(() => _payments = payments);
     } catch (_) {
       if (!mounted) return;
-      setState(() => _error = 'Could not load payments. Check your connection.');
+      setState(
+          () => _error = 'Could not load payments. Check your connection.');
     }
   }
 
@@ -55,23 +56,32 @@ class _StaffPaymentsScreenState extends State<StaffPaymentsScreen> {
     final reference = await showPGBottomSheet<String>(
       context: context,
       builder: (context) => Padding(
-        padding: const EdgeInsets.fromLTRB(PGSpacing.screenHorizontal, 24, PGSpacing.screenHorizontal, 24),
+        padding: const EdgeInsets.fromLTRB(
+            PGSpacing.screenHorizontal, 24, PGSpacing.screenHorizontal, 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Bank reference', style: PGTextStyles.cardTitle.copyWith(color: PGColors.ink)),
+            Text('Bank reference',
+                style: PGTextStyles.cardTitle.copyWith(color: PGColors.ink)),
             const SizedBox(height: PGSpacing.groupGap),
-            TextField(controller: controller, decoration: const InputDecoration(hintText: 'Reference found on statement')),
+            TextField(
+                controller: controller,
+                decoration: const InputDecoration(
+                    hintText: 'Reference found on statement')),
             const SizedBox(height: PGSpacing.groupGap),
-            PGPrimaryButton(label: 'Mark matched', onPressed: () => Navigator.of(context).pop(controller.text.trim())),
+            PGPrimaryButton(
+                label: 'Mark matched',
+                onPressed: () =>
+                    Navigator.of(context).pop(controller.text.trim())),
           ],
         ),
       ),
     );
     if (reference == null || reference.isEmpty) return;
     try {
-      await widget.paymentRepository.triage(paymentId: payment.id, result: 'matched', bankReference: reference);
+      await widget.paymentRepository.triage(
+          paymentId: payment.id, result: 'matched', bankReference: reference);
       _load();
     } catch (e) {
       if (!mounted) return;
@@ -81,7 +91,8 @@ class _StaffPaymentsScreenState extends State<StaffPaymentsScreen> {
 
   Future<void> _markNoMatch(PaymentRecord payment) async {
     try {
-      await widget.paymentRepository.triage(paymentId: payment.id, result: 'no_match');
+      await widget.paymentRepository
+          .triage(paymentId: payment.id, result: 'no_match');
       _load();
     } catch (e) {
       if (!mounted) return;
@@ -90,7 +101,8 @@ class _StaffPaymentsScreenState extends State<StaffPaymentsScreen> {
   }
 
   Future<void> _confirm(PaymentRecord payment) async {
-    final confirmed = await showAccountantPinGate(context, jobRef: payment.jobRef, paymentId: payment.id);
+    final confirmed = await showAccountantPinGate(context,
+        jobRef: payment.jobRef, paymentId: payment.id);
     if (confirmed != true) return;
     // showAccountantPinGate performs the confirm-payment call itself
     // (it needs the PIN in the same request) — reload to reflect it.
@@ -104,17 +116,26 @@ class _StaffPaymentsScreenState extends State<StaffPaymentsScreen> {
       appBar: AppBar(
         backgroundColor: PGColors.paper,
         elevation: 0,
-        title: Text('Payments', style: PGTextStyles.cardTitle.copyWith(color: PGColors.ink, fontSize: 20)),
+        title: Text('Payments',
+            style: PGTextStyles.cardTitle
+                .copyWith(color: PGColors.ink, fontSize: 20)),
       ),
       body: SafeArea(
         child: _error != null
-            ? Center(child: Text(_error!, style: PGTextStyles.body.copyWith(color: PGColors.dangerFg)))
+            ? Center(
+                child: Text(_error!,
+                    style:
+                        PGTextStyles.body.copyWith(color: PGColors.dangerFg)))
             : _payments == null
                 ? const Center(child: CircularProgressIndicator())
                 : _payments!.isEmpty
-                    ? Center(child: Text('No payments visible to your role.', style: PGTextStyles.body.copyWith(color: PGColors.textSoft)))
+                    ? Center(
+                        child: Text('No payments visible to your role.',
+                            style: PGTextStyles.body
+                                .copyWith(color: PGColors.textSoft)))
                     : ListView.separated(
-                        padding: const EdgeInsets.all(PGSpacing.screenHorizontal),
+                        padding:
+                            const EdgeInsets.all(PGSpacing.screenHorizontal),
                         itemCount: _payments!.length,
                         separatorBuilder: (_, __) => const SizedBox(height: 10),
                         itemBuilder: (context, index) => _PaymentCard(
@@ -151,7 +172,9 @@ class _PaymentCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(payment.jobRef, style: PGTextStyles.body.copyWith(fontWeight: FontWeight.w700, color: PGColors.ink)),
+              Text(payment.jobRef,
+                  style: PGTextStyles.body.copyWith(
+                      fontWeight: FontWeight.w700, color: PGColors.ink)),
               PGTag(
                 label: payment.status.replaceAll('_', ' '),
                 tone: switch (payment.status) {
@@ -169,14 +192,19 @@ class _PaymentCard extends StatelessWidget {
             style: PGTextStyles.caption.copyWith(color: PGColors.textSoft),
           ),
           if (payment.bankReference != null)
-            Text('Ref: ${payment.bankReference}', style: PGTextStyles.caption.copyWith(color: PGColors.textSoft)),
+            Text('Ref: ${payment.bankReference}',
+                style: PGTextStyles.caption.copyWith(color: PGColors.textSoft)),
           const SizedBox(height: PGSpacing.groupGap),
           if (payment.status == 'pending')
             Row(
               children: [
-                Expanded(child: PGSecondaryButton(label: 'No match', onPressed: onMarkNoMatch)),
+                Expanded(
+                    child: PGSecondaryButton(
+                        label: 'No match', onPressed: onMarkNoMatch)),
                 const SizedBox(width: 8),
-                Expanded(child: PGPrimaryButton(label: 'Mark matched', onPressed: onMarkMatched)),
+                Expanded(
+                    child: PGPrimaryButton(
+                        label: 'Mark matched', onPressed: onMarkMatched)),
               ],
             )
           else if (payment.status == 'matched' || payment.status == 'no_match')

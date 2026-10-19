@@ -21,7 +21,8 @@ import '../data/models/job_summary.dart';
 ///
 /// UNTESTED against a live backend.
 class JobDetailScreen extends StatefulWidget {
-  const JobDetailScreen({super.key, required this.jobId, required this.jobRepository});
+  const JobDetailScreen(
+      {super.key, required this.jobId, required this.jobRepository});
 
   final String jobId;
   final JobRepository jobRepository;
@@ -50,9 +51,12 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   Future<void> _load() async {
     try {
       final detail = await widget.jobRepository.fetchJobDetail(widget.jobId);
-      final history = await widget.jobRepository.fetchStageHistory(widget.jobId);
-      final deposit = await _paymentRepository.fetchLatestForJob(widget.jobId, 'deposit');
-      final documents = await _documentRepository.fetchAvailableTypes(widget.jobId);
+      final history =
+          await widget.jobRepository.fetchStageHistory(widget.jobId);
+      final deposit =
+          await _paymentRepository.fetchLatestForJob(widget.jobId, 'deposit');
+      final documents =
+          await _documentRepository.fetchAvailableTypes(widget.jobId);
       if (!mounted) return;
       setState(() {
         _detail = detail;
@@ -62,7 +66,8 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       });
     } catch (_) {
       if (!mounted) return;
-      setState(() => _error = 'Could not load this job. Check your connection.');
+      setState(
+          () => _error = 'Could not load this job. Check your connection.');
     }
   }
 
@@ -75,7 +80,11 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
         builder: (context) => AlertDialog(
           title: Text('$type — signed URL (expires in 5 minutes)'),
           content: SelectableText(url),
-          actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Close'))],
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Close'))
+          ],
         ),
       );
     } catch (e) {
@@ -101,7 +110,11 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       builder: (context) => AlertDialog(
         title: const Text('Continue on WhatsApp'),
         content: SelectableText(url),
-        actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Close'))],
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'))
+        ],
       ),
     );
   }
@@ -126,23 +139,27 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     final note = await showPGBottomSheet<String>(
       context: context,
       builder: (context) => Padding(
-        padding: const EdgeInsets.fromLTRB(PGSpacing.screenHorizontal, 24, PGSpacing.screenHorizontal, 24),
+        padding: const EdgeInsets.fromLTRB(
+            PGSpacing.screenHorizontal, 24, PGSpacing.screenHorizontal, 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Request a change', style: PGTextStyles.cardTitle.copyWith(color: PGColors.ink)),
+            Text('Request a change',
+                style: PGTextStyles.cardTitle.copyWith(color: PGColors.ink)),
             const SizedBox(height: PGSpacing.groupGap),
             TextField(
               controller: noteController,
               maxLines: 4,
               maxLength: 240,
-              decoration: const InputDecoration(hintText: 'What would you like changed?'),
+              decoration: const InputDecoration(
+                  hintText: 'What would you like changed?'),
             ),
             const SizedBox(height: PGSpacing.groupGap),
             PGPrimaryButton(
               label: 'Send',
-              onPressed: () => Navigator.of(context).pop(noteController.text.trim()),
+              onPressed: () =>
+                  Navigator.of(context).pop(noteController.text.trim()),
             ),
           ],
         ),
@@ -167,9 +184,11 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   Future<void> _requestDepositPayment() async {
     setState(() => _submitting = true);
     try {
-      await _paymentRepository.requestPayment(jobId: widget.jobId, kind: 'deposit');
+      await _paymentRepository.requestPayment(
+          jobId: widget.jobId, kind: 'deposit');
       if (!mounted) return;
-      showPGToast(context, 'Deposit payment requested — Pro_Grafiz will confirm it once received.');
+      showPGToast(context,
+          'Deposit payment requested — Pro_Grafiz will confirm it once received.');
       _load();
     } catch (e) {
       if (!mounted) return;
@@ -185,7 +204,10 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       backgroundColor: PGColors.paper,
       body: SafeArea(
         child: _error != null
-            ? Center(child: Text(_error!, style: PGTextStyles.body.copyWith(color: PGColors.dangerFg)))
+            ? Center(
+                child: Text(_error!,
+                    style:
+                        PGTextStyles.body.copyWith(color: PGColors.dangerFg)))
             : _detail == null
                 ? const Center(child: CircularProgressIndicator())
                 : _buildContent(_detail!),
@@ -201,16 +223,23 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
         children: [
           Row(
             children: [
-              IconButton(icon: const Icon(Icons.arrow_back, color: PGColors.ink), onPressed: () => Navigator.of(context).pop()),
-              Text(detail.jobRef, style: PGTextStyles.screenTitle.copyWith(color: PGColors.ink)),
+              IconButton(
+                  icon: const Icon(Icons.arrow_back, color: PGColors.ink),
+                  onPressed: () => Navigator.of(context).pop()),
+              Text(detail.jobRef,
+                  style:
+                      PGTextStyles.screenTitle.copyWith(color: PGColors.ink)),
             ],
           ),
           const SizedBox(height: PGSpacing.groupGap),
-
-          if (detail.status == 'on_hold') _buildBanner('On hold', detail.holdReason, detail.holdNote, PGColors.warningBg, PGColors.warningFg),
-          if (detail.status == 'cancelled') _buildBanner('Cancelled', detail.cancelReason, detail.cancelNote, PGColors.dangerBg, PGColors.dangerFg),
-          if (detail.status != 'active') const SizedBox(height: PGSpacing.groupGap),
-
+          if (detail.status == 'on_hold')
+            _buildBanner('On hold', detail.holdReason, detail.holdNote,
+                PGColors.warningBg, PGColors.warningFg),
+          if (detail.status == 'cancelled')
+            _buildBanner('Cancelled', detail.cancelReason, detail.cancelNote,
+                PGColors.dangerBg, PGColors.dangerFg),
+          if (detail.status != 'active')
+            const SizedBox(height: PGSpacing.groupGap),
           PGHeroCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,17 +252,19 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 ),
                 if (detail.totalKobo != null) ...[
                   const SizedBox(height: 8),
-                  Text('Total: ₦${(detail.totalKobo! / 100).toStringAsFixed(0)}', style: PGTextStyles.body.copyWith(color: PGColors.paper)),
+                  Text(
+                      'Total: ₦${(detail.totalKobo! / 100).toStringAsFixed(0)}',
+                      style: PGTextStyles.body.copyWith(color: PGColors.paper)),
                 ],
               ],
             ),
           ),
-
           const SizedBox(height: PGSpacing.sectionGap),
           const PGSectionHeader(title: 'Stages'),
           const SizedBox(height: PGSpacing.groupGap),
           ...jobStages.map((stage) {
-            final reached = jobStages.indexOf(stage) <= jobStages.indexOf(detail.currentStage);
+            final reached = jobStages.indexOf(stage) <=
+                jobStages.indexOf(detail.currentStage);
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 6),
               child: Row(
@@ -246,14 +277,15 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   const SizedBox(width: 10),
                   Text(
                     stage.replaceAll('_', ' '),
-                    style: PGTextStyles.body.copyWith(color: reached ? PGColors.ink : PGColors.textFaint),
+                    style: PGTextStyles.body.copyWith(
+                        color: reached ? PGColors.ink : PGColors.textFaint),
                   ),
                 ],
               ),
             );
           }),
-
-          if (detail.currentStage == 'SUBMITTED' && detail.status == 'active') ...[
+          if (detail.currentStage == 'SUBMITTED' &&
+              detail.status == 'active') ...[
             const SizedBox(height: PGSpacing.sectionGap),
             const PGSectionHeader(title: 'Deposit payment'),
             const SizedBox(height: PGSpacing.groupGap),
@@ -265,12 +297,14 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                         Text(
                           'No deposit payment requested yet. Payment is by bank transfer '
                           'only for now — Pro_Grafiz will confirm it once received.',
-                          style: PGTextStyles.body.copyWith(color: PGColors.textMid),
+                          style: PGTextStyles.body
+                              .copyWith(color: PGColors.textMid),
                         ),
                         const SizedBox(height: PGSpacing.groupGap),
                         PGPrimaryButton(
                           label: 'Request deposit payment',
-                          onPressed: _submitting ? null : _requestDepositPayment,
+                          onPressed:
+                              _submitting ? null : _requestDepositPayment,
                         ),
                       ],
                     )
@@ -282,12 +316,14 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                           children: [
                             Text(
                               '₦${(_depositPayment!.amountKobo / 100).toStringAsFixed(0)}',
-                              style: PGTextStyles.numeric.copyWith(color: PGColors.ink),
+                              style: PGTextStyles.numeric
+                                  .copyWith(color: PGColors.ink),
                             ),
                             if (_depositPayment!.bankReference != null)
                               Text(
                                 'Ref: ${_depositPayment!.bankReference}',
-                                style: PGTextStyles.caption.copyWith(color: PGColors.textSoft),
+                                style: PGTextStyles.caption
+                                    .copyWith(color: PGColors.textSoft),
                               ),
                           ],
                         ),
@@ -304,7 +340,6 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                     ),
             ),
           ],
-
           if (_availableDocuments.isNotEmpty) ...[
             const SizedBox(height: PGSpacing.sectionGap),
             const PGSectionHeader(title: 'Documents'),
@@ -313,25 +348,29 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               children: [
                 if (_availableDocuments.contains('PGJO'))
                   Expanded(
-                    child: PGSecondaryButton(label: 'View PGJO', onPressed: () => _viewDocument('PGJO')),
+                    child: PGSecondaryButton(
+                        label: 'View PGJO',
+                        onPressed: () => _viewDocument('PGJO')),
                   ),
-                if (_availableDocuments.contains('PGJO') && _availableDocuments.contains('PGAO'))
+                if (_availableDocuments.contains('PGJO') &&
+                    _availableDocuments.contains('PGAO'))
                   const SizedBox(width: 8),
                 if (_availableDocuments.contains('PGAO'))
                   Expanded(
-                    child: PGSecondaryButton(label: 'View PGAO', onPressed: () => _viewDocument('PGAO')),
+                    child: PGSecondaryButton(
+                        label: 'View PGAO',
+                        onPressed: () => _viewDocument('PGAO')),
                   ),
               ],
             ),
           ],
-
           const SizedBox(height: PGSpacing.sectionGap),
           PGSecondaryButton(
             label: 'Need help? Continue on WhatsApp',
             onPressed: () => _openWhatsAppHandoff(detail.jobRef),
           ),
-
-          if (detail.currentStage == 'DESIGN_SENT_FOR_APPROVAL' && detail.status == 'active') ...[
+          if (detail.currentStage == 'DESIGN_SENT_FOR_APPROVAL' &&
+              detail.status == 'active') ...[
             const SizedBox(height: PGSpacing.sectionGap),
             const PGSectionHeader(title: 'Approve your design'),
             const SizedBox(height: PGSpacing.groupGap),
@@ -358,7 +397,9 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                       Expanded(
                         child: PGPrimaryButton(
                           label: 'Approve',
-                          onPressed: (_submitting || !detail.hasReleasedDraft) ? null : _approve,
+                          onPressed: (_submitting || !detail.hasReleasedDraft)
+                              ? null
+                              : _approve,
                         ),
                       ),
                     ],
@@ -367,23 +408,28 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               ),
             ),
           ],
-
           const SizedBox(height: PGSpacing.screenBottomForNav),
         ],
       ),
     );
   }
 
-  Widget _buildBanner(String title, String? reason, String? note, Color bg, Color fg) {
+  Widget _buildBanner(
+      String title, String? reason, String? note, Color bg, Color fg) {
     return Container(
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(PGRadius.smallNote)),
+      decoration: BoxDecoration(
+          color: bg, borderRadius: BorderRadius.circular(PGRadius.smallNote)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: PGTextStyles.body.copyWith(fontWeight: FontWeight.w700, color: fg)),
-          if (reason != null) Text(reason, style: PGTextStyles.caption.copyWith(color: fg)),
-          if (note != null) Text(note, style: PGTextStyles.caption.copyWith(color: fg)),
+          Text(title,
+              style: PGTextStyles.body
+                  .copyWith(fontWeight: FontWeight.w700, color: fg)),
+          if (reason != null)
+            Text(reason, style: PGTextStyles.caption.copyWith(color: fg)),
+          if (note != null)
+            Text(note, style: PGTextStyles.caption.copyWith(color: fg)),
         ],
       ),
     );

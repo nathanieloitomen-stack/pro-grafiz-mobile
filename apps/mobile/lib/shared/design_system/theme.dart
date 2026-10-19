@@ -34,7 +34,8 @@ class PGTheme {
       colorScheme: colorScheme,
       scaffoldBackgroundColor: PGColors.paper,
       fontFamily: PGFonts.sans,
-      splashFactory: NoSplash.splashFactory, // approved design has no ripple/hover, only press-scale
+      splashFactory: NoSplash
+          .splashFactory, // approved design has no ripple/hover, only press-scale
       textTheme: const TextTheme(
         displayLarge: PGTextStyles.hero,
         headlineLarge: PGTextStyles.screenTitle,
@@ -66,7 +67,8 @@ class PGTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(PGRadius.pill),
           borderSide: BorderSide(color: PGColors.hairline()),

@@ -1,0 +1,11 @@
+{
+  "name": "pro-grafiz-appetize-e2e",
+  "private": true,
+  "description": "Appetize + Playwright end-to-end tests for the Pro_Grafiz Flutter mobile app (Android).",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:smoke": "playwright test tests/smoke.spec.ts",
+    "report": "playwright show-report"
+  }
+}

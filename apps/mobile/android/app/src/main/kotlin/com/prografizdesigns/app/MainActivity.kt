@@ -1,4 +1,4 @@
-package com.example.pro_grafiz_mobile
+package com.prografizdesigns.app
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -20,9 +20,13 @@ class AuthRepository {
 
   /// Staff sign-in account picker (approved design screen #11, step 1).
   Future<List<StaffIdentity>> fetchStaffIdentities() async {
-    final response = await _client.functions.invoke('staff-list-signin-identities');
-    final identities = (response.data as Map<String, dynamic>)['identities'] as List<dynamic>;
-    return identities.map((e) => StaffIdentity.fromJson(e as Map<String, dynamic>)).toList();
+    final response =
+        await _client.functions.invoke('staff-list-signin-identities');
+    final identities =
+        (response.data as Map<String, dynamic>)['identities'] as List<dynamic>;
+    return identities
+        .map((e) => StaffIdentity.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   /// Staff sign-in PIN step (screen #11, step 2). The PIN *is* the
@@ -74,7 +78,8 @@ class AuthRepository {
     required String phone,
     required String token,
   }) {
-    return _client.auth.verifyOTP(phone: phone, token: token, type: OtpType.sms);
+    return _client.auth
+        .verifyOTP(phone: phone, token: token, type: OtpType.sms);
   }
 
   Future<void> signOut() => _client.auth.signOut();

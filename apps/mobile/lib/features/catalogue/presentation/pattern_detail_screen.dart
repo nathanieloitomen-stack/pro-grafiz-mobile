@@ -55,12 +55,14 @@ class _PatternDetailScreenState extends State<PatternDetailScreen> {
 
   Future<void> _load() async {
     try {
-      final detail = await widget.catalogueRepository.fetchPatternDetail(widget.patternId);
+      final detail =
+          await widget.catalogueRepository.fetchPatternDetail(widget.patternId);
       if (!mounted) return;
       setState(() => _detail = detail);
     } catch (_) {
       if (!mounted) return;
-      setState(() => _error = 'Could not load this design. Check your connection.');
+      setState(
+          () => _error = 'Could not load this design. Check your connection.');
     }
   }
 
@@ -70,7 +72,10 @@ class _PatternDetailScreenState extends State<PatternDetailScreen> {
       backgroundColor: PGColors.paper,
       body: SafeArea(
         child: _error != null
-            ? Center(child: Text(_error!, style: PGTextStyles.body.copyWith(color: PGColors.dangerFg)))
+            ? Center(
+                child: Text(_error!,
+                    style:
+                        PGTextStyles.body.copyWith(color: PGColors.dangerFg)))
             : _detail == null
                 ? const Center(child: CircularProgressIndicator())
                 : _buildContent(_detail!),
@@ -121,7 +126,9 @@ class _PatternDetailScreenState extends State<PatternDetailScreen> {
                       color: _materialSwatches[label],
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: _selectedMaterialLabel == label ? PGColors.ember : Colors.transparent,
+                        color: _selectedMaterialLabel == label
+                            ? PGColors.ember
+                            : Colors.transparent,
                         width: 2,
                       ),
                     ),
@@ -134,14 +141,18 @@ class _PatternDetailScreenState extends State<PatternDetailScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                child: Text(detail.name, style: PGTextStyles.cardTitle.copyWith(color: PGColors.ink)),
+                child: Text(detail.name,
+                    style:
+                        PGTextStyles.cardTitle.copyWith(color: PGColors.ink)),
               ),
               IconButton(
                 icon: Icon(
                   detail.isFavourited ? Icons.favorite : Icons.favorite_border,
-                  color: detail.isFavourited ? PGColors.ember : PGColors.textFaint,
+                  color:
+                      detail.isFavourited ? PGColors.ember : PGColors.textFaint,
                 ),
-                onPressed: () {}, // favouriting from detail mirrors PatternsScreen's toggle — omitted here to avoid duplicating that logic; see docs/catalogue.md
+                onPressed:
+                    () {}, // favouriting from detail mirrors PatternsScreen's toggle — omitted here to avoid duplicating that logic; see docs/catalogue.md
               ),
             ],
           ),
@@ -153,7 +164,9 @@ class _PatternDetailScreenState extends State<PatternDetailScreen> {
           Wrap(
             spacing: 8,
             children: [
-              PGTag(label: detail.hasSvg ? 'SVG ready' : 'SVG pending', tone: detail.hasSvg ? PGTagTone.success : PGTagTone.neutral),
+              PGTag(
+                  label: detail.hasSvg ? 'SVG ready' : 'SVG pending',
+                  tone: detail.hasSvg ? PGTagTone.success : PGTagTone.neutral),
               PGTag(
                 label: detail.hasDxf ? 'DXF on file' : 'DXF pending',
                 tone: detail.hasDxf ? PGTagTone.success : PGTagTone.neutral,
@@ -167,20 +180,25 @@ class _PatternDetailScreenState extends State<PatternDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _detailRow('Category', detail.categoryName),
-                if (detail.minThicknessMm != null) _detailRow('Minimum thickness', '${detail.minThicknessMm} mm'),
-                if (detail.typicalUses != null) _detailRow('Typical uses', detail.typicalUses!),
+                if (detail.minThicknessMm != null)
+                  _detailRow(
+                      'Minimum thickness', '${detail.minThicknessMm} mm'),
+                if (detail.typicalUses != null)
+                  _detailRow('Typical uses', detail.typicalUses!),
               ],
             ),
           ),
           if (detail.categoryDescription != null) ...[
             const SizedBox(height: PGSpacing.groupGap),
-            Text(detail.categoryDescription!, style: PGTextStyles.body.copyWith(color: PGColors.textMid)),
+            Text(detail.categoryDescription!,
+                style: PGTextStyles.body.copyWith(color: PGColors.textMid)),
           ],
           if (detail.engineeringNote != null) ...[
             const SizedBox(height: PGSpacing.groupGap),
             PGLabel('Engineering note', color: PGColors.textSoft),
             const SizedBox(height: 4),
-            Text(detail.engineeringNote!, style: PGTextStyles.body.copyWith(color: PGColors.textMid)),
+            Text(detail.engineeringNote!,
+                style: PGTextStyles.body.copyWith(color: PGColors.textMid)),
           ],
           const SizedBox(height: PGSpacing.sectionGap),
           PGPrimaryButton(

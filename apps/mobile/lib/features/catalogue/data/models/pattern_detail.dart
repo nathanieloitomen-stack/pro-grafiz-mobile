@@ -51,7 +51,9 @@ class PatternDetail {
       final type = asset['asset_type'] as String?;
       if (type == 'preview') previewPath = asset['storage_path'] as String?;
       if (type == 'svg') hasSvg = true;
-      if (type == 'dxf') hasDxf = true; // row visible at all ⇒ staff viewer; customers never see dxf rows (PG-005)
+      if (type == 'dxf')
+        hasDxf =
+            true; // row visible at all ⇒ staff viewer; customers never see dxf rows (PG-005)
     }
     return PatternDetail(
       id: json['id'] as String,
