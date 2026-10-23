@@ -1,0 +1,69 @@
+name: Supabase staging (PG-023)
+
+# Deploys back-end changes to the STAGING Supabase project only.
+# Locked to one project ref so it can never touch production by mistake.
+# Modes:
+#   dry-run          -> report only, changes nothing
+#   deploy-functions -> deploy all Edge Functions in supabase/functions
+#   push-migrations  -> apply pending migrations (run dry-run first!)
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'What to do'
+        type: choice
+        options: [dry-run, deploy-functions, push-migrations]
+        default: dry-run
+
+concurrency:
+  group: supabase-staging
+  cancel-in-progress: false
+
+jobs:
+  staging:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PROJECT_REF: dtfbthswtabhvhqqeejg   # STAGING project (decision A, 2026-10-23)
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.STAGING_SUPABASE_DB_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check secrets
+        run: |
+          if [ -z "$SUPABASE_ACCESS_TOKEN" ] || [ -z "$SUPABASE_DB_PASSWORD" ]; then
+            echo "::error::Add SUPABASE_ACCESS_TOKEN and STAGING_SUPABASE_DB_PASSWORD repository secrets first."
+            exit 1
+          fi
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link to staging project
+        run: supabase link --project-ref "$PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
+
+      - name: Report - migrations (local vs staging)
+        run: supabase migration list --password "$SUPABASE_DB_PASSWORD"
+
+      - name: Report - pending database changes (dry run)
+        run: supabase db push --dry-run --password "$SUPABASE_DB_PASSWORD"
+
+      - name: Report - functions in repo
+        run: |
+          echo "Edge Functions in supabase/functions:"
+          ls -1 supabase/functions | grep -v '^_' | nl
+
+      - name: Report - functions already on staging
+        run: supabase functions list --project-ref "$PROJECT_REF"
+
+      - name: Deploy all Edge Functions
+        if: ${{ inputs.mode == 'deploy-functions' }}
+        run: |
+          supabase functions deploy --project-ref "$PROJECT_REF"
+          supabase functions list --project-ref "$PROJECT_REF"
+
+      - name: Apply pending migrations
+        if: ${{ inputs.mode == 'push-migrations' }}
+        run: supabase db push --password "$SUPABASE_DB_PASSWORD"
