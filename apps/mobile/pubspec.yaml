@@ -48,3 +48,47 @@ flutter:
   uses-material-design: true
   assets:
     - assets/pglc/
+    - assets/brand/
+
+  # Brand fonts (PG-024), per the approved design handoff. Google Fonts,
+  # SIL Open Font License — see assets/fonts/OFL-*.txt. Karla weights are
+  # static instances cut from the variable font so Flutter selects the
+  # exact weight the design system asks for.
+  fonts:
+    - family: InstrumentSerif
+      fonts:
+        - asset: assets/fonts/InstrumentSerif-Regular.ttf
+        - asset: assets/fonts/InstrumentSerif-Italic.ttf
+          style: italic
+    - family: Karla
+      fonts:
+        - asset: assets/fonts/Karla-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Karla-LightItalic.ttf
+          weight: 300
+          style: italic
+        - asset: assets/fonts/Karla-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Karla-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: assets/fonts/Karla-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Karla-MediumItalic.ttf
+          weight: 500
+          style: italic
+        - asset: assets/fonts/Karla-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Karla-SemiBoldItalic.ttf
+          weight: 600
+          style: italic
+        - asset: assets/fonts/Karla-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Karla-BoldItalic.ttf
+          weight: 700
+          style: italic
+        - asset: assets/fonts/Karla-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/Karla-ExtraBoldItalic.ttf
+          weight: 800
+          style: italic

@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="pro_grafiz_mobile"
+        android:label="Pro_Grafiz"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

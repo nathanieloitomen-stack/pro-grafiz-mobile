@@ -37,23 +37,19 @@ Dependency versions in `pubspec.yaml` were declared without access to a
 live pub.dev registry — run `flutter pub outdated` before first install
 and update as needed.
 
-## Fonts
+## Fonts and brand assets
 
-The approved design uses **Instrument Serif** (headings, numerals,
-prices, pull quotes) and **Karla** (everything else), both from Google
-Fonts. Actual font files are **not bundled** in this scaffold — PG-002
-was built without network access to fetch them.
+As of PG-024 the approved fonts are bundled under `assets/fonts/` and
+registered in `pubspec.yaml`: **Instrument Serif** (regular + italic) and
+**Karla** (300-800, static instances cut from the Google Fonts variable
+font). Both are SIL Open Font License; the licence texts sit next to the
+font files.
 
-`lib/shared/design_system/tokens/typography.dart` references the family
-names `InstrumentSerif` and `Karla`; until real font files are added,
-Flutter falls back to the platform default font (visually wrong, not a
-build break). Before shipping:
-
-1. Download Instrument Serif (400, regular + italic) and Karla (300–800)
-   from Google Fonts.
-2. Add the files under `assets/fonts/`.
-3. Register them in `pubspec.yaml` under `flutter: fonts:` with family
-   names `InstrumentSerif` and `Karla` matching the token file.
+The logo (`assets/brand/logo-on-light.png`, `logo-on-dark.png`, 600x140,
+from the design handoff) appears in the customer Home header and on the
+customer sign-in screen. The Android launcher icon is a temporary crop of
+the logo mark; replace it with an export from the original vector logo
+before store release.
 
 ## Structure
 

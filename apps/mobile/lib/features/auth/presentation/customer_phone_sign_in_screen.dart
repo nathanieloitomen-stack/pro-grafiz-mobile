@@ -78,8 +78,11 @@ class _CustomerPhoneSignInScreenState extends State<CustomerPhoneSignInScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Pro_Grafiz',
-                  style: PGTextStyles.hero.copyWith(color: PGColors.ink)),
+              Image.asset(
+                'assets/brand/logo-on-light.png',
+                height: 34,
+                semanticLabel: 'Pro_Grafiz Designs',
+              ),
               const SizedBox(height: PGSpacing.groupGap),
               Text(
                 'Enter your phone number to sign in or create an account.',

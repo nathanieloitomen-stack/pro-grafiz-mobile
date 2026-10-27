@@ -65,6 +65,15 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Approved design, Chrome: "logo (customer Home only)",
+              // logo-on-light at 19px high, left-aligned in the header row.
+              // The Sign in / My jobs actions sit top-right (AuthGate).
+              Image.asset(
+                'assets/brand/logo-on-light.png',
+                height: 19,
+                semanticLabel: 'Pro_Grafiz Designs',
+              ),
+              const SizedBox(height: PGSpacing.sectionGap),
               Text(_greeting,
                   style: PGTextStyles.hero.copyWith(color: PGColors.ink)),
               const SizedBox(height: PGSpacing.sectionGap),

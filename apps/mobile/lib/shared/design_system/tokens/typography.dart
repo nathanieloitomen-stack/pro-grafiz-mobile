@@ -4,13 +4,9 @@ import 'package:flutter/material.dart';
 /// design: Instrument Serif for headings/numerals/prices/pull quotes,
 /// Karla for everything else.
 ///
-/// IMPORTANT — fonts are not bundled in this scaffold. No network access
-/// was available while building PG-002 to fetch the actual Google Fonts
-/// files. TextStyles below reference these family names; until real font
-/// files are added under `assets/fonts/` and registered in `pubspec.yaml`
-/// (`flutter.fonts`), Flutter silently falls back to the platform default
-/// font rather than failing — visually wrong, but not a build break. See
-/// `apps/mobile/README.md` → "Fonts" for the exact steps to finish this.
+/// Font files are bundled under `assets/fonts/` and registered in
+/// `pubspec.yaml` (`flutter.fonts`) as of PG-024. Family names here must
+/// match the `family:` entries there exactly.
 class PGFonts {
   PGFonts._();
   static const serif = 'InstrumentSerif';
